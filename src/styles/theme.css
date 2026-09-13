@@ -163,3 +163,15 @@
     scroll-behavior: smooth;
   }
 }
+
+/* Intro loading skeleton — soft highlight sweeping across a neutral base,
+   used only by the one-time-per-load intro sequence on the Home page. */
+@keyframes shimmer-sweep {
+  0%   { background-position: -150% 0; }
+  100% { background-position: 150% 0; }
+}
+.intro-shimmer {
+  background-image: linear-gradient(100deg, var(--muted) 35%, color-mix(in srgb, var(--muted) 40%, white) 50%, var(--muted) 65%);
+  background-size: 250% 100%;
+  animation: shimmer-sweep 1.8s ease-in-out infinite;
+}

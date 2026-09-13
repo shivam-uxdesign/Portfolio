@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { Home as HomeIcon } from 'lucide-react';
 import { Link } from 'react-router';
 import { ImageGallery } from '../components/ImageGallery';
@@ -25,6 +25,15 @@ const GRID: { id: CellId; label: string }[][] = [
 ];
 
 const HOME_POS: Pos = { row: 1, col: 1 };
+
+// Intro reveal order: opposite cells reveal together, converging on Home last —
+// (Gallery+Stack) → (Work+Resume) → (Fun+Interests) → (About+Contact) → Home,
+// then the zoom fires.
+const REVEAL_RANK: number[][] = [
+  [0, 1, 2],
+  [3, 4, 3],
+  [2, 1, 0],
+];
 const DRAG_THRESHOLD = 55;
 const NAV_EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 const NAV_MS = 600;
@@ -585,6 +594,68 @@ function StackCell() {
   return <StackContent />;
 }
 
+// ─── Intro skeleton / crossfade ────────────────────────────────────────────
+// Used only for the one-time intro loading sequence (see computeRunIntro / the
+// intro sequencing effect in Home()). Two generic layout variants stand in for
+// a cell's real content until it's ready to reveal — they don't need to
+// pixel-match each leaf component, since the crossfade hides any mismatch.
+const MEDIA_CELLS: CellId[] = ['hero', 'about', 'gallery', 'fun'];
+
+function CellSkeleton({ id, revealRank }: { id: CellId; revealRank: number }) {
+  const isMedia = MEDIA_CELLS.includes(id);
+  // Slight per-pair offset so the sweep doesn't read as perfectly synchronized
+  // across every stage — a small touch of organic polish.
+  const style = { animationDelay: `${revealRank * 0.08}s` };
+  return (
+    <div className="w-full h-full flex flex-col gap-3">
+      {isMedia ? (
+        <>
+          <div className="intro-shimmer h-1/2 w-full rounded-xl" style={style} />
+          <div className="intro-shimmer h-3 w-2/3 rounded-md" style={style} />
+          <div className="intro-shimmer h-3 w-1/2 rounded-md" style={style} />
+          <div className="intro-shimmer flex-1 w-full rounded-xl" style={style} />
+        </>
+      ) : (
+        <>
+          <div className="intro-shimmer h-3 w-1/3 rounded-md" style={style} />
+          <div className="intro-shimmer h-6 w-2/3 rounded-md" style={style} />
+          <div className="intro-shimmer h-3 w-full rounded-md" style={style} />
+          <div className="intro-shimmer h-3 w-5/6 rounded-md" style={style} />
+          <div className="intro-shimmer flex-1 w-full rounded-xl mt-2" style={style} />
+        </>
+      )}
+    </div>
+  );
+}
+
+// Both layers stay mounted throughout (opacity-only crossfade, no
+// mount/unmount) so the real content's images start downloading during the
+// skeleton phase — a free head start for the Unsplash-backed cells.
+function CellCrossfade({ id, skeletonMode, revealRank }: { id: CellId; skeletonMode: boolean; revealRank: number }) {
+  const delay = revealRank * 0.15; // seconds — pairs of opposite cells reveal together, converging on Home last
+  return (
+    <div className="relative w-full h-full">
+      <motion.div
+        className="absolute inset-0"
+        initial={false}
+        animate={{ opacity: skeletonMode ? 0 : 1, scale: skeletonMode ? 0.96 : 1 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 24, delay: skeletonMode ? 0 : delay }}
+      >
+        <CellContent id={id} />
+      </motion.div>
+      <motion.div
+        className="absolute inset-0"
+        initial={false}
+        animate={{ opacity: skeletonMode ? 1 : 0 }}
+        transition={{ duration: 0.35, delay: skeletonMode ? 0 : delay, ease: [0.16, 1, 0.3, 1] }}
+        style={{ pointerEvents: skeletonMode ? 'auto' : 'none' }}
+      >
+        <CellSkeleton id={id} revealRank={revealRank} />
+      </motion.div>
+    </div>
+  );
+}
+
 function CellContent({ id }: { id: CellId }) {
   switch (id) {
     case 'hero':      return <HeroCell />;
@@ -764,17 +835,119 @@ function EdgeIndicators({
 // then physPos is silently rebased to the equivalent real cell after the animation.
 // Overview: scale(0.333) translate(-20%, -20%) — shows the center 3×3 (world x/y 100-400vw)
 // Normal: scale(1) translate(-(col+1)*20%, -(row+1)*20%) — shows physPos cell
-function worldTransform(physPos: Pos, overview: boolean) {
-  if (overview) return 'scale(0.333) translate(-20%, -20%)';
-  const tx = -((physPos.col + 1) / 5) * 100;
-  const ty = -((physPos.row + 1) / 5) * 100;
-  return `scale(1) translate(${tx.toFixed(4)}%, ${ty.toFixed(4)}%)`;
+function clamp01(n: number) { return Math.max(0, Math.min(1, n)); }
+
+// Default tween curve — fast initial motion, soft landing. Extracted so it can
+// be the default `easing` for startTween while individual callers (namely the
+// intro) can opt into a different curve.
+function easeOutExpo(t: number) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+
+// A restrained easeOutBack — briefly overshoots 1 before settling, the small
+// "spring past the target and back" feel Apple's own zoom-open transitions
+// use. Used only by the intro's final zoom (see the intro sequencing effect).
+function easeOutBackSubtle(t: number) {
+  const c1 = 0.8; // ~2.3% peak overshoot — clearly felt, still restrained not bouncy
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+}
+
+// progress: 0 = normal (viewing physPos), 1 = fully zoomed out to the overview grid.
+//
+// This interpolates the VISIBLE WORLD-RECT BOUNDS linearly (not scale/translate
+// directly) and derives scale/translate from those bounds. That distinction matters:
+// lerping scale linearly while translate is lerped independently produces a path where
+// the focused cell drifts off-center and the interpolation is non-monotonic (cells can
+// momentarily reverse direction or clip past the viewport edge mid-transition). Lerping
+// the bounds themselves guarantees the focused cell stays exactly centered and every
+// other cell's edge position moves monotonically into place — verified algebraically:
+// with a(p) = lerp(cellStart, 0.2, p) for the visible rect's left/top edge (in world
+// fractions), width(p) = 0.2 + 0.4p is independent of which cell is focused, so a single
+// uniform `scale(p) = 1/(1+2p)` works for both axes regardless of physPos.
+function worldTransform(physPos: Pos, progress: number) {
+  const p = progress;
+  const scale = 1 / (1 + 2 * p);
+  const colFrac = (physPos.col + 1) / 5;
+  const rowFrac = (physPos.row + 1) / 5;
+  const aX = colFrac + (0.2 - colFrac) * p;
+  const aY = rowFrac + (0.2 - rowFrac) * p;
+  const tx = -aX * 100;
+  const ty = -aY * 100;
+  return `scale(${scale.toFixed(5)}) translate(${tx.toFixed(4)}%, ${ty.toFixed(4)}%)`;
 }
 
 // CellOverlayLabel removed — overview chrome is now a fixed overlay (OverviewFrame)
 
+// Renders all 25 world cells (3×3 real + 1-cell clone border). Its only props are
+// two rarely-changing primitives for the one-time intro sequence (runIntro never
+// changes after mount, skeletonMode flips at most once) — memoizing still means the
+// high-frequency live-pinch updates (which don't touch either prop) never re-render
+// actual cell content, only the transform wrapper.
+const WorldCells = memo(function WorldCells({ runIntro, skeletonMode }: { runIntro: boolean; skeletonMode: boolean }) {
+  return (
+    <>
+      {([-1, 0, 1, 2, 3]).flatMap(pr =>
+        ([-1, 0, 1, 2, 3]).map(pc => {
+          const actualRow = mod(pr, 3);
+          const actualCol = mod(pc, 3);
+          const cell = GRID[actualRow][actualCol];
+          const colIdx = pc + 1; // 0-4
+          const rowIdx = pr + 1;
+          // Clone-border cells (pr/pc = -1 or 3) are never on-screen during the
+          // intro since physPos doesn't move until the final zoom lands.
+          const isRealCell = pr >= 0 && pr <= 2 && pc >= 0 && pc <= 2;
+          return (
+            <div
+              key={`${pr}-${pc}`}
+              style={{
+                position: 'absolute',
+                left:   `${(colIdx / 5) * 100}%`,
+                top:    `${(rowIdx / 5) * 100}%`,
+                width:  '20%',
+                height: '20%',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Safe-zone padding — keeps cell content clear of the fixed nav
+                  chrome (edge labels, compass) at every viewport size, so
+                  text/cards can never render underneath them. */}
+              <div className="w-full h-full box-border pt-8 pl-9 pr-14 pb-14 md:pt-10 md:pl-11 md:pr-16 md:pb-16">
+                {runIntro && isRealCell ? (
+                  <CellCrossfade
+                    id={cell.id}
+                    skeletonMode={skeletonMode}
+                    revealRank={REVEAL_RANK[actualRow][actualCol]}
+                  />
+                ) : (
+                  <CellContent id={cell.id} />
+                )}
+              </div>
+            </div>
+          );
+        })
+      )}
+    </>
+  );
+});
+
+// ─── Intro sequence ──────────────────────────────────────────────────────────
+// Decides, once, whether this mount should play the intro loading animation —
+// it runs on every fresh load, deliberately, except for a deep-linked hash
+// (land directly on the linked cell) or a user who has asked for reduced motion.
+function computeRunIntro(): boolean {
+  try {
+    if (window.location.hash) return false;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 export function Home() {
+  // Stable for the component's lifetime — decided once at mount.
+  const [runIntro] = useState(() => computeRunIntro());
+
   // physPos ranges -1 to 3; after every wrap animation it is rebased to 0-2
   const [physPos, setPhysPos] = useState<Pos>(() => {
     try {
@@ -784,8 +957,29 @@ export function Home() {
       return HOME_POS;
     }
   });
-  const [locked, setLocked] = useState(false);
-  const [overview, setOverview] = useState(false);
+  // Seeded true only when the intro will run — blocks all real navigation until
+  // the intro's own onComplete clears it. Every nav entry point (Compass, wheel/
+  // touch, EdgeIndicators, keyboard) already checks this, so no new guards needed.
+  const [locked, setLocked] = useState(() => runIntro);
+  // 0 = normal, 1 = fully zoomed out to the overview grid. This is the ONE value that
+  // drives every cell's transform, the focused cell's own content, and the grid chrome
+  // overlay — all three read it every frame from the same rAF loop below, so nothing can
+  // desync (see the animation core further down for how it's driven).
+  // Seeded straight to 1 when running the intro — worldTransform is provably
+  // physPos-independent at progress===1, so this is "already zoomed out" from
+  // the very first paint, no animation needed to get there.
+  const [overviewProgress, setOverviewProgress] = useState(() => (runIntro ? 1 : 0));
+  // Intro-only: flips true → false exactly once to trigger each cell's crossfade.
+  const [skeletonMode, setSkeletonMode] = useState(() => runIntro);
+  // Intro-only: true for the intro's entire duration, cleared only in its own
+  // onComplete. Deliberately separate from `locked`/`overviewProgress` (which get
+  // reused by every later dismiss/goHome animation) so a later, unrelated zoom
+  // can never be mistaken for the intro still running.
+  const [introActive, setIntroActive] = useState(() => runIntro);
+  // Intro-only: brief true just before the zoom fires — a purely cosmetic
+  // "gather" (the grid pulls in a couple percent) applied on a wrapper outside
+  // the geometry-critical world/chrome transforms, so it can never affect them.
+  const [introGather, setIntroGather] = useState(false);
   const [showHint, setShowHint] = useState(() => {
     try {
       return !localStorage.getItem('nav-hint-seen');
@@ -803,14 +997,183 @@ export function Home() {
   // Refs so event handlers (wheel, touch) never go stale
   const physPosRef = useRef(physPos);
   const lockedRef = useRef(locked);
-  const overviewRef = useRef(overview);
+  const overviewProgressRef = useRef(overviewProgress); // mirrors the rendered value every frame
+  // true for the entire duration of a live pinch gesture (wheel or touch) — generalizes
+  // the old touch-only isPinchingRef. While true, the rAF loop below follows
+  // targetProgressRef directly (no easing curve, just a fast smoothing catch-up) and
+  // every other nav trigger is blocked.
+  const gestureActiveRef = useRef(false);
   const navigateRef = useRef<(r: number, c: number) => void>(() => {});
   const goHomeRef = useRef<() => void>(() => {});
-  const showOverviewRef = useRef<() => void>(() => {});
-  const dismissOverviewRef = useRef<(target?: Pos) => void>(() => {});
+  const dismissOverviewRef = useRef<(target: Pos) => void>(() => {});
+
+  // ── Single animation core for the overview zoom ──────────────────────────────
+  // targetProgressRef is "where we're heading" — set directly by gesture input, or by
+  // startTween for a programmatic settle (Escape, goHome, tap-to-cell, gesture-end).
+  // One rAF loop is the only thing that ever writes overviewProgress: during a live
+  // gesture it smooths toward targetProgressRef (so a single chunky input event can't
+  // produce a hard cut); otherwise, if a tween is active, it advances a proper
+  // time+easing-based interpolation. This is the one place all cells' geometry and the
+  // grid chrome overlay ultimately read from — see worldTransform and the chrome render.
+  const targetProgressRef = useRef(0);
+  const tweenActiveRef = useRef(false);
+  const tweenStartRef = useRef(0);
+  const tweenStartTimeRef = useRef(0);
+  const tweenTargetRef = useRef<0 | 1>(0);
+  const tweenCompleteRef = useRef<(() => void) | null>(null);
+  // Per-call overrides (default to the ordinary dismiss feel) — only the intro's
+  // final zoom currently opts into a different duration/easing/blur.
+  const tweenDurationRef = useRef(620);
+  const tweenEasingRef = useRef<(t: number) => number>(easeOutExpo);
+  const tweenBlurMaxRef = useRef(0);
+  const SETTLE_MS = 620;
+  // Blur-to-sharp "focus pull", only nonzero while a tween with blurPx is active
+  // (the intro's zoom) — applied to the world div and chrome overlay together so
+  // they stay in the same shared-lockstep sync as their transform.
+  const [zoomFocusBlur, setZoomFocusBlur] = useState(0);
+
+  const startTween = useCallback((
+    target: 0 | 1,
+    onComplete?: () => void,
+    opts?: { durationMs?: number; easing?: (t: number) => number; blurPx?: number },
+  ) => {
+    tweenStartRef.current = overviewProgressRef.current;
+    tweenStartTimeRef.current = performance.now();
+    tweenTargetRef.current = target;
+    tweenCompleteRef.current = onComplete ?? null;
+    tweenDurationRef.current = opts?.durationMs ?? SETTLE_MS;
+    tweenEasingRef.current = opts?.easing ?? easeOutExpo;
+    tweenBlurMaxRef.current = opts?.blurPx ?? 0;
+    tweenActiveRef.current = true;
+    targetProgressRef.current = target;
+  }, []);
+  const startTweenRef = useRef(startTween);
+  useEffect(() => { startTweenRef.current = startTween; }, [startTween]);
+
+  // ── Intro sequencing ──────────────────────────────────────────────────────
+  // Skeleton → reveal → hold → zoom-to-Home, reusing startTween for the last
+  // step exactly as a manual tap-to-dismiss would. Early interaction fast-
+  // forwards the idle holds below (via `wait`), but never the crossfade or the
+  // zoom tween itself — those always play at full duration.
+  const introSkipRef = useRef(false);
+  const introSkipResolversRef = useRef<Array<() => void>>([]);
+  useEffect(() => {
+    if (!runIntro) return;
+
+    const skip = () => {
+      introSkipRef.current = true;
+      introSkipResolversRef.current.forEach(r => r());
+      introSkipResolversRef.current = [];
+    };
+    window.addEventListener('pointerdown', skip, { once: true });
+    window.addEventListener('keydown', skip, { once: true });
+
+    const wait = (ms: number) => new Promise<void>(resolve => {
+      if (introSkipRef.current) { resolve(); return; }
+      const t = setTimeout(resolve, ms);
+      introSkipResolversRef.current.push(() => { clearTimeout(t); resolve(); });
+    });
+
+    let cancelled = false;
+    (async () => {
+      try {
+        await Promise.race([
+          document.fonts?.ready ?? Promise.resolve(),
+          new Promise(r => setTimeout(r, 600)),
+        ]);
+      } catch { /* ignore */ }
+      if (cancelled) return;
+
+      await wait(900); // intentional lag — a clearly-felt beat, every load
+      if (cancelled) return;
+      setSkeletonMode(false); // crossfade cascades in from the outer rows, Home last
+
+      // Cascade takes ~1s to reach Home (rank 4 * 150ms stagger + its own
+      // ~400ms fade) — wait for it to fully land before the hold/zoom.
+      await wait(1050);
+      if (cancelled) return;
+      await wait(300); // hold at the fully-revealed grid
+      if (cancelled) return;
+
+      // Anticipation: a brief, subtle "gather" before the release — wind-up
+      // before the zoom, purely cosmetic (see the wrapper div in the render).
+      setIntroGather(true);
+      await wait(120);
+      if (cancelled) { setIntroGather(false); return; }
+      setIntroGather(false);
+
+      // Premium zoom: a restrained spring-like overshoot (vs. the snappier expo
+      // curve used for ordinary dismiss) plus a blur-to-sharp focus pull —
+      // distinct from, and more cinematic than, a manual pinch-dismiss.
+      startTweenRef.current(0, () => {
+        setLocked(false);
+        setIntroActive(false);
+      }, {
+        durationMs: 950,
+        easing: easeOutBackSubtle,
+        blurPx: 10,
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('pointerdown', skip);
+      window.removeEventListener('keydown', skip);
+    };
+  }, []);
+
+  // Shared live-drag smoothing step (exponential catch-up toward targetProgressRef).
+  // Called from the rAF loop below AND directly from the wheel/touch input handlers
+  // themselves — the latter is a deliberate belt-and-suspenders: real input events
+  // already arrive many times a second, so nudging the rendered value right on the
+  // event (not waiting for the next animation frame) means live-tracking motion is
+  // never solely dependent on rAF cadence. rAF still adds extra smoothing between
+  // events when it fires normally; this just guarantees a floor of responsiveness.
+  const stepGestureRef = useRef(() => {
+    const current = overviewProgressRef.current;
+    const target = targetProgressRef.current;
+    const next = current + (target - current) * 0.45;
+    const settled = Math.abs(target - next) < 0.0008 ? target : next;
+    overviewProgressRef.current = settled;
+    setOverviewProgress(settled);
+  });
+
+  useEffect(() => {
+    let raf: number;
+    const tick = () => {
+      if (gestureActiveRef.current) {
+        stepGestureRef.current();
+      } else if (tweenActiveRef.current) {
+        const elapsed = performance.now() - tweenStartTimeRef.current;
+        const t = clamp01(elapsed / tweenDurationRef.current);
+        // Default is easeOutExpo (fast initial motion, soft landing), same for both
+        // directions by design — but a caller (namely the intro) can supply its own
+        // curve/duration/blur via startTween's opts for a distinct feel.
+        const eased = tweenEasingRef.current(t);
+        const start = tweenStartRef.current;
+        const end = tweenTargetRef.current;
+        const value = t >= 1 ? end : start + (end - start) * eased;
+        overviewProgressRef.current = value;
+        setOverviewProgress(value);
+        if (tweenBlurMaxRef.current > 0) {
+          setZoomFocusBlur(t >= 1 ? 0 : Math.max(0, tweenBlurMaxRef.current * (1 - eased)));
+        }
+        if (t >= 1) {
+          tweenActiveRef.current = false;
+          const cb = tweenCompleteRef.current;
+          tweenCompleteRef.current = null;
+          if (cb) cb();
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   useEffect(() => { physPosRef.current = physPos; }, [physPos]);
   useEffect(() => { lockedRef.current = locked; }, [locked]);
-  useEffect(() => { overviewRef.current = overview; }, [overview]);
+  useEffect(() => { overviewProgressRef.current = overviewProgress; }, [overviewProgress]);
 
   // First-visit hint: auto-dismiss after ~4s and never show again on this device
   useEffect(() => {
@@ -825,8 +1188,9 @@ export function Home() {
   }, [showHint]);
 
   // Pinch tracking refs (multi-touch for mobile)
-  const pinchRef = useRef<{ active: boolean; initialDist: number }>({ active: false, initialDist: 0 });
-  const isPinchingRef = useRef(false);
+  const pinchRef = useRef<{ active: boolean; initialDist: number; initialProgress: number }>({
+    active: false, initialDist: 0, initialProgress: 0,
+  });
 
   // Actual (0-2) position for compass/edge display
   const actualPos: Pos = { row: mod(physPos.row, 3), col: mod(physPos.col, 3) };
@@ -846,7 +1210,7 @@ export function Home() {
 
   // ── Navigation ──
   const navigateTo = useCallback((r: number, c: number) => {
-    if (locked) return;
+    if (locked || gestureActiveRef.current) return;
     setLocked(true);
     setPhysPos({ row: r, col: c });
     setShowHint(false);
@@ -873,38 +1237,21 @@ export function Home() {
 
   useEffect(() => { navigateRef.current = navigateTo; }, [navigateTo]);
 
-  // ── Dismiss overview (tap cell in overview, or pinch-out) ──
-  // Silently repositions to the target cell then zooms in.
-  const dismissOverview = useCallback((target?: Pos) => {
-    if (!overviewRef.current || lockedRef.current) return;
+  // ── Dismiss overview onto a specific tapped/clicked cell ──
+  // Only actionable once fully settled in overview (progress === 1). Repositioning
+  // happens instantly with no snap trick needed: at progress exactly 1, worldTransform
+  // is mathematically independent of physPos (see its comment), so changing physPos
+  // here has zero visual effect until the tween below actually starts moving progress
+  // away from 1 — at which point it correctly zooms into the NEW cell.
+  const dismissOverview = useCallback((target: Pos) => {
+    if (overviewProgressRef.current !== 1 || lockedRef.current) return;
     setLocked(true);
     setHoveredCell(null);
-    if (target) {
-      setNoTransition(true);
-      setPhysPos(target);
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        setNoTransition(false);
-        setOverview(false);
-        setTimeout(() => setLocked(false), NAV_MS + 50);
-      }));
-    } else {
-      setOverview(false);
-      setTimeout(() => setLocked(false), NAV_MS + 50);
-    }
-  }, []); // uses refs + stable setters only
+    setPhysPos(target);
+    startTweenRef.current(0, () => setLocked(false));
+  }, []);
 
   useEffect(() => { dismissOverviewRef.current = dismissOverview; }, [dismissOverview]);
-
-  // ── Show overview and wait (used by pinch — does NOT auto-zoom back) ──
-  const showOverview = useCallback(() => {
-    if (locked || overview) return;
-    setLocked(true);
-    setShowHint(false);
-    setOverview(true);
-    setTimeout(() => setLocked(false), 700); // just wait for the zoom-out animation
-  }, [locked, overview]);
-
-  useEffect(() => { showOverviewRef.current = showOverview; }, [showOverview]);
 
   // ── Home zoom transition (compass button — zooms out, snaps to hero, zooms back in) ──
   const goHome = useCallback(() => {
@@ -912,19 +1259,15 @@ export function Home() {
     setLocked(true);
     setShowHint(false);
 
-    // Step 1: zoom out to show the full 3×3 grid
-    setOverview(true);
-
-    setTimeout(() => {
-      // Step 2: quietly snap position to center (no visual change, still in overview)
+    startTweenRef.current(1, () => {
+      // At progress exactly 1 the transform is physPos-independent (see worldTransform),
+      // so this reposition is invisible — the zoom-in tween below then correctly eases
+      // into the new (Home) cell.
       setPhysPos(HOME_POS);
-
       setTimeout(() => {
-        // Step 3: zoom back into center cell
-        setOverview(false);
-        setTimeout(() => setLocked(false), NAV_MS + 50);
-      }, 380);
-    }, 680);
+        startTweenRef.current(0, () => setLocked(false));
+      }, 220); // brief dwell at full zoom-out before zooming back in
+    });
   }, [locked]);
 
   useEffect(() => { goHomeRef.current = goHome; }, [goHome]);
@@ -932,7 +1275,16 @@ export function Home() {
   // ── Keyboard navigation ──
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { dismissOverviewRef.current(); return; }
+      if (e.key === 'Escape') {
+        if (overviewProgressRef.current > 0 || gestureActiveRef.current || tweenActiveRef.current) {
+          gestureActiveRef.current = false;
+          pinchRef.current.active = false;
+          setLocked(true);
+          setHoveredCell(null);
+          startTweenRef.current(0, () => setLocked(false));
+        }
+        return;
+      }
       if (!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) return;
       e.preventDefault();
       if (e.key === 'ArrowUp')    navigateTo(physPos.row - 1, physPos.col);
@@ -947,35 +1299,36 @@ export function Home() {
   // ── Wheel / trackpad scroll navigation + trackpad pinch ──
   useEffect(() => {
     const wheelAccum = { x: 0, y: 0 };
-    let pinchAccum = 0;
     let resetTimer: ReturnType<typeof setTimeout> | null = null;
-    let pinchResetTimer: ReturnType<typeof setTimeout> | null = null;
+    let pinchEndTimer: ReturnType<typeof setTimeout> | null = null;
     const THRESHOLD = 90;
-    const PINCH_THRESHOLD = 60; // ctrlKey+wheel deltaY units
+    const PINCH_RANGE = 190; // deltaY units to sweep the full 0→1 overview range
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
 
-      // Trackpad pinch: browsers fire wheel with ctrlKey=true
+      // Trackpad pinch: browsers fire wheel with ctrlKey=true. Continuous live-tracking —
+      // raw input accumulates into targetProgressRef; the rAF loop (above) smooths the
+      // rendered value toward it every frame, so bursty/chunky real hardware events
+      // never produce a hard cut.
       if (e.ctrlKey) {
         if (lockedRef.current) return;
-        pinchAccum += e.deltaY;
-        if (pinchResetTimer) clearTimeout(pinchResetTimer);
-        pinchResetTimer = setTimeout(() => { pinchAccum = 0; }, 400);
+        gestureActiveRef.current = true;
+        tweenActiveRef.current = false; // a new gesture takes over from any settle-in-flight
+        targetProgressRef.current = clamp01(targetProgressRef.current + e.deltaY / PINCH_RANGE);
+        stepGestureRef.current();
 
-        if (pinchAccum > PINCH_THRESHOLD && !overviewRef.current) {
-          // Pinching in (fingers together) → show gallery
-          pinchAccum = 0;
-          showOverviewRef.current();
-        } else if (pinchAccum < -PINCH_THRESHOLD && overviewRef.current) {
-          // Spreading out → dismiss gallery
-          pinchAccum = 0;
-          dismissOverviewRef.current();
-        }
+        if (pinchEndTimer) clearTimeout(pinchEndTimer);
+        pinchEndTimer = setTimeout(() => {
+          gestureActiveRef.current = false;
+          const committed = targetProgressRef.current > 0.5;
+          setLocked(true);
+          startTweenRef.current(committed ? 1 : 0, () => setLocked(false));
+        }, 220); // no further ctrlKey-wheel events for 220ms → gesture ended
         return;
       }
 
-      if (lockedRef.current) return;
+      if (lockedRef.current || gestureActiveRef.current) return;
 
       wheelAccum.x += e.deltaX;
       wheelAccum.y += e.deltaY;
@@ -999,21 +1352,40 @@ export function Home() {
     return () => {
       window.removeEventListener('wheel', handleWheel);
       if (resetTimer) clearTimeout(resetTimer);
-      if (pinchResetTimer) clearTimeout(pinchResetTimer);
+      if (pinchEndTimer) clearTimeout(pinchEndTimer);
     };
   }, []); // empty — uses refs only
 
   // ── Pinch-to-overview (native touch events, empty deps — uses refs only) ──
+  // Continuous live-tracking — progress follows finger distance in real time; settling
+  // to fully in/out is decided only once the gesture ends (mirrors the wheel handler).
   useEffect(() => {
     const getDist = (t: TouchList) =>
       Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    const SENSITIVITY = 3.4; // pinch travel → progress sweep
+
+    const endGesture = () => {
+      pinchRef.current.active = false;
+      gestureActiveRef.current = false;
+      const committed = targetProgressRef.current > 0.5;
+      setLocked(true);
+      startTweenRef.current(committed ? 1 : 0, () => setLocked(false));
+    };
 
     const onTouchStart = (e: TouchEvent) => {
       if (e.touches.length >= 2) {
-        isPinchingRef.current = true;
-        pinchRef.current = { active: true, initialDist: getDist(e.touches) };
+        if (lockedRef.current) return;
+        gestureActiveRef.current = true;
+        tweenActiveRef.current = false;
+        pinchRef.current = {
+          active: true,
+          initialDist: getDist(e.touches),
+          initialProgress: overviewProgressRef.current,
+        };
+        targetProgressRef.current = overviewProgressRef.current;
       } else {
-        isPinchingRef.current = false;
+        gestureActiveRef.current = false;
+        pinchRef.current.active = false;
       }
     };
 
@@ -1021,24 +1393,13 @@ export function Home() {
       if (!pinchRef.current.active || e.touches.length < 2) return;
       e.preventDefault(); // block browser native pinch-zoom
       const ratio = getDist(e.touches) / pinchRef.current.initialDist;
-      if (ratio < 0.68 && !lockedRef.current && !overviewRef.current) {
-        // Pinch in → show overview and wait for user to tap a cell
-        pinchRef.current.active = false;
-        isPinchingRef.current = false;
-        showOverviewRef.current();
-      } else if (ratio > 1.35 && !lockedRef.current && overviewRef.current) {
-        // Pinch out → dismiss overview, stay on current cell
-        pinchRef.current.active = false;
-        isPinchingRef.current = false;
-        dismissOverviewRef.current();
-      }
+      // Fingers together (ratio < 1) → progress rises toward 1 (overview)
+      targetProgressRef.current = clamp01(pinchRef.current.initialProgress + (1 - ratio) * SENSITIVITY);
+      stepGestureRef.current();
     };
 
     const onTouchEnd = (e: TouchEvent) => {
-      if (e.touches.length < 2) {
-        isPinchingRef.current = false;
-        pinchRef.current.active = false;
-      }
+      if (e.touches.length < 2 && pinchRef.current.active) endGesture();
     };
 
     window.addEventListener('touchstart', onTouchStart, { passive: true });
@@ -1049,6 +1410,25 @@ export function Home() {
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
+    };
+  }, []);
+
+  // ── Safety net: a gesture that never fires a clean end event (tab loses focus
+  // mid-pinch, browser eats a touchend) shouldn't permanently wedge navigation.
+  useEffect(() => {
+    const clearStuckGesture = () => {
+      if (!gestureActiveRef.current) return;
+      gestureActiveRef.current = false;
+      pinchRef.current.active = false;
+      const committed = targetProgressRef.current > 0.5;
+      setLocked(true);
+      startTweenRef.current(committed ? 1 : 0, () => setLocked(false));
+    };
+    window.addEventListener('blur', clearStuckGesture);
+    document.addEventListener('visibilitychange', clearStuckGesture);
+    return () => {
+      window.removeEventListener('blur', clearStuckGesture);
+      document.removeEventListener('visibilitychange', clearStuckGesture);
     };
   }, []);
 
@@ -1073,8 +1453,8 @@ export function Home() {
     dragStart.current = null;
 
     if (!didDrag.current) {
-      // Tap with no drag: in overview, navigate to the tapped cell
-      if (overview && !locked) {
+      // Tap with no drag: once fully settled in overview, navigate to the tapped cell
+      if (overviewProgressRef.current === 1 && !locked) {
         const row = Math.min(2, Math.max(0, Math.floor(e.clientY / window.innerHeight * 3)));
         const col = Math.min(2, Math.max(0, Math.floor(e.clientX / window.innerWidth * 3)));
         dismissOverview({ row, col });
@@ -1083,7 +1463,7 @@ export function Home() {
     }
 
     // Swipe navigation — skip if pinching
-    if (locked || isPinchingRef.current) return;
+    if (locked || gestureActiveRef.current) return;
     if (Math.max(Math.abs(dx), Math.abs(dy)) < DRAG_THRESHOLD) return;
     if (Math.abs(dx) > Math.abs(dy)) {
       if (dx > 0) navigateTo(physPos.row, physPos.col - 1);
@@ -1094,10 +1474,17 @@ export function Home() {
     }
   };
 
-  const transition = noTransition ? 'none'
-    : overview
-    ? `transform 0.68s ${NAV_EASE}`
-    : `transform 0.58s ${NAV_EASE}`;
+  // The overview zoom (gesture-live or settle-tween) is driven entirely by the rAF loop
+  // above — overviewProgress is already a smooth, eased per-frame value in that case, so
+  // NO CSS transition should be layered on top of it (that would double-animate/lag).
+  // A CSS transition is only wanted for plain cell-to-cell panning (navigateTo, compass,
+  // edge arrows), where overviewProgress stays constant and only physPos changes.
+  const transition = noTransition || gestureActiveRef.current || tweenActiveRef.current
+    ? 'none'
+    : `transform ${NAV_MS}ms ${NAV_EASE}`;
+  // Suppressed during the intro's hold — overviewProgress sits at 1 before
+  // there's anything for the user to dismiss yet.
+  const hintOpacity = introActive ? 0 : clamp01((overviewProgress - 0.6) / 0.4);
 
   return (
     <div
@@ -1107,220 +1494,182 @@ export function Home() {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
     >
-      {/* World — 500% × 500% of viewport (5×5 cells: real 3×3 + 1-cell clone border) */}
-      <div
-        ref={worldRef}
-        style={{
-          position: 'absolute',
-          width: '500%',
-          height: '500%',
-          transformOrigin: '0 0',
-          transform: worldTransform(physPos, overview),
-          transition,
-          willChange: 'transform',
-        }}
-      >
-        {([-1, 0, 1, 2, 3]).flatMap(pr =>
-          ([-1, 0, 1, 2, 3]).map(pc => {
-            const actualRow = mod(pr, 3);
-            const actualCol = mod(pc, 3);
-            const cell = GRID[actualRow][actualCol];
-            const colIdx = pc + 1; // 0-4
-            const rowIdx = pr + 1;
-            return (
-              <div
-                key={`${pr}-${pc}`}
-                style={{
-                  position: 'absolute',
-                  left:   `${(colIdx / 5) * 100}%`,
-                  top:    `${(rowIdx / 5) * 100}%`,
-                  width:  '20%',
-                  height: '20%',
-                  overflow: 'hidden',
-                }}
-              >
-                {/* Safe-zone padding — keeps cell content clear of the fixed nav
-                    chrome (edge labels, compass) at every viewport size, so
-                    text/cards can never render underneath them. */}
-                <div className="w-full h-full box-border pt-8 pl-9 pr-14 pb-14 md:pt-10 md:pl-11 md:pr-16 md:pb-16">
-                  <CellContent id={cell.id} />
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+      {/* Gather wrapper — a brief, purely cosmetic pre-zoom "anticipation" scale
+          (see introGather in the intro sequencing effect). Sits outside the
+          world/chrome divs' own geometry-critical transforms, so it can never
+          affect them — it only ever composes as an outer scale. */}
+      <div style={{ position: 'absolute', inset: 0, transform: introGather ? 'scale(0.985)' : 'scale(1)', transition: 'transform 0.18s ease' }}>
+        {/* World — 500% × 500% of viewport (5×5 cells: real 3×3 + 1-cell clone border) */}
+        <div
+          ref={worldRef}
+          style={{
+            position: 'absolute',
+            width: '500%',
+            height: '500%',
+            transformOrigin: '0 0',
+            transform: worldTransform(physPos, overviewProgress),
+            transition,
+            willChange: 'transform',
+            filter: zoomFocusBlur > 0 ? `blur(${zoomFocusBlur}px)` : undefined,
+          }}
+        >
+          <WorldCells runIntro={runIntro} skeletonMode={skeletonMode} />
+        </div>
 
-      {/* ── Gallery / overview overlay ── */}
-      <AnimatePresence>
-        {overview && (
-          <>
-            {/* Dismiss hint */}
-            <motion.div
-              key="overview-hint"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ delay: 0.55, duration: 0.28, ease: 'easeOut' }}
-              className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 pointer-events-none select-none"
-            >
-              <div className="flex items-center gap-[7px] px-3.5 py-[7px] rounded-full"
-                style={{ background: 'rgba(16,16,14,0.80)', backdropFilter: 'blur(14px)', border: '1px solid rgba(255,255,255,0.10)' }}>
-                {['pinch out', '·', 'esc', '·', 'tap to go'].map((t, i) => (
-                  <span key={i} style={{ fontSize: 10, fontFamily: 'inherit',
-                    color: t === '·' ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.42)',
-                    letterSpacing: t === '·' ? 0 : '0.04em' }}>
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Grid */}
-            <motion.div
-              key="overview-frame"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.28 }}
-              className="fixed inset-0 z-30 pointer-events-none"
+        {/* ── Grid chrome overlay ── */}
+        {/* Lives in the EXACT SAME transformed coordinate space as WorldCells — identical
+            transform/transition string, positioned per-cell via the same percentage
+            geometry WorldCells uses. That's what guarantees lockstep: there is only ONE
+            shared transform, so the chrome (ring, numeral, dot, label) can never drift
+            out of sync with the real content beneath it or with each other. Sizes below
+            are ~3x their intended resting appearance (1/0.333) because this whole layer
+            gets scaled down by the same ancestor transform that shrinks the real cells —
+            exactly how the real cell content already handles it. */}
+        {overviewProgress > 0 && (
+            <div
+              className="absolute z-30"
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gridTemplateRows: 'repeat(3, 1fr)',
-                gap: '7px',
-                padding: '7px',
-                background: 'rgba(8,8,6,0.50)',
+                width: '500%',
+                height: '500%',
+                transformOrigin: '0 0',
+                transform: worldTransform(physPos, overviewProgress),
+                transition,
+                willChange: 'transform',
+                filter: zoomFocusBlur > 0 ? `blur(${zoomFocusBlur}px)` : undefined,
+                // Gated on !locked too, not just the visual progress — the settle tween's
+                // completion callback (which clears `locked`) can fire slightly after the
+                // value is visually indistinguishable from 1, so a click landing in that
+                // gap would otherwise be silently swallowed by dismissOverview's guard.
+                pointerEvents: overviewProgress === 1 && !locked ? 'auto' : 'none',
               }}
             >
               {[0, 1, 2].flatMap(r => [0, 1, 2].map(c => {
                 const cell = GRID[r][c];
                 const isActive = actualPos.row === r && actualPos.col === c;
                 const isHovered = hoveredCell === `${r}-${c}`;
-                const anyHovered = hoveredCell !== null;
-                const idx = r * 3 + c + 1;
-                // radial stagger — center cell enters first, corners last
-                const dist = Math.sqrt((r - 1) ** 2 + (c - 1) ** 2);
-                const enterDelay = isActive ? 0 : dist * 0.06;
+                const colIdx = c + 1, rowIdx = r + 1;
+                // Per-edge inset so adjacent cells combine to the same visual gap as
+                // the outer edge (21 local px ≈ 7px once scaled to rest) — reproducing
+                // the original grid's uniform 7px gap/padding exactly.
+                const padTop = r === 0 ? 21 : 10.5;
+                const padBottom = r === 2 ? 21 : 10.5;
+                const padLeft = c === 0 ? 21 : 10.5;
+                const padRight = c === 2 ? 21 : 10.5;
 
                 return (
-                  <motion.div
+                  <button
+                    type="button"
                     key={`${r}-${c}`}
-                    initial={{ opacity: 0, scale: 0.91 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.42, delay: enterDelay, ease: [0.22, 1, 0.36, 1] }}
-                    className="relative overflow-hidden pointer-events-auto"
+                    tabIndex={overviewProgress === 1 && !locked ? 0 : -1}
+                    aria-label={`Go to ${cell.label}`}
+                    className="absolute text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     style={{
-                      borderRadius: 11,
+                      left: `${(colIdx / 5) * 100}%`,
+                      top: `${(rowIdx / 5) * 100}%`,
+                      width: '20%',
+                      height: '20%',
+                      paddingTop: padTop,
+                      paddingBottom: padBottom,
+                      paddingLeft: padLeft,
+                      paddingRight: padRight,
+                      opacity: overviewProgress,
                       cursor: 'pointer',
-                      boxShadow: isActive
-                        ? '0 0 0 2px rgba(255,255,255,0.92), 0 16px 48px rgba(0,0,0,0.65)'
-                        : isHovered
-                        ? '0 0 0 1.5px rgba(255,255,255,0.30), 0 8px 32px rgba(0,0,0,0.50)'
-                        : '0 0 0 1px rgba(255,255,255,0.09)',
-                      transition: 'box-shadow 0.22s ease',
                     }}
                     onMouseEnter={() => setHoveredCell(`${r}-${c}`)}
                     onMouseLeave={() => setHoveredCell(null)}
+                    onFocus={() => setHoveredCell(`${r}-${c}`)}
+                    onBlur={() => setHoveredCell(null)}
                     onClick={() => dismissOverviewRef.current({ row: r, col: c })}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        dismissOverviewRef.current({ row: r, col: c });
+                      }
+                    }}
                   >
-                    {/* Dim veil — light by default so content is readable */}
-                    <motion.div
-                      className="absolute inset-0 pointer-events-none z-10"
-                      animate={{
-                        backgroundColor: isActive || isHovered
-                          ? 'rgba(0,0,0,0.00)'
-                          : anyHovered
-                          ? 'rgba(0,0,0,0.35)'
-                          : 'rgba(0,0,0,0.08)',
-                      }}
-                      transition={{ duration: 0.22, ease: 'easeOut' }}
-                    />
-
-                    {/* Index — top-left, dissolves on interaction */}
-                    <motion.div
-                      className="absolute top-0 left-0 z-20 pointer-events-none"
-                      animate={{ opacity: isActive || isHovered ? 0 : 0.50 }}
-                      transition={{ duration: 0.18 }}
-                      style={{ padding: 'clamp(5px, 1.4vw, 9px)' }}
-                    >
-                      <span className="text-white font-mono leading-none"
-                        style={{ fontSize: 'clamp(6px, 1.4vw, 8.5px)', letterSpacing: '0.05em' }}>
-                        {String(idx).padStart(2, '0')}
-                      </span>
-                    </motion.div>
-
-                    {/* Active glow dot — top-right */}
-                    <motion.div
-                      className="absolute top-0 right-0 z-20 pointer-events-none"
-                      animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 0 }}
-                      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                      style={{ padding: 'clamp(5px, 1.4vw, 9px)' }}
-                    >
-                      <div className="rounded-full" style={{
-                        width: 6, height: 6,
-                        background: 'white',
-                        boxShadow: '0 0 8px rgba(255,255,255,0.9), 0 0 20px rgba(255,255,255,0.4)',
-                      }} />
-                    </motion.div>
-
-                    {/* Label bar — always rendered, opacity shifts between states */}
-                    <motion.div
-                      className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none flex items-center justify-between"
-                      animate={{
-                        backgroundColor: isActive
-                          ? 'rgba(255,255,255,0.13)'
-                          : isHovered
-                          ? 'rgba(6,6,4,0.82)'
-                          : 'rgba(6,6,4,0.58)',
-                      }}
-                      transition={{ duration: 0.2 }}
+                    <div
+                      className="relative w-full h-full overflow-hidden"
                       style={{
-                        height: 'clamp(21px, 5.5vh, 28px)',
-                        backdropFilter: 'blur(12px)',
-                        paddingLeft: 'clamp(7px, 1.8vw, 12px)',
-                        paddingRight: 'clamp(7px, 1.8vw, 12px)',
-                        borderTop: isActive
-                          ? '1px solid rgba(255,255,255,0.20)'
-                          : '1px solid rgba(255,255,255,0.07)',
+                        borderRadius: 33,
+                        boxShadow: isHovered
+                          ? '0 0 0 3px var(--border), 0 48px 96px -60px rgba(20,20,18,0.28), 0 18px 42px -24px rgba(20,20,18,0.14)'
+                          : '0 0 0 3px var(--border), 0 48px 96px -60px rgba(20,20,18,0.18), 0 12px 30px -18px rgba(20,20,18,0.1)',
+                        transform: isHovered ? 'translateY(-9px)' : 'translateY(0)',
+                        transition: 'box-shadow 0.22s ease, transform 0.22s ease',
                       }}
                     >
-                      <motion.span
-                        className="font-semibold uppercase leading-none tracking-[0.1em]"
-                        animate={{
-                          color: isActive || isHovered
-                            ? 'rgba(255,255,255,0.92)'
-                            : 'rgba(255,255,255,0.48)',
-                        }}
-                        transition={{ duration: 0.2 }}
-                        style={{ fontSize: 'clamp(6px, 1.6vw, 8.5px)' }}
+                      {/* Active dot — top-right, same sage motif as Compass/Contact */}
+                      <div
+                        className="absolute top-0 right-0 pointer-events-none"
+                        style={{ padding: 21, opacity: isActive ? 1 : 0, transition: 'opacity 0.28s ease' }}
                       >
-                        {cell.label}
-                      </motion.span>
+                        <div className="rounded-full bg-primary" style={{
+                          width: 18, height: 18,
+                          boxShadow: '0 6px 18px rgba(138,158,123,0.5)',
+                        }} />
+                      </div>
 
-                      {/* Arrow — slides in on hover */}
-                      <motion.svg
-                        animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -4 }}
-                        transition={{ duration: 0.2 }}
-                        width="9" height="9" viewBox="0 0 9 9" fill="none"
-                        style={{ flexShrink: 0 }}
+                      {/* Hover reveal — darkens the whole card, cell name slides up from
+                          the bottom. Replaces the old always-on numeral/label bar. */}
+                      <div
+                        className="absolute inset-0 pointer-events-none flex items-end justify-center"
+                        style={{
+                          background: isHovered
+                            ? 'linear-gradient(to top, rgba(20,20,18,0.65) 0%, rgba(20,20,18,0.28) 30%, rgba(20,20,18,0) 60%)'
+                            : 'linear-gradient(to top, rgba(20,20,18,0) 0%, rgba(20,20,18,0) 100%)',
+                          transition: 'background 0.28s ease',
+                        }}
                       >
-                        <path d="M1.5 4.5h6M4.5 2L7 4.5 4.5 7"
-                          stroke="rgba(255,255,255,0.70)"
-                          strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                      </motion.svg>
-                    </motion.div>
-                  </motion.div>
+                        <span
+                          className="font-semibold uppercase leading-none"
+                          style={{
+                            fontSize: 27,
+                            letterSpacing: '0.12em',
+                            color: 'white',
+                            paddingBottom: 33,
+                            opacity: isHovered ? 1 : 0,
+                            transform: isHovered ? 'translateY(0)' : 'translateY(30px)',
+                            transition: 'opacity 0.25s ease, transform 0.25s ease',
+                          }}
+                        >
+                          {cell.label}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
                 );
               }))}
-            </motion.div>
-          </>
+            </div>
         )}
-      </AnimatePresence>
+      </div>
+
+      {/* Dismiss hint — fixed positioning (not part of the zoomed content), so
+          it lives outside the gather wrapper and shares nothing but the
+          computed opacity with the grid above. */}
+      {overviewProgress > 0 && (
+        <div
+          className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 pointer-events-none select-none"
+          style={{
+            opacity: hintOpacity,
+            transform: `translateX(-50%) translateY(${8 - hintOpacity * 8}px)`,
+          }}
+        >
+          <div className="flex items-center gap-[7px] px-3.5 py-[7px] rounded-full"
+            style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(14px)', border: '1px solid var(--border)' }}>
+            {['pinch out', '·', 'esc', '·', 'tap to go'].map((t, i) => (
+              <span key={i} style={{ fontSize: 10, fontFamily: 'inherit',
+                color: t === '·' ? 'var(--border)' : 'var(--muted-foreground)',
+                letterSpacing: t === '·' ? 0 : '0.04em' }}>
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* UI chrome — edge indicators (hidden during overview) */}
       <AnimatePresence>
-        {!overview && (
+        {overviewProgress === 0 && (
           <motion.div
             key="chrome"
             initial={{ opacity: 0 }}
@@ -1341,9 +1690,9 @@ export function Home() {
 
       <Compass
         pos={actualPos}
-        pulse={showHint && !overview}
+        pulse={showHint && overviewProgress === 0}
         onNavigate={(r, c) => {
-          if (locked) return;
+          if (locked || gestureActiveRef.current) return;
           setLocked(true);
           setPhysPos({ row: r, col: c });
           setShowHint(false);
@@ -1354,7 +1703,7 @@ export function Home() {
 
       {/* Navigation hint — fades in after 2s, disappears on first nav */}
       <AnimatePresence>
-        {showHint && !overview && (
+        {showHint && overviewProgress === 0 && (
           <motion.div
             key="hint"
             initial={{ opacity: 0, y: 6 }}
