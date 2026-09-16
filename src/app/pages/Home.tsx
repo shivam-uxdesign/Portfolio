@@ -26,13 +26,12 @@ const GRID: { id: CellId; label: string }[][] = [
 
 const HOME_POS: Pos = { row: 1, col: 1 };
 
-// Intro reveal order: opposite cells reveal together, converging on Home last —
-// (Gallery+Stack) → (Work+Resume) → (Fun+Interests) → (About+Contact) → Home,
-// then the zoom fires.
+// Intro reveal order: one consistent top-left → bottom-right stagger, no
+// per-cell variance.
 const REVEAL_RANK: number[][] = [
   [0, 1, 2],
-  [3, 4, 3],
-  [2, 1, 0],
+  [3, 4, 5],
+  [6, 7, 8],
 ];
 const DRAG_THRESHOLD = 55;
 const NAV_EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
@@ -603,9 +602,7 @@ const MEDIA_CELLS: CellId[] = ['hero', 'about', 'gallery', 'fun'];
 
 function CellSkeleton({ id, revealRank }: { id: CellId; revealRank: number }) {
   const isMedia = MEDIA_CELLS.includes(id);
-  // Slight per-pair offset so the sweep doesn't read as perfectly synchronized
-  // across every stage — a small touch of organic polish.
-  const style = { animationDelay: `${revealRank * 0.08}s` };
+  const style = { animationDelay: `${revealRank * 0.07}s` };
   return (
     <div className="w-full h-full flex flex-col gap-3">
       {isMedia ? (
@@ -632,14 +629,17 @@ function CellSkeleton({ id, revealRank }: { id: CellId; revealRank: number }) {
 // mount/unmount) so the real content's images start downloading during the
 // skeleton phase — a free head start for the Unsplash-backed cells.
 function CellCrossfade({ id, skeletonMode, revealRank }: { id: CellId; skeletonMode: boolean; revealRank: number }) {
-  const delay = revealRank * 0.15; // seconds — pairs of opposite cells reveal together, converging on Home last
+  const delay = revealRank * 0.07; // seconds — one consistent top-left → bottom-right stagger
+  // Same duration/easing/delay for every cell (no per-cell variance) — the only
+  // thing that differs across cells is this shared delay.
+  const revealTransition = { duration: 0.45, delay: skeletonMode ? 0 : delay, ease: [0.16, 1, 0.3, 1] as const };
   return (
     <div className="relative w-full h-full">
       <motion.div
         className="absolute inset-0"
         initial={false}
-        animate={{ opacity: skeletonMode ? 0 : 1, scale: skeletonMode ? 0.96 : 1 }}
-        transition={{ type: 'spring', stiffness: 260, damping: 24, delay: skeletonMode ? 0 : delay }}
+        animate={{ opacity: skeletonMode ? 0 : 1, scale: skeletonMode ? 0.98 : 1, y: skeletonMode ? 8 : 0 }}
+        transition={revealTransition}
       >
         <CellContent id={id} />
       </motion.div>
@@ -647,7 +647,7 @@ function CellCrossfade({ id, skeletonMode, revealRank }: { id: CellId; skeletonM
         className="absolute inset-0"
         initial={false}
         animate={{ opacity: skeletonMode ? 1 : 0 }}
-        transition={{ duration: 0.35, delay: skeletonMode ? 0 : delay, ease: [0.16, 1, 0.3, 1] }}
+        transition={revealTransition}
         style={{ pointerEvents: skeletonMode ? 'auto' : 'none' }}
       >
         <CellSkeleton id={id} revealRank={revealRank} />
@@ -842,14 +842,11 @@ function clamp01(n: number) { return Math.max(0, Math.min(1, n)); }
 // intro) can opt into a different curve.
 function easeOutExpo(t: number) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
 
-// A restrained easeOutBack — briefly overshoots 1 before settling, the small
-// "spring past the target and back" feel Apple's own zoom-open transitions
-// use. Used only by the intro's final zoom (see the intro sequencing effect).
-function easeOutBackSubtle(t: number) {
-  const c1 = 0.8; // ~2.3% peak overshoot — clearly felt, still restrained not bouncy
-  const c3 = c1 + 1;
-  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-}
+// A clean, monotonic ease-out (no overshoot) — numerically approximates
+// cubic-bezier(0.16, 1, 0.3, 1) closely enough for this rAF-driven tween.
+// Used by the intro's final zoom so it reads as a plain scale/opacity
+// transition, not a spring.
+function easeOutQuint(t: number) { return t >= 1 ? 1 : 1 - Math.pow(1 - t, 5); }
 
 // progress: 0 = normal (viewing physPos), 1 = fully zoomed out to the overview grid.
 //
@@ -877,12 +874,14 @@ function worldTransform(physPos: Pos, progress: number) {
 
 // CellOverlayLabel removed — overview chrome is now a fixed overlay (OverviewFrame)
 
-// Renders all 25 world cells (3×3 real + 1-cell clone border). Its only props are
-// two rarely-changing primitives for the one-time intro sequence (runIntro never
-// changes after mount, skeletonMode flips at most once) — memoizing still means the
-// high-frequency live-pinch updates (which don't touch either prop) never re-render
-// actual cell content, only the transform wrapper.
-const WorldCells = memo(function WorldCells({ runIntro, skeletonMode }: { runIntro: boolean; skeletonMode: boolean }) {
+// Renders all 25 world cells (3×3 real + 1-cell clone border). `runIntro`/
+// `skeletonMode` are rarely-changing primitives for the one-time intro
+// sequence (runIntro never changes after mount, skeletonMode flips at most
+// once); `hoveredCell` changes only on mouse enter/leave between grid cells
+// during the overview (not the high-frequency per-frame pinch updates), so
+// re-rendering on it is cheap and doesn't reintroduce the cost this memo
+// exists to avoid.
+const WorldCells = memo(function WorldCells({ runIntro, skeletonMode, hoveredCell }: { runIntro: boolean; skeletonMode: boolean; hoveredCell: string | null }) {
   return (
     <>
       {([-1, 0, 1, 2, 3]).flatMap(pr =>
@@ -895,6 +894,7 @@ const WorldCells = memo(function WorldCells({ runIntro, skeletonMode }: { runInt
           // Clone-border cells (pr/pc = -1 or 3) are never on-screen during the
           // intro since physPos doesn't move until the final zoom lands.
           const isRealCell = pr >= 0 && pr <= 2 && pc >= 0 && pc <= 2;
+          const isHovered = hoveredCell === `${actualRow}-${actualCol}`;
           return (
             <div
               key={`${pr}-${pc}`}
@@ -911,15 +911,24 @@ const WorldCells = memo(function WorldCells({ runIntro, skeletonMode }: { runInt
                   chrome (edge labels, compass) at every viewport size, so
                   text/cards can never render underneath them. */}
               <div className="w-full h-full box-border pt-8 pl-9 pr-14 pb-14 md:pt-10 md:pl-11 md:pr-16 md:pb-16">
-                {runIntro && isRealCell ? (
-                  <CellCrossfade
-                    id={cell.id}
-                    skeletonMode={skeletonMode}
-                    revealRank={REVEAL_RANK[actualRow][actualCol]}
-                  />
-                ) : (
-                  <CellContent id={cell.id} />
-                )}
+                {/* Subtle zoom on the thumbnail itself when this cell is
+                    hovered in the overview grid — the outer div above already
+                    clips overflow, so the scale never bleeds into a neighbor. */}
+                <div style={{
+                  width: '100%', height: '100%',
+                  transform: isHovered ? 'scale(1.03)' : 'scale(1)',
+                  transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}>
+                  {runIntro && isRealCell ? (
+                    <CellCrossfade
+                      id={cell.id}
+                      skeletonMode={skeletonMode}
+                      revealRank={REVEAL_RANK[actualRow][actualCol]}
+                    />
+                  ) : (
+                    <CellContent id={cell.id} />
+                  )}
+                </div>
               </div>
             </div>
           );
@@ -930,11 +939,12 @@ const WorldCells = memo(function WorldCells({ runIntro, skeletonMode }: { runInt
 });
 
 // ─── Intro sequence ──────────────────────────────────────────────────────────
-// Decides, once, whether this mount should play the intro loading animation —
-// it runs on every fresh load, deliberately, except for a deep-linked hash
-// (land directly on the linked cell) or a user who has asked for reduced motion.
+// Decides, once, whether this mount should play the intro loading animation.
+// It's a first-visit tutorial, not a loading state, so it plays once ever per
+// browser (localStorage flag) — a deep-linked hash or reduced-motion also skip it.
 function computeRunIntro(): boolean {
   try {
+    if (localStorage.getItem('hasSeenIntro')) return false;
     if (window.location.hash) return false;
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false;
     return true;
@@ -947,6 +957,12 @@ function computeRunIntro(): boolean {
 export function Home() {
   // Stable for the component's lifetime — decided once at mount.
   const [runIntro] = useState(() => computeRunIntro());
+  // Written unconditionally on mount regardless of which branch computeRunIntro
+  // took, so a repeat visit, a hash-skip, or a reduced-motion-skip all count as
+  // "seen" — the intro is guaranteed at most once ever for this browser.
+  useEffect(() => {
+    try { localStorage.setItem('hasSeenIntro', '1'); } catch {}
+  }, []);
 
   // physPos ranges -1 to 3; after every wrap animation it is rebased to 0-2
   const [physPos, setPhysPos] = useState<Pos>(() => {
@@ -980,6 +996,9 @@ export function Home() {
   // "gather" (the grid pulls in a couple percent) applied on a wrapper outside
   // the geometry-critical world/chrome transforms, so it can never affect them.
   const [introGather, setIntroGather] = useState(false);
+  // Intro-only: the "Use ← → ↑ ↓ to explore" nav hint — appears once the grid
+  // content finishes loading, fades out before the zoom back into Home begins.
+  const [introHintVisible, setIntroHintVisible] = useState(false);
   const [showHint, setShowHint] = useState(() => {
     try {
       return !localStorage.getItem('nav-hint-seen');
@@ -1022,20 +1041,16 @@ export function Home() {
   const tweenTargetRef = useRef<0 | 1>(0);
   const tweenCompleteRef = useRef<(() => void) | null>(null);
   // Per-call overrides (default to the ordinary dismiss feel) — only the intro's
-  // final zoom currently opts into a different duration/easing/blur.
+  // final zoom currently opts into a different duration/easing. Scale + opacity
+  // only, deliberately — no blur filter on any zoom leg.
   const tweenDurationRef = useRef(620);
   const tweenEasingRef = useRef<(t: number) => number>(easeOutExpo);
-  const tweenBlurMaxRef = useRef(0);
   const SETTLE_MS = 620;
-  // Blur-to-sharp "focus pull", only nonzero while a tween with blurPx is active
-  // (the intro's zoom) — applied to the world div and chrome overlay together so
-  // they stay in the same shared-lockstep sync as their transform.
-  const [zoomFocusBlur, setZoomFocusBlur] = useState(0);
 
   const startTween = useCallback((
     target: 0 | 1,
     onComplete?: () => void,
-    opts?: { durationMs?: number; easing?: (t: number) => number; blurPx?: number },
+    opts?: { durationMs?: number; easing?: (t: number) => number },
   ) => {
     tweenStartRef.current = overviewProgressRef.current;
     tweenStartTimeRef.current = performance.now();
@@ -1043,7 +1058,6 @@ export function Home() {
     tweenCompleteRef.current = onComplete ?? null;
     tweenDurationRef.current = opts?.durationMs ?? SETTLE_MS;
     tweenEasingRef.current = opts?.easing ?? easeOutExpo;
-    tweenBlurMaxRef.current = opts?.blurPx ?? 0;
     tweenActiveRef.current = true;
     targetProgressRef.current = target;
   }, []);
@@ -1051,19 +1065,30 @@ export function Home() {
   useEffect(() => { startTweenRef.current = startTween; }, [startTween]);
 
   // ── Intro sequencing ──────────────────────────────────────────────────────
-  // Skeleton → reveal → hold → zoom-to-Home, reusing startTween for the last
-  // step exactly as a manual tap-to-dismiss would. Early interaction fast-
-  // forwards the idle holds below (via `wait`), but never the crossfade or the
-  // zoom tween itself — those always play at full duration.
+  // Skeleton → reveal → nav hint → gather → zoom-to-Home, reusing startTween
+  // for the last step exactly as a manual tap-to-dismiss would. A click/tap/
+  // keypress at any point hard-skips: it cancels every remaining step outright
+  // and jumps straight to the fully-loaded Home panel (not just a fast-forward).
   const introSkipRef = useRef(false);
   const introSkipResolversRef = useRef<Array<() => void>>([]);
   useEffect(() => {
     if (!runIntro) return;
 
     const skip = () => {
+      if (introSkipRef.current) return;
       introSkipRef.current = true;
       introSkipResolversRef.current.forEach(r => r());
       introSkipResolversRef.current = [];
+      // Hard-cut to the final state — cancel any in-flight tween/gather/hint
+      // rather than merely fast-forwarding the remaining wait timers.
+      tweenActiveRef.current = false;
+      overviewProgressRef.current = 0;
+      setOverviewProgress(0);
+      setSkeletonMode(false);
+      setIntroGather(false);
+      setIntroHintVisible(false);
+      setLocked(false);
+      setIntroActive(false);
     };
     window.addEventListener('pointerdown', skip, { once: true });
     window.addEventListener('keydown', skip, { once: true });
@@ -1082,36 +1107,41 @@ export function Home() {
           new Promise(r => setTimeout(r, 600)),
         ]);
       } catch { /* ignore */ }
-      if (cancelled) return;
+      if (cancelled || introSkipRef.current) return;
 
-      await wait(900); // intentional lag — a clearly-felt beat, every load
-      if (cancelled) return;
-      setSkeletonMode(false); // crossfade cascades in from the outer rows, Home last
+      await wait(500); // brief presence beat before the cascade starts
+      if (cancelled || introSkipRef.current) return;
+      setSkeletonMode(false); // crossfade cascades top-left → bottom-right, one uniform stagger
 
-      // Cascade takes ~1s to reach Home (rank 4 * 150ms stagger + its own
-      // ~400ms fade) — wait for it to fully land before the hold/zoom.
-      await wait(1050);
-      if (cancelled) return;
-      await wait(300); // hold at the fully-revealed grid
-      if (cancelled) return;
+      // Cascade takes ~1s to finish (rank 8 * 70ms stagger + its own 450ms fade)
+      // — wait for it to fully land before showing the nav hint. Total time the
+      // zoomed-out grid is on screen (this + the hint dwell below) lands ~2.5s,
+      // and all of it is doing work (reveal, then the hint), not sitting idle.
+      await wait(1010);
+      if (cancelled || introSkipRef.current) return;
+
+      setIntroHintVisible(true);
+      await wait(700); // long enough to actually read the hint
+      if (cancelled || introSkipRef.current) return;
+      setIntroHintVisible(false);
+      await wait(300); // let the hint's own fade-out finish before the zoom
+      if (cancelled || introSkipRef.current) return;
 
       // Anticipation: a brief, subtle "gather" before the release — wind-up
       // before the zoom, purely cosmetic (see the wrapper div in the render).
       setIntroGather(true);
       await wait(120);
-      if (cancelled) { setIntroGather(false); return; }
+      if (cancelled || introSkipRef.current) { setIntroGather(false); return; }
       setIntroGather(false);
 
-      // Premium zoom: a restrained spring-like overshoot (vs. the snappier expo
-      // curve used for ordinary dismiss) plus a blur-to-sharp focus pull —
-      // distinct from, and more cinematic than, a manual pinch-dismiss.
+      // Clean scale + opacity zoom — no blur, no overshoot — a plain ease-out
+      // curve approximating cubic-bezier(0.16, 1, 0.3, 1).
       startTweenRef.current(0, () => {
         setLocked(false);
         setIntroActive(false);
       }, {
-        durationMs: 950,
-        easing: easeOutBackSubtle,
-        blurPx: 10,
+        durationMs: 650,
+        easing: easeOutQuint,
       });
     })();
 
@@ -1148,16 +1178,13 @@ export function Home() {
         const t = clamp01(elapsed / tweenDurationRef.current);
         // Default is easeOutExpo (fast initial motion, soft landing), same for both
         // directions by design — but a caller (namely the intro) can supply its own
-        // curve/duration/blur via startTween's opts for a distinct feel.
+        // curve/duration via startTween's opts for a distinct feel.
         const eased = tweenEasingRef.current(t);
         const start = tweenStartRef.current;
         const end = tweenTargetRef.current;
         const value = t >= 1 ? end : start + (end - start) * eased;
         overviewProgressRef.current = value;
         setOverviewProgress(value);
-        if (tweenBlurMaxRef.current > 0) {
-          setZoomFocusBlur(t >= 1 ? 0 : Math.max(0, tweenBlurMaxRef.current * (1 - eased)));
-        }
         if (t >= 1) {
           tweenActiveRef.current = false;
           const cb = tweenCompleteRef.current;
@@ -1510,10 +1537,9 @@ export function Home() {
             transform: worldTransform(physPos, overviewProgress),
             transition,
             willChange: 'transform',
-            filter: zoomFocusBlur > 0 ? `blur(${zoomFocusBlur}px)` : undefined,
           }}
         >
-          <WorldCells runIntro={runIntro} skeletonMode={skeletonMode} />
+          <WorldCells runIntro={runIntro} skeletonMode={skeletonMode} hoveredCell={hoveredCell} />
         </div>
 
         {/* ── Grid chrome overlay ── */}
@@ -1535,7 +1561,6 @@ export function Home() {
                 transform: worldTransform(physPos, overviewProgress),
                 transition,
                 willChange: 'transform',
-                filter: zoomFocusBlur > 0 ? `blur(${zoomFocusBlur}px)` : undefined,
                 // Gated on !locked too, not just the visual progress — the settle tween's
                 // completion callback (which clears `locked`) can fire slightly after the
                 // value is visually indistinguishable from 1, so a click landing in that
@@ -1548,13 +1573,13 @@ export function Home() {
                 const isActive = actualPos.row === r && actualPos.col === c;
                 const isHovered = hoveredCell === `${r}-${c}`;
                 const colIdx = c + 1, rowIdx = r + 1;
-                // Per-edge inset so adjacent cells combine to the same visual gap as
-                // the outer edge (21 local px ≈ 7px once scaled to rest) — reproducing
-                // the original grid's uniform 7px gap/padding exactly.
-                const padTop = r === 0 ? 21 : 10.5;
-                const padBottom = r === 2 ? 21 : 10.5;
-                const padLeft = c === 0 ? 21 : 10.5;
-                const padRight = c === 2 ? 21 : 10.5;
+                // Cells sit flush (no gap/padding) — the only separation between
+                // them is the 1px hairline below, so each cell contributes just
+                // its right/bottom edge, plus a left/top edge for the first
+                // column/row, giving a single 1px line everywhere (no doubling
+                // at shared internal edges).
+                const borderColor = 'var(--border)';
+                const hairline = 3; // local units — ~1px once scaled down to rest
 
                 return (
                   <button
@@ -1568,10 +1593,6 @@ export function Home() {
                       top: `${(rowIdx / 5) * 100}%`,
                       width: '20%',
                       height: '20%',
-                      paddingTop: padTop,
-                      paddingBottom: padBottom,
-                      paddingLeft: padLeft,
-                      paddingRight: padRight,
                       opacity: overviewProgress,
                       cursor: 'pointer',
                     }}
@@ -1588,14 +1609,12 @@ export function Home() {
                     }}
                   >
                     <div
-                      className="relative w-full h-full overflow-hidden"
+                      className="relative w-full h-full overflow-hidden box-border"
                       style={{
-                        borderRadius: 33,
-                        boxShadow: isHovered
-                          ? '0 0 0 3px var(--border), 0 48px 96px -60px rgba(20,20,18,0.28), 0 18px 42px -24px rgba(20,20,18,0.14)'
-                          : '0 0 0 3px var(--border), 0 48px 96px -60px rgba(20,20,18,0.18), 0 12px 30px -18px rgba(20,20,18,0.1)',
-                        transform: isHovered ? 'translateY(-9px)' : 'translateY(0)',
-                        transition: 'box-shadow 0.22s ease, transform 0.22s ease',
+                        borderRight: `${hairline}px solid ${borderColor}`,
+                        borderBottom: `${hairline}px solid ${borderColor}`,
+                        borderLeft: c === 0 ? `${hairline}px solid ${borderColor}` : undefined,
+                        borderTop: r === 0 ? `${hairline}px solid ${borderColor}` : undefined,
                       }}
                     >
                       {/* Active dot — top-right, same sage motif as Compass/Contact */}
@@ -1609,15 +1628,15 @@ export function Home() {
                         }} />
                       </div>
 
-                      {/* Hover reveal — darkens the whole card, cell name slides up from
-                          the bottom. Replaces the old always-on numeral/label bar. */}
+                      {/* Hover reveal — darkens the full cell edge-to-edge, cell name
+                          settles into the center. Replaces the old always-on
+                          numeral/label bar. */}
                       <div
-                        className="absolute inset-0 pointer-events-none flex items-end justify-center"
+                        className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center"
                         style={{
-                          background: isHovered
-                            ? 'linear-gradient(to top, rgba(20,20,18,0.65) 0%, rgba(20,20,18,0.28) 30%, rgba(20,20,18,0) 60%)'
-                            : 'linear-gradient(to top, rgba(20,20,18,0) 0%, rgba(20,20,18,0) 100%)',
-                          transition: 'background 0.28s ease',
+                          backgroundColor: 'rgba(20,20,18,0.55)',
+                          opacity: isHovered ? 1 : 0,
+                          transition: 'opacity 0.28s ease',
                         }}
                       >
                         <span
@@ -1626,14 +1645,25 @@ export function Home() {
                             fontSize: 27,
                             letterSpacing: '0.12em',
                             color: 'white',
-                            paddingBottom: 33,
                             opacity: isHovered ? 1 : 0,
-                            transform: isHovered ? 'translateY(0)' : 'translateY(30px)',
-                            transition: 'opacity 0.25s ease, transform 0.25s ease',
+                            transform: isHovered ? 'scale(1)' : 'scale(0.92)',
+                            transition: 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                           }}
                         >
                           {cell.label}
                         </span>
+                        {/* Sage accent underline — same motif as the active dot/Compass */}
+                        <div
+                          className="bg-primary"
+                          style={{
+                            height: 3,
+                            width: isHovered ? 54 : 0,
+                            marginTop: 15,
+                            borderRadius: 3,
+                            opacity: isHovered ? 1 : 0,
+                            transition: 'width 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.05s, opacity 0.25s ease 0.05s',
+                          }}
+                        />
                       </div>
                     </div>
                   </button>
@@ -1667,9 +1697,11 @@ export function Home() {
         </div>
       )}
 
-      {/* UI chrome — edge indicators (hidden during overview) */}
+      {/* UI chrome — edge indicators. Hidden during a manual pinch-out overview,
+          but kept visible through the intro's zoom-out — they double as the
+          nav-direction labels the intro is teaching (WORK/ABOUT/CONTACT/RESUME). */}
       <AnimatePresence>
-        {overviewProgress === 0 && (
+        {(overviewProgress === 0 || introActive) && (
           <motion.div
             key="chrome"
             initial={{ opacity: 0 }}
@@ -1687,6 +1719,28 @@ export function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Intro-only nav hint — appears once the grid content finishes loading,
+          fades out before the zoom back into Home begins. */}
+      {runIntro && (
+        <div
+          className="fixed bottom-8 left-1/2 z-50 pointer-events-none select-none"
+          style={{
+            opacity: introHintVisible ? 1 : 0,
+            transform: 'translateX(-50%)',
+            transition: 'opacity 0.3s ease',
+          }}
+        >
+          <div
+            className="px-4 py-2 rounded-full"
+            style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(14px)', border: '1px solid var(--border)' }}
+          >
+            <span style={{ fontSize: 11, letterSpacing: '0.04em', color: 'var(--muted-foreground)' }}>
+              Use ← → ↑ ↓ to explore
+            </span>
+          </div>
+        </div>
+      )}
 
       <Compass
         pos={actualPos}
