@@ -806,7 +806,7 @@ function EdgeIndicators({
           className={`fixed z-40 flex items-center gap-2 p-1.5 -m-1.5 ${style} group select-none`}
         >
           <span
-            className="text-foreground/45 group-hover:text-foreground/90 transition-colors duration-200"
+            className="text-foreground/65 group-hover:text-foreground/90 transition-colors duration-200"
             style={{
               width: 0,
               height: 0,
@@ -817,7 +817,7 @@ function EdgeIndicators({
             }}
           />
           <span
-            className="text-[9px] tracking-[0.1em] uppercase text-foreground/40 group-hover:text-foreground/80 transition-colors duration-200 font-medium"
+            className="text-[9px] tracking-[0.1em] uppercase text-foreground/65 group-hover:text-foreground/80 transition-colors duration-200 font-medium"
             style={vertical ? { writingMode: 'vertical-rl' } : undefined}
           >
             {GRID[r][c].label}
@@ -898,6 +898,16 @@ const WorldCells = memo(function WorldCells({ runIntro, skeletonMode, hoveredCel
           return (
             <div
               key={`${pr}-${pc}`}
+              // Clone-border cells duplicate a real cell's content purely for
+              // seamless wrap-around scrolling — without this, every focusable
+              // element inside them (contact form, gallery links, project
+              // cards) is reachable by keyboard/screen reader up to 3x, mostly
+              // off-screen and in an order unrelated to what's visually
+              // focused. `inert` removes the whole subtree from both. Set via
+              // a ref, not the JSX prop — React 18's runtime doesn't yet
+              // serialize `inert` to the DOM (added in React 19), even though
+              // the installed @types/react does type it.
+              ref={(el) => { if (el) el.inert = !isRealCell; }}
               style={{
                 position: 'absolute',
                 left:   `${(colIdx / 5) * 100}%`,
@@ -1302,6 +1312,14 @@ export function Home() {
   // ── Keyboard navigation ──
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // Don't hijack arrow-key/Escape presses meant for a focused form field
+      // (e.g. moving the text cursor in the contact form's message box) —
+      // confirmed bug: without this, arrow keys there silently discarded
+      // typed input and navigated the whole page instead.
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
       if (e.key === 'Escape') {
         if (overviewProgressRef.current > 0 || gestureActiveRef.current || tweenActiveRef.current) {
           gestureActiveRef.current = false;
@@ -1766,7 +1784,7 @@ export function Home() {
             transition={{ delay: 2.2, duration: 0.7 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
           >
-            <span className="text-[10px] tracking-[0.1em] text-foreground/35 select-none">
+            <span className="text-[10px] tracking-[0.1em] text-foreground/65 select-none">
               <span className="md:hidden">swipe · pinch to explore</span>
               <span className="hidden md:inline">scroll · drag · arrow keys to explore</span>
             </span>

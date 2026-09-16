@@ -79,12 +79,14 @@ export function CTACard() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name (optional)"
+            aria-label="Your name (optional)"
             className="w-full bg-background/10 border border-background/20 rounded-lg px-3 py-1.5 text-[13px] text-background placeholder:text-background/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 transition-colors"
           />
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Your message (optional)"
+            aria-label="Your message (optional)"
             rows={1}
             className="w-full resize-none bg-background/10 border border-background/20 rounded-lg px-3 py-1.5 text-[13px] text-background placeholder:text-background/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 transition-colors"
           />
@@ -102,7 +104,7 @@ export function CTACard() {
             whileTap={status === 'idle' ? { scale: 0.98 } : undefined}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           >
-            <span className="text-[14px] font-medium">
+            <span className="text-[14px] font-medium" aria-live="polite">
               {status === 'sending' ? 'Sending…' : status === 'sent' ? 'Message sent' : status === 'error' ? 'Try again' : 'Say Hello'}
             </span>
             {status === 'sent' ? (
@@ -134,6 +136,7 @@ export function CTACard() {
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             onClick={() => window.open('https://www.linkedin.com/in/shivamsehgal26/', '_blank')}
             title="LinkedIn"
+            aria-label="LinkedIn"
           >
             <Linkedin className="w-[18px] h-[18px]" strokeWidth={1.5} />
           </motion.button>
