@@ -744,6 +744,8 @@ function Compass({ pos, onNavigate, onHome, pulse }: {
                     'group relative rounded-full transition-all duration-200 flex items-center justify-center',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                     isCenter ? 'w-6 h-6' : 'w-5 h-5',
+                    // 44px minimum touch target on coarse pointers (WCAG 2.5.5)
+                    'pointer-coarse:w-11 pointer-coarse:h-11',
                   ].join(' ')}
                 >
                   <span
