@@ -21,6 +21,8 @@ export interface HeroBridgeState {
   introActive: boolean;
   /** Hat currently worn by the hero portrait. */
   hat: WearableId;
+  /** A project overlay opened from the Home stacks, if any. */
+  overlay: 'work' | 'fun' | null;
 }
 
 export interface HeroBridge {
@@ -32,7 +34,7 @@ export interface HeroBridge {
 export function createHeroBridge(initial: Partial<HeroBridgeState> = {}): HeroBridge {
   let state: HeroBridgeState = {
     cell: 'hero', prevCell: null, settled: false, heroActive: false,
-    overview: 0, introActive: false, hat: 'me', ...initial,
+    overview: 0, introActive: false, hat: 'me', overlay: null, ...initial,
   };
   const subs = new Set<() => void>();
   return {

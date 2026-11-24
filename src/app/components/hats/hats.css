@@ -19,11 +19,15 @@
 .hh-cell { container-type: size; }
 .hh-stage-wrap {
   container-type: size; position: relative; display: flex; align-items: center; justify-content: center;
-  flex: 1 1 0; min-height: 0; max-height: min(600px, 120cqw);
+  width: 100%; flex: 1 1 0; min-height: 0; max-height: min(600px, 120cqw);
 }
 .hats-hero { position: relative; width: min(100cqw, 540px); height: min(100cqh, 100cqw * 1.2, 600px); }
 @media (min-width: 768px) {
-  .hh-stage-wrap { max-height: min(540px, 100cqw); }
+  .hh-stage-wrap { max-height: min(560px, 90cqw); }
+}
+/* Desktop: stage on the left, filling the cell height; text + stacks on the right. */
+@media (min-width: 1024px) {
+  .hh-stage-wrap { flex: 0 1 auto; width: min(560px, 100cqh, 52cqw); height: 100%; max-height: none; }
   .hats-hero { width: min(100cqw, 100cqh, 540px); height: min(100cqw, 100cqh, 540px); }
 }
 

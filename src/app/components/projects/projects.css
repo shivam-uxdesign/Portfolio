@@ -1,0 +1,100 @@
+/* Home project stacks + project overlay. */
+
+/* ── Stacks ─────────────────────────────────────────────────────────────── */
+.ps-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
+.ps-stack-btn {
+  display: flex; flex-direction: column; gap: 10px; padding: 0; border: 0; background: none;
+  text-align: left; cursor: pointer; color: inherit; -webkit-tap-highlight-color: transparent;
+}
+.ps-stack-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 6px; border-radius: 16px; }
+.ps-deck { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; }
+.ps-card {
+  position: absolute; inset: 0; border-radius: 14px; overflow: hidden; display: block;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .04), 0 10px 24px -14px rgba(20, 20, 18, .45);
+  transition: transform .4s cubic-bezier(.3, 1.4, .5, 1);
+  outline: 1px solid rgba(0, 0, 0, .06); outline-offset: -1px;
+}
+.ps-card-2 { transform: rotate(-6deg) translate(-5%, 3%) scale(.94); }
+.ps-card-1 { transform: rotate(4deg) translate(5%, 1.5%) scale(.97); }
+.ps-card-0 { transform: none; }
+@media (hover: hover) {
+  .ps-stack-btn:hover .ps-card-2 { transform: rotate(-12deg) translate(-16%, -3%) scale(.94); }
+  .ps-stack-btn:hover .ps-card-1 { transform: rotate(9deg) translate(15%, -2%) scale(.97); }
+  .ps-stack-btn:hover .ps-card-0 { transform: translateY(-5%); }
+}
+.ps-stack-btn:focus-visible .ps-card-2 { transform: rotate(-12deg) translate(-16%, -3%) scale(.94); }
+.ps-stack-btn:focus-visible .ps-card-1 { transform: rotate(9deg) translate(15%, -2%) scale(.97); }
+.ps-stack-btn:active .ps-card-0 { transform: scale(.97); }
+
+.ps-face { position: absolute; inset: 0; display: block; overflow: hidden; }
+.ps-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Drawn thumbnails are designed for big cards: render large, scale down. */
+.ps-thumb { position: absolute; left: 0; top: 0; width: 250%; height: 250%; transform: scale(.4); transform-origin: 0 0; }
+.ps-label { display: flex; flex-direction: column; gap: 1px; padding-left: 2px; }
+.ps-name { font-size: 14px; font-weight: 600; color: var(--foreground); letter-spacing: -.01em; }
+.ps-count { font-size: 11px; color: var(--muted-foreground); }
+.ps-stack-btn:hover .ps-count { color: var(--foreground); }
+
+/* ── Overlay ────────────────────────────────────────────────────────────── */
+.po-root { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-start; justify-content: center; }
+.po-scrim {
+  position: absolute; inset: 0; background: color-mix(in oklab, var(--background) 72%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: po-fade .25s ease-out both;
+}
+.po-root.po-closing .po-scrim { animation: po-fade-out .2s ease-in both; }
+.po-panel {
+  position: relative; display: flex; flex-direction: column;
+  width: min(1040px, calc(100vw - 64px)); max-height: calc(100dvh - 220px);
+  margin-top: max(160px, 16vh);
+  background: var(--background); border: 1px solid var(--border); border-radius: 24px;
+  box-shadow: 0 40px 80px -40px rgba(20, 20, 18, .45);
+}
+.po-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 26px 28px 14px; }
+.po-title { font-size: clamp(1.4rem, 2.4vw, 1.9rem); font-weight: 500; letter-spacing: -.03em; color: var(--foreground); line-height: 1.1; }
+.po-sub { margin-top: 4px; font-size: 13px; color: var(--muted-foreground); }
+.po-close {
+  flex: none; width: 36px; height: 36px; border-radius: 999px; display: grid; place-items: center;
+  border: 1px solid var(--border); background: var(--background); color: var(--foreground); cursor: pointer;
+}
+.po-close:hover { background: var(--muted, #f4f4f3); }
+.po-close:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.po-scroll { overflow-y: auto; overscroll-behavior: contain; padding: 6px 28px 28px; -webkit-overflow-scrolling: touch; }
+.po-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; list-style: none; margin: 0; padding: 0; }
+.po-card { will-change: transform; }
+.po-link { display: flex; flex-direction: column; gap: 12px; color: inherit; text-decoration: none; border-radius: 18px; }
+.po-link:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
+.po-thumb {
+  position: relative; display: block; aspect-ratio: 16 / 11; border-radius: 16px; overflow: hidden;
+  transition: transform .35s cubic-bezier(.3, 1.4, .5, 1), box-shadow .35s;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .04);
+  outline: 1px solid rgba(0, 0, 0, .06); outline-offset: -1px;
+}
+.po-thumb .ps-thumb { width: 160%; height: 160%; transform: scale(.625); }
+.po-link:hover .po-thumb { transform: translateY(-3px); box-shadow: 0 18px 30px -18px rgba(20, 20, 18, .5); }
+.po-meta { display: flex; flex-direction: column; gap: 4px; padding: 0 2px; }
+.po-tag { font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted-foreground); }
+.po-card-title { font-size: 15px; font-weight: 600; line-height: 1.3; color: var(--foreground); letter-spacing: -.01em; }
+.po-desc { font-size: 13px; line-height: 1.45; color: var(--muted-foreground); }
+.po-cta { margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--foreground); }
+
+/* The peek sits on the panel's top edge: head above, fingers over the front. */
+.work-peek.in-overlay { bottom: auto; top: 0; transform: translate(-50%, -100%); width: clamp(120px, 15vw, 190px); }
+
+/* Phone: bottom sheet. */
+.po-root.po-sheet { align-items: flex-end; }
+.po-sheet .po-panel {
+  width: 100%; margin: 0; max-height: 80dvh; border-radius: 24px 24px 0 0; border-bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.po-sheet .po-head { padding: 22px 20px 10px; }
+.po-sheet .po-scroll { padding: 4px 20px 24px; }
+.po-sheet .po-grid { grid-template-columns: 1fr; gap: 20px; }
+.po-sheet .po-thumb { aspect-ratio: 16 / 9; }
+
+@keyframes po-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes po-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .ps-card, .po-thumb { transition: none; }
+  .po-scrim { animation: none; }
+}

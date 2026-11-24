@@ -1,7 +1,8 @@
-import { useEffect, useId, useMemo, useRef } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { prefixedPortrait } from './portrait';
 import { PROPS } from './props';
 import { useHeroBridge } from './heroBridge';
+import type { WearableId } from './hatsData';
 import './hats.css';
 
 // Shivam peeking up over the Work cell's bottom edge after you swipe up from
@@ -28,25 +29,41 @@ function handSvg(clipId: string, mirrored: boolean) {
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {
+export type PeekMode = 'hidden' | 'animate' | 'static';
+
+export interface PeekProps {
+  /** hidden → tucked below the edge; animate → play the rise once; static → final pose, no motion. */
+  mode: PeekMode;
+  hat: WearableId;
+  /** Where the eyes settle: up at the Other-works tiles, down into the overlay. */
+  look: 'up' | 'down';
+  /** CSS animations (blink, drumming) run only while true. */
+  running: boolean;
+  label: string;
+  onHeadTap: () => void;
+  className?: string;
+  /** Delay before the rise starts, e.g. to let an overlay's cards land first. */
+  delayMs?: number;
+}
+
+/**
+ * Shivam's head cropped under the glasses, rising over an edge with two hands
+ * gripping it. Position the root so its bottom sits on the edge: the head
+ * rises above it, the fingers fold down over it.
+ */
+export function Peek({ mode, hat, look, running, label, onHeadTap, className = '', delayMs = 0 }: PeekProps) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   // Memoised {__html} objects: React must never re-apply this markup on a
   // re-render, or it would wipe the hat and finger transforms set imperatively.
   const portraitHtml = useMemo(() => ({ __html: prefixedPortrait(`wp${uid}-`) }), [uid]);
   const handsHtml = useMemo(() => ({ __html: handSvg(`wp${uid}-abv0`, false) + handSvg(`wp${uid}-abv1`, true) }), [uid]);
 
-  const inWork = useHeroBridge(s => s.cell === 'work');
-  const fromHero = useHeroBridge(s => s.prevCell === 'hero');
-  const settled = useHeroBridge(s => s.settled);
-  const inOverview = useHeroBridge(s => s.overview > 0);
-  const hat = useHeroBridge(s => s.hat);
-
   const rootRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLButtonElement>(null);
   const handsRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
-  const playedRef = useRef(false);
-  const isCloneRef = useRef(false);
+  const lookRef = useRef(look);
+  lookRef.current = look;
 
   // Paint one frame of the peek timeline (p: 0 hidden → 1 fully peeking).
   const render = (p: number) => {
@@ -55,8 +72,8 @@ export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {
     if (!head || !handsEl) return;
     const rise = easeOutBack(seg(p, 0, 0.55));
     head.style.transform = `translateY(${((1 - rise) * 100).toFixed(2)}%)`;
-    const look = seg(p, 0.3, 0.6);
-    head.querySelectorAll('.pupil').forEach(pu => pu.setAttribute('transform', `translate(0 ${(-5 * look).toFixed(2)})`));
+    const lk = seg(p, 0.3, 0.6) * (lookRef.current === 'up' ? -5 : 5);
+    head.querySelectorAll('.pupil').forEach(pu => pu.setAttribute('transform', `translate(0 ${lk.toFixed(2)})`));
     // Hands: pop up with open palms, then fold the fingers over the edge.
     const a = seg(p, 0.45, 0.66), c = seg(p, 0.72, 1);
     handsEl.querySelectorAll<SVGSVGElement>('.wp-hand').forEach(el => {
@@ -74,7 +91,6 @@ export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {
   useEffect(() => {
     const root = rootRef.current, handsEl = handsRef.current;
     if (!root || !handsEl) return;
-    isCloneRef.current = !!root.closest('[inert]');
     const place = () => {
       const W = root.offsetWidth, H = W * VB_RATIO;
       root.style.height = `${H}px`;
@@ -101,14 +117,12 @@ export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {
     if (props) props.innerHTML = hat === 'me' ? '' : PROPS[hat].svg(false);
   }, [hat]);
 
-  // Arrival from Hero → play once; leaving Work resets.
   useEffect(() => {
-    if (!inWork) { playedRef.current = false; render(0); return; }
-    if (isCloneRef.current || !fromHero || !settled || playedRef.current) return;
-    playedRef.current = true;
-    if (prefersReducedMotion()) { render(1); return; }
+    if (mode === 'hidden') { render(0); return; }
+    if (mode === 'static' || prefersReducedMotion()) { render(1); return; }
     let raf = 0;
-    const t0 = performance.now();
+    render(0);
+    const t0 = performance.now() + delayMs;
     const step = (now: number) => {
       const p = cl((now - t0) / TIMELINE_MS);
       render(p);
@@ -116,17 +130,17 @@ export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {
     };
     raf = requestAnimationFrame(step);
     // Interrupted (e.g. a pinch starts mid-rise): land on the final pose rather
-    // than freezing half-way, since it only plays once per arrival.
+    // than freezing half-way.
     return () => { cancelAnimationFrame(raf); if (progressRef.current < 1) render(1); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inWork, fromHero, settled]);
+  }, [mode]);
 
-  const visible = inWork && fromHero && !inOverview && !isCloneRef.current;
-  const running = visible && settled;
+  const visible = mode !== 'hidden';
+  const live = visible && running;
 
   // Fingers drum on the edge every ~6s while he's peeking.
   useEffect(() => {
-    if (!running || prefersReducedMotion()) return;
+    if (!live || prefersReducedMotion()) return;
     const id = setInterval(() => {
       if (progressRef.current < 1) return;
       handsRef.current?.querySelectorAll('.wp-hand').forEach((el, i) =>
@@ -134,12 +148,12 @@ export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {
           f.animate([{ opacity: 1 }, { opacity: 0.75 }, { opacity: 1 }], { duration: 200, delay: (3 - j) * 90 + i * 420 })));
     }, 6000);
     return () => clearInterval(id);
-  }, [running]);
+  }, [live]);
 
   return (
     <div
       ref={rootRef}
-      className={`work-peek${visible ? '' : ' is-hidden'}${running ? '' : ' paused'}`}
+      className={`work-peek ${className}${visible ? '' : ' is-hidden'}${live ? '' : ' paused'}`}
       data-hat={hat}
     >
       <div className="wp-clip">
@@ -149,8 +163,8 @@ export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {
           className="wp-head"
           tabIndex={visible ? 0 : -1}
           aria-hidden={!visible}
-          aria-label="Shivam is peeking. Back to Home"
-          onClick={onBackToHero}
+          aria-label={label}
+          onClick={onHeadTap}
           style={HEAD_START}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox={VIEWBOX} aria-hidden="true" dangerouslySetInnerHTML={portraitHtml} />
@@ -158,5 +172,47 @@ export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {
       </div>
       <div ref={handsRef} aria-hidden="true" dangerouslySetInnerHTML={handsHtml} />
     </div>
+  );
+}
+
+// The full rise plays the first time per visit; after that he's already there.
+let cellPeekPlayed = false;
+
+/** The peek in the cell above Home, shown when you arrive from Home. */
+export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {
+  const inCell = useHeroBridge(s => s.cell === 'work');
+  const fromHero = useHeroBridge(s => s.prevCell === 'hero');
+  const settled = useHeroBridge(s => s.settled);
+  const inOverview = useHeroBridge(s => s.overview > 0);
+  const hat = useHeroBridge(s => s.hat);
+
+  const probeRef = useRef<HTMLSpanElement>(null);
+  const [isClone, setIsClone] = useState(false);
+  useEffect(() => { setIsClone(!!probeRef.current?.closest('[inert]')); }, []);
+
+  const [mode, setMode] = useState<PeekMode>('hidden');
+  useEffect(() => {
+    if (!inCell || !fromHero || isClone) { setMode('hidden'); return; }
+    // Already seen this visit: he's simply there as the cell slides in.
+    if (cellPeekPlayed) { setMode(m => (m === 'hidden' ? 'static' : m)); return; }
+    if (!settled) return;
+    cellPeekPlayed = true;
+    setMode('animate');
+  }, [inCell, fromHero, settled, isClone]);
+  // Coming back from the overview shouldn't replay the rise.
+  useEffect(() => { if (inOverview) setMode(m => (m === 'animate' ? 'static' : m)); }, [inOverview]);
+
+  return (
+    <>
+      <span ref={probeRef} hidden />
+      <Peek
+        mode={inOverview ? 'hidden' : mode}
+        hat={hat}
+        look="up"
+        running={settled && !inOverview}
+        label="Shivam is peeking. Back to Home"
+        onHeadTap={onBackToHero}
+      />
+    </>
   );
 }

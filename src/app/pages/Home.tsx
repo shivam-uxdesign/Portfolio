@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { Home as HomeIcon, ArrowUp } from 'lucide-react';
-import { Link } from 'react-router';
+import { Home as HomeIcon } from 'lucide-react';
 import { ImageGallery } from '../components/ImageGallery';
 import { InterestGrid } from '../components/InterestGrid';
 import { AboutBlock } from '../components/AboutBlock';
@@ -14,6 +13,9 @@ import { HatsHero } from '../components/hats/HatsHero';
 import { WorkPeek } from '../components/hats/WorkPeek';
 import { HATS, PAL, type WearableId } from '../components/hats/hatsData';
 import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
+import { ProjectStacks } from '../components/projects/ProjectStacks';
+import { ProjectOverlay } from '../components/projects/ProjectOverlay';
+import type { ProjectGroup, ProjectGroupId } from '../components/projects/types';
 
 // ─── Grid config ─────────────────────────────────────────────────────────────
 // Layout:  [Gallery]  [Work ↑]   [Fun]
@@ -23,7 +25,7 @@ type CellId = 'gallery' | 'work' | 'fun' | 'about' | 'hero' | 'contact' | 'inter
 type Pos = { row: number; col: number };
 
 const GRID: { id: CellId; label: string }[][] = [
-  [{ id: 'gallery',   label: 'Gallery'   }, { id: 'work',      label: 'Work'      }, { id: 'fun',       label: 'Fun'       }],
+  [{ id: 'gallery',   label: 'Gallery'   }, { id: 'work',      label: 'Other works' }, { id: 'fun',       label: 'Fun'       }],
   [{ id: 'about',     label: 'About'     }, { id: 'hero',      label: 'Home'      }, { id: 'contact',   label: 'Contact'   }],
   [{ id: 'interests', label: 'Interests' }, { id: 'resume',    label: 'Resume'    }, { id: 'stack',     label: 'Stack'     }],
 ];
@@ -166,7 +168,6 @@ function MobileAppThumbnail() {
   );
 }
 
-const MotionLink = motion.create(Link);
 
 const PROJECTS = [
   {
@@ -196,7 +197,29 @@ type NavDir = 'up' | 'down';
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-function HeroCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
+const FUN_PROJECTS = [
+  { title: 'Whatiswrongwith.in', descriptor: 'AI that roasts your text with brutal honesty.', tag: 'Vibe coded', bg: '#DDE8F5',
+    image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&h=300&fit=crop', link: '/play/whatiswrongwithin' },
+  { title: 'Nightmare Rider', descriptor: 'A game born from a recurring dream.', tag: 'Vibe coded', bg: '#1A1A1A',
+    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&h=300&fit=crop', link: '/play/nightmare-rider' },
+  { title: 'Whatshouldieat.in', descriptor: 'Tell it your goals. It tells you what to eat.', tag: 'Vibe coded', bg: '#F5E8DD',
+    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&h=300&fit=crop', link: '/play/whatshouldieat' },
+];
+
+const PROJECT_GROUPS: ProjectGroup[] = [
+  {
+    id: 'work', label: 'Work', count: `${PROJECTS.length} case studies`,
+    heading: 'Work', sub: 'Case studies from Rupyy and before.',
+    items: PROJECTS.map(p => ({ title: p.title, descriptor: p.descriptor, link: p.link, external: p.external, bg: p.bg, thumbnail: p.thumbnail })),
+  },
+  {
+    id: 'fun', label: 'Fun', count: `${FUN_PROJECTS.length} side projects`,
+    heading: 'Fun projects', sub: 'Things I build for myself, mostly vibe coded.',
+    items: FUN_PROJECTS,
+  },
+];
+
+function HeroCell() {
   const [isNameHovered, setIsNameHovered] = useState(false);
   const bridge = useHeroBridgeStore();
   const heroActive = useHeroBridge(s => s.heroActive);
@@ -222,14 +245,40 @@ function HeroCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
   const onHatChange = useCallback((h: WearableId) => bridge.set({ hat: h }), [bridge]);
   const onWear = useCallback((h: string) => trackEvent('hat_worn', { hat: h }), []);
 
-  return (
-    <div className="hh-cell w-full h-full flex flex-col items-center justify-center bg-background gap-3 md:gap-4 select-text overflow-hidden">
+  // Project overlay opened from a stack.
+  const [overlay, setOverlay] = useState<{ id: ProjectGroupId; from: DOMRect; trigger: HTMLElement } | null>(null);
+  const openOverlay = useCallback((id: ProjectGroupId, from: DOMRect, trigger: HTMLElement) => {
+    setOverlay({ id, from, trigger });
+    bridge.set({ overlay: id });
+    trackEvent('project_stack_opened', { stack: id });
+  }, [bridge]);
+  const closeOverlay = useCallback(() => {
+    setOverlay(o => { o?.trigger.focus({ preventScroll: true }); return null; });
+    bridge.set({ overlay: null });
+  }, [bridge]);
+  const overlayGroup = overlay && PROJECT_GROUPS.find(g => g.id === overlay.id);
 
-      {/* ── Text: above the stage on phones, below it from md up ── */}
-      <div
-        className="hh-text order-1 md:order-2 flex-shrink-0 flex flex-col items-center text-center w-full"
-        style={{ '--hh-accent': PAL[hat].accent } as React.CSSProperties}
-      >
+  // pb on phones keeps the stacks clear of the (large, touch-sized) Compass.
+  return (
+    <div className="hh-cell w-full h-full flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-14 pb-14 md:pb-0 bg-background select-text overflow-hidden">
+
+      {/* ── Stage: the portrait card with the hat orbit ── */}
+      <div className="hh-stage-wrap order-2 lg:order-1">
+        <HatsHero
+          isActive={heroActive && !overlay}
+          overviewProgress={overviewStep}
+          deferEntrance={deferEntrance}
+          onHatChange={onHatChange}
+          onWear={onWear}
+        />
+      </div>
+
+      {/* Phone/tablet: text above the stage, stacks below it. Desktop: both in a right-hand column. */}
+      <div className="contents lg:order-2 lg:flex lg:flex-col lg:justify-center lg:gap-7 lg:w-[min(400px,34%)] lg:flex-none">
+        <div
+          className="hh-text order-1 lg:order-none flex-shrink-0 flex flex-col items-center lg:items-start text-center lg:text-left w-full"
+          style={{ '--hh-accent': PAL[hat].accent } as React.CSSProperties}
+        >
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -267,88 +316,58 @@ function HeroCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.5 }}
           aria-live="polite"
-          className={`hh-tagline text-[13px] md:text-[14px] leading-snug text-muted-foreground mt-2 max-w-[34em] min-h-[2.9em]${swapping ? ' swap' : ''}`}
+          className={`hh-tagline text-[13px] md:text-[14px] leading-snug text-muted-foreground mt-2 max-w-[34em] lg:max-w-none min-h-[2.9em]${swapping ? ' swap' : ''}`}
         >
           {info
             ? <><em>{info.name}.</em> {info.line}</>
             : <>A product designer who works from <em>strategy</em> to pixel. I wear a lot of hats.</>}
         </motion.p>
-        <button
-          type="button"
-          onClick={() => onNavigateDir('up')}
-          aria-label="Go to Work"
-          className="mt-2 inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          Work <ArrowUp size={11} strokeWidth={2.25} aria-hidden="true" />
-        </button>
+        </div>
+        <div className="order-3 lg:order-none w-full max-w-[420px] lg:max-w-none flex-shrink-0 px-1 lg:px-0">
+          <ProjectStacks groups={PROJECT_GROUPS} onOpen={openOverlay} />
+        </div>
       </div>
 
-      {/* ── Stage: the portrait card with the hat orbit ── */}
-      <div className="hh-stage-wrap order-2 md:order-1 w-full">
-        <HatsHero
-          isActive={heroActive}
-          overviewProgress={overviewStep}
-          deferEntrance={deferEntrance}
-          onHatChange={onHatChange}
-          onWear={onWear}
-        />
-      </div>
+      {overlay && overlayGroup && (
+        <ProjectOverlay group={overlayGroup} from={overlay.from} hat={hat} onClose={closeOverlay} />
+      )}
     </div>
   );
 }
 
-function WorkCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+const OTHER_WORKS = [
+  { title: 'Illustration', note: 'Ink, gouache, digital', bg: '#E9E2D6', ink: '#3B3326' },
+  { title: 'Motion studies', note: 'Timing and easing experiments', bg: '#DCE5D2', ink: '#2F3A27' },
+  { title: '3D in Spline', note: 'Objects, scenes, interactions', bg: '#DDE3EE', ink: '#26304A' },
+  { title: 'Textile prints', note: 'Pattern and repeat work', bg: '#F2DCD4', ink: '#4A2A20' },
+];
 
+function OtherWorksCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
   return (
     // Outer wrapper stays overflow-visible so the peek's fingers can curl over
     // the bottom edge into the cell's safe-area padding.
     <div className="relative w-full h-full">
-    <div className="w-full h-full bg-background flex flex-col overflow-hidden">
-      <div className="px-8 md:px-12 pt-6 md:pt-12 pb-3 md:pb-4 flex-shrink-0">
-        <p className="text-[11px] tracking-[0.1em] text-muted-foreground uppercase mb-1.5 md:mb-2">Selected Work</p>
-        <h2 className="text-[21px] md:text-[32px] text-foreground leading-tight">Everything I've Shipped</h2>
-      </div>
-      <div className="flex-1 min-h-0 px-4 pb-4 grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3">
-        {PROJECTS.map((project, idx) => {
-          const isHov = hoveredCard === idx;
-          return (
-            <MotionLink
-              key={idx}
-              to={project.link}
-              className="rounded-xl overflow-hidden relative block h-full min-h-[170px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              style={{ backgroundColor: project.bg }}
-              onMouseEnter={() => setHoveredCard(idx)}
-              onMouseLeave={() => setHoveredCard(null)}
-              animate={{ y: isHov ? -3 : 0 }}
-              transition={{ duration: 0.3, ease: [0.34, 1.2, 0.64, 1] as const }}
-            >
-              {project.thumbnail}
-              <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0.96) 100%)' }} />
-              <div
-                className="absolute top-3 right-3 text-[10px] font-medium tracking-[0.06em] text-white rounded-full px-2 py-0.5"
-                style={{ backgroundColor: `rgba(0,0,0,${isHov ? 0.45 : 0.3})`, backdropFilter: 'blur(4px)', transition: 'background-color 0.3s ease' }}
-              >
-                {project.number}
+      <div className="w-full h-full bg-background flex flex-col overflow-hidden">
+        <div className="flex-shrink-0 px-2 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
+          <div className="text-[11px] font-medium tracking-[0.09em] text-muted-foreground uppercase mb-1.5">Other works</div>
+          <h2 className="text-[1.5rem] md:text-[2rem] font-medium text-foreground leading-tight" style={{ letterSpacing: '-0.03em' }}>
+            Beyond product design
+          </h2>
+        </div>
+        <div className="flex-1 min-h-0 grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 px-0 md:px-2 pb-4">
+          {OTHER_WORKS.map(w => (
+            <div key={w.title} className="relative rounded-2xl overflow-hidden min-h-0" style={{ background: w.bg }}>
+              <div className="absolute inset-0 opacity-[0.12]" style={{ backgroundImage: `radial-gradient(${w.ink} 1px, transparent 1px)`, backgroundSize: '14px 14px' }} />
+              <div className="relative p-4 md:p-5">
+                <div className="text-[15px] md:text-[17px] font-semibold leading-tight" style={{ color: w.ink }}>{w.title}</div>
+                <div className="text-[12px] mt-1 opacity-70" style={{ color: w.ink }}>{w.note}</div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 p-4 pr-16" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.7)' }}>
-                <div className="text-white text-[12px] font-medium leading-[1.35] mb-1.5">{project.title}</div>
-                <p className="text-white/75 text-[11px] leading-[1.5]">{project.descriptor}</p>
-              </div>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: isHov ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute top-3 left-3 text-white/85 text-[10px] font-medium whitespace-nowrap"
-              >
-                View →
-              </motion.div>
-            </MotionLink>
-          );
-        })}
+              <span className="absolute right-3 top-3 text-[9px] font-semibold uppercase tracking-[0.1em] rounded-full px-2 py-0.5" style={{ color: w.ink, background: 'rgba(255,255,255,.55)' }}>Placeholder</span>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-    <WorkPeek onBackToHero={() => onNavigateDir('down')} />
+      <WorkPeek onBackToHero={() => onNavigateDir('down')} />
     </div>
   );
 }
@@ -628,8 +647,8 @@ function CellCrossfade({ id, skeletonMode, revealRank, onNavigateDir }: { id: Ce
 
 function CellContent({ id, onNavigateDir }: { id: CellId; onNavigateDir: (dir: NavDir) => void }) {
   switch (id) {
-    case 'hero':      return <HeroCell onNavigateDir={onNavigateDir} />;
-    case 'work':      return <WorkCell onNavigateDir={onNavigateDir} />;
+    case 'hero':      return <HeroCell />;
+    case 'work':      return <OtherWorksCell onNavigateDir={onNavigateDir} />;
     case 'about':     return <AboutCell />;
     case 'gallery':   return <GalleryCell />;
     case 'fun':       return <FunCell />;
