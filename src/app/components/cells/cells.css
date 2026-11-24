@@ -1,5 +1,5 @@
 /* ── Contact ────────────────────────────────────────────────────────────── */
 /* Short phones: keep the ask and the form, drop the supporting lines. */
-@container (max-height: 520px) { .ct-extra { display: none; } }
+@media (max-width: 767px) { @container (max-height: 520px) { .ct-extra { display: none; } } }
 /* Tall phones: room for the signature line again. */
 @media (max-width: 767px) { @container (min-height: 600px) { .ct-sig { display: block; } } }

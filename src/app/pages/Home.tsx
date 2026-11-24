@@ -392,15 +392,13 @@ export function ContactCell() {
       <div className="w-full max-w-5xl mx-auto flex flex-col md:grid md:grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-5 md:gap-4 lg:gap-14 md:items-center">
         {/* Left — greeting, status, signature */}
         <div className="flex flex-col gap-3 md:gap-5 max-w-[420px]">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2 flex-shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-70" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
-            </span>
-            <span className="text-[10.5px] md:text-[11px] tracking-[0.08em] uppercase text-muted-foreground">
-              Open to <span className="hidden md:inline">select </span>freelance &amp; full-time work
-            </span>
-          </div>
+          {/* Page label, with the availability status folded in. */}
+          <p className="flex items-center gap-2 text-[11px] tracking-[0.12em] uppercase text-muted-foreground">
+            Contact
+            <span aria-hidden="true">·</span>
+            <span className="inline-flex h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
+            Open to work
+          </p>
 
           <h2 className="text-[clamp(23px,7.2cqw,27px)] md:text-[36px] leading-[1.12] text-foreground" style={{ letterSpacing: '-0.02em' }}>
             Got a project, a role,<br className="hidden md:inline" />{' '}
