@@ -6,13 +6,15 @@ export interface PageMeta {
   /** Short name, for the summary view. */
   name: string;
   /** Work and fun projects get a TL;DR toggle. Title: before, accent word, after. */
-  tldr?: { kind: 'Case study' | 'Fun project'; title: [string, string, string] };
+  tldr?: { kind: 'Case study' | 'Fun project'; title?: [string, string, string]; embedded?: boolean };
 }
 
 export const PAGES: Record<string, PageMeta> = {
-  '/case-study/bm-dashboard': { cell: 'work', name: 'BM Dashboard', tldr: { kind: 'Case study', title: ['BM Dashboard, in ', 'one', ' minute.'] } },
-  '/case-study/design-system': { cell: 'work', name: 'Design System', tldr: { kind: 'Case study', title: ['The design system, in ', 'one', ' minute.'] } },
-  '/case-study/mobile-app': { cell: 'work', name: 'Mobile App', tldr: { kind: 'Case study', title: ['The mobile app, in ', 'one', ' minute.'] } },
+  '/case-study/sales-case-card': { cell: 'work', name: 'Sales Case Card', tldr: { kind: 'Case study', embedded: true } },
+  '/case-study/rupyy-design-system': { cell: 'work', name: 'The Rupyy design system' },
+  '/case-study/journey-studio': { cell: 'work', name: 'Journey Studio', tldr: { kind: 'Case study', embedded: true } },
+  '/case-study/design-kit': { cell: 'work', name: 'Design Kit', tldr: { kind: 'Case study', embedded: true } },
+  '/case-study/illustration-studio': { cell: 'work', name: 'Illustration Studio', tldr: { kind: 'Case study', embedded: true } },
   '/play/whatiswrongwithin': { cell: 'work', name: 'What is wrong within', tldr: { kind: 'Fun project', title: ['What is wrong within, in ', 'one', ' minute.'] } },
   '/play/whatshouldieat': { cell: 'work', name: 'What should I eat', tldr: { kind: 'Fun project', title: ['What should I eat, in ', 'one', ' minute.'] } },
   '/play/nightmare-rider': { cell: 'work', name: 'Nightmare Rider', tldr: { kind: 'Fun project', title: ['Nightmare Rider, in ', 'one', ' minute.'] } },

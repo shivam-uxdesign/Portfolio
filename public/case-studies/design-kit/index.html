@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Design Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@500&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Same visual world as the Illustration Studio case study (a series): white paper, ink type, Rupyy green for structure, spark yellow used sparingly.
+     Layout: five beats, each a claim headline + a working exhibit; reading column with exhibits breaking wider. Product UI inside exhibits uses the Rupyy app tokens. */
+  --paper: #FBFBF8; --card: #FFFFFF; --ink: #15171C; --muted: #5E6470; --rule: #E4E6E1; --green: #00845A; --green-soft: #E4F3EC; --spark: #FFD94A; --desk: #EEF1EC;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif; --body: "Source Serif 4", Georgia, serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --app: "DM Sans", system-ui, sans-serif; --appd: "Poppins", system-ui, sans-serif;
+  --rp-green: #46BE88; --rp-blue: #3B82F6; --rp-ink: #1E293B; --rp-slate: #64748B; --rp-line: #E2E8F0; --rp-bg: #F1F5F9; --red: #D9534A; --amber: #C98A00; --purple: #7C3AED;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { -webkit-text-size-adjust: 100% }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 18.5px/1.6 var(--body) }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 22px }
+.col { max-width: 660px; display: grid; gap: 14px }
+h1, h2, h3, h4 { font-family: var(--display); margin: 0; text-wrap: balance }
+p { margin: 0 }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted) }
+.ph { font: 500 .8em var(--mono); background: #FFF6CF; border: 1px dashed #C9A400; border-radius: 4px; padding: 0 5px; white-space: nowrap }
+.ex { font: 500 10.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: #8A6A00; background: #FFF6CF; border-radius: 4px; padding: 2px 6px; white-space: nowrap }
+button { font: inherit; color: inherit }
+
+/* Hero */
+.hero { padding: 60px 0 56px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 44px; align-items: center; border-bottom: 1px solid var(--rule) }
+.hero h1 { font-size: clamp(46px, 7.6vw, 96px); font-weight: 800; line-height: .92; letter-spacing: -.04em }
+.hero .kick { font: 700 clamp(22px, 2.6vw, 30px)/1.2 var(--display); letter-spacing: -.015em; margin-top: 18px; max-width: 22ch }
+.hero .kick em { font-style: normal; background: linear-gradient(transparent 62%, var(--spark) 62% 92%, transparent 92%) }
+.hero .dek { margin-top: 16px; font-size: 19px; line-height: 1.5; color: #2B2F37; max-width: 38ch }
+.meta { margin-top: 24px; display: grid; grid-template-columns: repeat(4, auto); gap: 6px 26px; justify-content: start }
+.meta div { display: grid; gap: 2px } .meta b { font: 600 15px/1.3 var(--display) }
+.hero .art { position: relative; justify-self: center; width: min(100%, 440px); aspect-ratio: 1; background: var(--card); border: 1px solid var(--rule); border-radius: 28px; box-shadow: 0 1px 2px rgba(20,30,25,.05), 0 24px 60px -30px rgba(20,40,30,.35); overflow: hidden }
+.hero .art svg { width: 100%; height: 100%; display: block }
+.hero .art .tag { position: absolute; left: 18px; bottom: 16px; font: 500 11.5px var(--mono); color: var(--muted) }
+.strip { margin-top: 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; grid-column: 1 / -1 }
+.stat { border-top: 3px solid var(--ink); padding-top: 10px; display: grid; gap: 4px }
+.stat b { font: 800 32px/1.05 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums }
+.stat span { font-size: 15px; line-height: 1.4; color: #2B2F37 }
+
+section { padding: 72px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 26px }
+section:last-of-type { border-bottom: 0 }
+.beat { display: flex; gap: 14px; align-items: baseline }
+.beat .n { font: 800 15px var(--display); color: var(--green) }
+h2 { font-size: clamp(32px, 4.4vw, 50px); font-weight: 800; letter-spacing: -.03em; line-height: 1.02 }
+h3 { font-size: 23px; font-weight: 700; letter-spacing: -.015em }
+.sub { display: grid; gap: 18px; margin-top: 18px }
+.sub .col p { font-size: 17.5px }
+.sub-h { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap }
+.sub-h .k { font: 500 11.5px var(--mono); color: var(--green); letter-spacing: .05em; text-transform: uppercase }
+figure { margin: 0; display: grid; gap: 10px }
+figcaption { font: 500 12.5px/1.5 var(--mono); color: var(--muted) }
+.desk { background: var(--desk); border-radius: 22px; padding: clamp(12px, 2.6vw, 28px) }
+.panel { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 20px; box-shadow: 0 1px 2px rgba(20,30,25,.04) }
+ul.pain { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+ul.pain li { border-top: 2px solid var(--red); padding-top: 10px; font-size: 16px; line-height: 1.45 }
+ul.pain b { display: block; font-family: var(--display); font-size: 17px; margin-bottom: 2px }
+.principles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+.pr { background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 18px; display: grid; gap: 6px; align-content: start }
+.pr b { font: 700 17px/1.25 var(--display) }
+.pr p { font-size: 15.5px; line-height: 1.45; color: #2B2F37 }
+.pr i { font-style: normal; font: 800 13px var(--display); color: var(--green) }
+.role { background: var(--green-soft); border-radius: 14px; padding: 18px 20px; display: grid; gap: 6px; font-size: 17px; line-height: 1.5 }
+
+/* Controls */
+.btn { font: 600 14px var(--display); border: 1px solid var(--rule); background: var(--card); color: var(--ink); border-radius: 999px; padding: 8px 14px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center }
+.btn:hover { border-color: #B9BFB7 }
+.btn.primary { background: var(--green); color: #fff; border-color: var(--green) }
+.btn.red { background: var(--red); color: #fff; border-color: var(--red) }
+.btn:disabled { opacity: .5; cursor: default }
+.btn.sm { padding: 5px 11px; font-size: 12.5px }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; padding: 3px; background: var(--card); flex-wrap: wrap }
+.seg button { border: 0; background: none; font: 600 13px var(--display); padding: 6px 14px; border-radius: 999px; cursor: pointer; color: var(--muted) }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between }
+.hint { font: 500 12px var(--mono); color: var(--muted) }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 3px }
+
+/* 01 parallel tracks */
+.tracks { display: grid; gap: 10px }
+.trk { display: grid; grid-template-columns: 132px minmax(0,1fr); gap: 12px; align-items: center }
+.trk > span { font: 600 13.5px var(--display); display: flex; gap: 8px; align-items: center }
+.trk > span i { width: 10px; height: 10px; border-radius: 3px; flex: none }
+.trk ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none }
+.trk li { flex: none; font: 500 12px/1 var(--app); padding: 8px 10px; border-radius: 8px; background: #F2F3F0; color: #8B9089; border: 1px solid transparent; transition: background .25s, color .25s, border-color .25s }
+.trk li.on { background: #fff; color: var(--ink); border-color: currentColor }
+.trk li.now { box-shadow: 0 0 0 3px rgba(255,217,74,.7) }
+.trk.single li { background: none; border: 1px dashed #CBD1C9 }
+.tclock { font: 600 13px var(--mono); color: var(--muted) }
+
+/* 02 shapes */
+.shapes { display: grid; grid-template-columns: 1fr 1.1fr; gap: 24px; align-items: center }
+.shp-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px }
+.shp { border: 1px solid var(--rule); background: var(--card); border-radius: 12px; padding: 10px 6px 8px; cursor: pointer; display: grid; gap: 6px; justify-items: center; font: 600 12px var(--display); color: var(--ink) }
+.shp svg { width: 56px; height: 34px }
+.shp[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); background: #FAFBF8 }
+.shp-detail { display: grid; gap: 10px; align-content: start; min-height: 190px }
+.shp-detail h4 { font: 800 24px var(--display); letter-spacing: -.02em }
+.shp-detail p { font-size: 16.5px; line-height: 1.5 }
+.shp-detail .inproto { background: var(--green-soft); border-radius: 12px; padding: 12px 14px; font-size: 15.5px; line-height: 1.45 }
+.shp-detail .inproto b { font: 700 12px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--green); display: block; margin-bottom: 3px }
+
+/* Flow explorer */
+.flowx { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: stretch }
+.canvas { background: #FAFBFC; background-image: radial-gradient(#DDE3EA 1px, transparent 1px); background-size: 18px 18px; border: 1px solid var(--rp-line); border-radius: 14px; overflow: hidden; position: relative }
+.canvas svg { width: 100%; height: auto; display: block }
+.canvas .node { cursor: pointer }
+.canvas .node text { font: 600 12px var(--app); fill: var(--rp-ink); pointer-events: none }
+.canvas .node .code { font: 600 10px var(--mono); fill: #94A3B8 }
+.canvas .edge path.ln { fill: none; stroke: #A3AEBD; stroke-width: 1.6 }
+.canvas .edge path.hit { fill: none; stroke: transparent; stroke-width: 14; cursor: pointer }
+.canvas .edge.loop path.ln { stroke-dasharray: 5 4 }
+.canvas .edge text { font: 500 10.5px var(--app); fill: #475569; paint-order: stroke; stroke: #FAFBFC; stroke-width: 4px; pointer-events: none }
+.canvas.focus .node:not(.hl), .canvas.focus .edge:not(.hl) { opacity: .18 }
+.canvas .node, .canvas .edge { transition: opacity .25s }
+.canvas .edge.hl path.ln { stroke: var(--ink); stroke-width: 2.2 }
+.canvas .node.sel .bd { stroke-width: 2.6 }
+.canvas .pulse { animation: pulse .7s ease 2 }
+@keyframes pulse { 50% { transform: scale(1.06) } }
+.side { background: var(--card); border: 1px solid var(--rp-line); border-radius: 14px; padding: 16px; display: grid; gap: 10px; align-content: start; font-family: var(--app); font-size: 14px; line-height: 1.45 }
+.side h4 { font: 700 17px var(--app); color: var(--rp-ink) }
+.side .chip { display: inline-flex; align-items: center; gap: 6px; font: 600 11.5px var(--app); padding: 3px 9px; border-radius: 999px; background: #F1F5F9; color: #334155 }
+.side .chip i { width: 8px; height: 8px; border-radius: 50% }
+.side .note { background: #FFFBEB; border: 1px solid #FDE68A; color: #713F12; border-radius: 10px; padding: 10px 12px; font-size: 13px }
+.side .nb { display: grid; gap: 4px }
+.side .nb b { font: 600 11px var(--mono); color: #94A3B8; letter-spacing: .05em; text-transform: uppercase }
+.side .nb button { text-align: left; border: 1px solid var(--rp-line); background: #fff; border-radius: 8px; padding: 6px 9px; cursor: pointer; font: 500 13px var(--app); color: var(--rp-ink) }
+.side .nb button:hover { border-color: #94A3B8 }
+.side .nb small { color: #64748B; margin-left: 4px }
+
+/* Devices */
+.devices { display: flex; gap: 18px; align-items: flex-start; justify-content: center; flex-wrap: wrap }
+.phone { width: 270px; flex: none; border: 9px solid #1A1F2C; border-radius: 36px; background: var(--rp-bg); overflow: hidden; box-shadow: 0 30px 60px -30px rgba(20,40,30,.45); font-family: var(--app); display: flex; flex-direction: column; height: 520px; transition: opacity .35s, transform .35s }
+.phone .sb { display: flex; justify-content: space-between; align-items: center; padding: 8px 18px 4px; font: 600 11px var(--app); color: #1A1F2C; background: #fff }
+.phone .sb i { width: 62px; height: 17px; border-radius: 10px; background: #1A1F2C }
+.phone .ah { background: #fff; padding: 8px 14px 10px; border-bottom: 1px solid var(--rp-line); display: flex; justify-content: space-between; align-items: center }
+.phone .ah b { font: 700 15px var(--appd); color: var(--rp-ink) }
+.phone .ah small { font: 600 10.5px var(--app); color: var(--rp-slate) }
+.phone .pb { flex: 1; overflow: auto; padding: 12px; display: grid; gap: 10px; align-content: start; scrollbar-width: none }
+.devlabel { font: 600 11.5px var(--mono); color: var(--muted); text-align: center; margin-top: 8px; letter-spacing: .04em }
+.dev { display: grid; justify-items: center; min-width: 0; max-width: 100% }
+.ccard { background: #fff; border: 1px solid var(--rp-line); border-radius: 12px; padding: 12px; display: grid; gap: 8px; transition: border-color .3s, box-shadow .3s }
+.ccard .t { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start }
+.ccard .t > div { flex: 1; min-width: 0 }
+.ccard .t b { font: 700 13.5px var(--appd); color: var(--rp-ink); display: block }
+.ccard .t small { font: 500 11.5px var(--app); color: var(--rp-slate) }
+.pill { display: inline-flex; font: 600 10.5px/16px var(--appd); padding: 2px 8px; border-radius: 999px; white-space: nowrap }
+.pill.g { background: #EDFFF7; color: #1F8A5C } .pill.a { background: #FFFBEB; color: #B45309 } .pill.r { background: #FEF2F2; color: #DC2626 } .pill.b { background: #EFF6FF; color: #1D4ED8 } .pill.s { background: #F1F5F9; color: #475569 } .pill.p { background: #F5F3FF; color: #6D28D9 }
+.bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px }
+.bars i { height: 5px; border-radius: 3px; background: #E2E8F0 } .bars i.d { background: var(--rp-green) } .bars i.c { background: #F59E0B } .bars i.x { background: #EF4444 }
+.ccard .ft { display: flex; justify-content: space-between; font: 600 12px var(--appd); color: var(--rp-blue) }
+.ghost { opacity: .55 }
+.desktop { width: min(520px, 100%); flex: none; border: 1px solid #CBD5E1; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -34px rgba(20,40,30,.45); font-family: var(--app); transition: opacity .35s }
+.desktop .bar { height: 26px; background: #EEF1F5; display: flex; gap: 6px; align-items: center; padding: 0 10px }
+.desktop .bar i { width: 9px; height: 9px; border-radius: 50%; background: #CBD5E1 }
+.desktop .bar span { margin-left: 10px; font: 500 10.5px var(--mono); color: #64748B }
+.desktop .top { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--rp-line) }
+.desktop .top b { font: 800 15px var(--app) } .desktop .top b em { font-style: normal; color: #22B573 }
+.desktop .facts { display: flex; gap: 18px; padding: 10px 16px; background: #F3F6FD; font-size: 12px; color: #6B7280; flex-wrap: wrap }
+.desktop .facts span b { display: block; color: #1F2430; font-weight: 600; font-size: 13px }
+.desktop .rows { padding: 12px 16px; display: grid; gap: 8px }
+.frow { display: grid; grid-template-columns: 110px 1fr auto; gap: 10px; align-items: center; border: 1px solid #ECEEF2; border-radius: 8px; padding: 8px 10px; font-size: 13px; transition: background .2s, border-color .2s }
+.frow .k { color: #6B7280 } .frow .v { color: #1F2430; font-weight: 600 }
+.frow.ok { border-color: #9EE0BF; background: #F6FCF9 } .frow.bad { border-color: #F5AAAA; background: #FFF8F8 }
+.vb { display: flex; gap: 6px } .vb button { width: 28px; height: 28px; border: 1px solid #E3E6EC; border-radius: 6px; background: #fff; cursor: pointer; color: #9AA0AB; font-weight: 700 }
+.vb button.y[aria-pressed="true"] { background: #22B573; border-color: #22B573; color: #fff } .vb button.n[aria-pressed="true"] { background: #EF4444; border-color: #EF4444; color: #fff }
+.frow .why { grid-column: 1 / -1; font-size: 12px; color: #991B1B; background: #FEF2F2; border-radius: 6px; padding: 5px 8px; display: none }
+.frow.bad .why { display: block }
+.desktop .foot { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px 14px; gap: 10px }
+.desktop .go { border: 0; border-radius: 6px; padding: 9px 16px; font: 600 13px var(--app); cursor: pointer; background: #E5E7EB; color: #A3A8B3 }
+.desktop .go.g { background: #22B573; color: #fff } .desktop .go.r { background: #EF4444; color: #fff }
+.xcard { width: 270px; flex: none; border: 1.5px dashed #A78BFA; background: #F5F3FF; border-radius: 18px; padding: 16px; display: grid; gap: 10px; font-family: var(--app); font-size: 13.5px; color: #4C1D95 }
+.xcard b { font: 700 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--purple) }
+.xcard h5 { margin: 0; font: 700 16px var(--app); color: #2E1065 }
+.xcard button { border: 1px solid #C4B5FD; background: #fff; border-radius: 10px; padding: 9px 10px; text-align: left; cursor: pointer; font: 600 13px var(--app); color: #4C1D95 }
+.xcard button:hover { border-color: var(--purple) }
+.hide { display: none !important }
+.fadein { animation: fadein .45s ease both }
+@keyframes fadein { from { opacity: 0; transform: translateY(10px) } }
+
+/* Design system */
+.ds { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 18px }
+.parts { display: grid; gap: 8px; align-content: start }
+.part { border: 1px solid var(--rule); background: var(--card); border-radius: 12px; padding: 11px 13px; cursor: pointer; display: grid; gap: 6px; text-align: left }
+.part[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.part .nm { display: flex; justify-content: space-between; font: 500 13px var(--mono) }
+.part .nm b { font: 700 13px var(--display) }
+.part .meter { height: 6px; border-radius: 3px; background: #EEF0EC; overflow: hidden } .part .meter i { display: block; height: 100%; background: var(--green); border-radius: 3px }
+.partview { background: var(--rp-bg); border-radius: 16px; padding: 18px; display: grid; gap: 14px; align-content: start; font-family: var(--app) }
+.partview .prev { background: #fff; border: 1px solid var(--rp-line); border-radius: 12px; padding: 14px; max-width: 380px }
+.usedon { display: flex; flex-wrap: wrap; gap: 6px }
+.usedon span { font: 500 11.5px var(--app); background: #fff; border: 1px solid var(--rp-line); border-radius: 999px; padding: 3px 9px; color: #334155 }
+.usedon span.more { background: none; border-style: dashed }
+.states { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start }
+.patch { background: #14161B; color: #D7DCE3; border-radius: 14px; padding: 16px; font: 500 12.5px/1.65 var(--mono); overflow-x: auto; white-space: pre }
+.patch .k { color: #8B95A5 } .patch .f { color: #FCA5A5 } .patch .r { color: #86EFAC } .patch .c { color: #6B7280 }
+.agent { background: #fff; border: 1px solid var(--rp-line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; font-family: var(--app) }
+.agent .hd { display: flex; justify-content: space-between; align-items: center }
+.agent .hd b { font: 700 14px var(--appd); color: var(--rp-ink) }
+.svc { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 13px; color: #475569; padding: 10px; border-radius: 10px; background: #F8FAFC }
+.svc b { color: var(--rp-ink) }
+.svc .msg { grid-column: 1 / -1; font-size: 12px; color: #64748B }
+.svc .msg.hl, .agent .hl { animation: flash 1s ease }
+@keyframes flash { 0% { background: #FFF3B0 } 100% { background: transparent } }
+.agent .cta { border: 0; border-radius: 10px; padding: 10px; font: 600 13px var(--appd); background: var(--rp-green); color: #fff }
+.agent .cta.off { background: #CBD5E1 !important; color: #fff }
+.tokens { width: 100%; border-collapse: collapse; font: 500 13px var(--app) }
+.tokens th { text-align: left; font: 500 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--rule) }
+.tokens td { padding: 9px 10px; border-bottom: 1px solid #F0F1EE; font-variant-numeric: tabular-nums }
+.tokens td.sw span { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 7px; border: 1px solid rgba(0,0,0,.08) }
+.st-ok { color: #1F8A5C; font-weight: 600 } .st-dr { color: #B91C1C; font-weight: 700 }
+tr.drift td { background: #FEF2F2 }
+
+/* Projects */
+.projects { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px }
+.proj { background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 14px; display: grid; gap: 8px; align-content: start; border-top: 4px solid var(--c) }
+.proj b { font: 700 16px/1.2 var(--display) }
+.proj .dv { font: 500 11px var(--mono); color: var(--muted); letter-spacing: .03em }
+.proj .ns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px }
+.proj .ns div { font: 500 11px var(--mono); color: var(--muted) } .proj .ns div b { display: block; font: 800 22px var(--display); color: var(--ink) }
+.proj p { font-size: 14.5px; line-height: 1.4; color: #2B2F37 }
+
+/* Needs attention */
+.na { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 18px; align-items: start }
+.hcard { background: #fff; border: 1px solid var(--rp-line); border-radius: 16px; padding: 18px; display: grid; gap: 12px; font-family: var(--app) }
+.hcard .hh { display: flex; justify-content: space-between; align-items: center; gap: 10px }
+.hcard .hh b { font: 700 18px var(--app); color: var(--rp-ink); display: flex; gap: 8px; align-items: center }
+.hcard .hh b i { width: 10px; height: 10px; border-radius: 3px }
+.hcard .stats { font: 500 12.5px var(--app); color: #64748B }
+.attn { border: 0; border-radius: 10px; padding: 10px 12px; font: 600 13.5px var(--app); display: flex; justify-content: space-between; align-items: center; background: #FEF2F2; color: #B91C1C; width: 100% }
+.attn.clean { background: #ECFDF5; color: #047857 }
+.issues { display: grid; gap: 12px }
+.igroup b { font: 600 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: #94A3B8; display: flex; gap: 8px; align-items: center }
+.irow { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 11px; border: 1px solid var(--rp-line); border-radius: 10px; margin-top: 6px; font: 500 13px var(--app); color: var(--rp-ink); background: #fff; transition: opacity .3s, background .3s }
+.irow small { color: #64748B; font-weight: 500 }
+.irow.fixed { opacity: .45; text-decoration: line-through }
+.kind { font: 600 10px var(--mono); padding: 2px 6px; border-radius: 4px; background: #F1F5F9; color: #475569; text-transform: uppercase; letter-spacing: .04em; flex: none }
+.kind.dead { background: #FEE2E2; color: #B91C1C } .irow .kind.heavy { background: #FEF3C7; color: #92400E } .irow .kind.design { background: #EDE9FE; color: #5B21B6 } .irow .kind.drift { background: #E0F2FE; color: #075985 }
+.mini { background: #FAFBFC; background-image: radial-gradient(#DDE3EA 1px, transparent 1px); background-size: 16px 16px; border: 1px solid var(--rp-line); border-radius: 14px; padding: 14px; display: grid; gap: 12px }
+.mini svg { width: 100%; height: auto; display: block }
+
+/* Review */
+.review { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 26px; align-items: start }
+.pinwrap { position: relative }
+.pin { position: absolute; width: 26px; height: 26px; border-radius: 50% 50% 50% 4px; background: var(--purple); color: #fff; font: 700 12px var(--app); border: 2px solid #fff; box-shadow: 0 4px 10px rgba(76,29,149,.35); cursor: pointer; display: grid; place-items: center; z-index: 3 }
+.thread { background: #fff; border: 1px solid var(--rp-line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; font-family: var(--app); font-size: 14px }
+.msg { display: grid; gap: 2px } .msg b { font: 600 12.5px var(--app); color: var(--rp-ink) } .msg span { color: #334155 }
+.msg small { color: #94A3B8; font-size: 11.5px }
+.status3 button[aria-pressed="true"][data-s="Draft"] { background: #64748B } .status3 button[aria-pressed="true"][data-s="In review"] { background: #B45309 } .status3 button[aria-pressed="true"][data-s="Approved"] { background: #047857 }
+[contenteditable] { outline: 1px dashed transparent; border-radius: 4px; transition: outline-color .2s }
+[contenteditable]:hover { outline-color: #93C5FD } [contenteditable]:focus { outline: 2px solid var(--rp-blue) }
+.toast { font: 500 12.5px var(--app); background: #1E293B; color: #fff; border-radius: 10px; padding: 8px 12px; display: inline-flex; gap: 10px; align-items: center; opacity: 0; transition: opacity .25s }
+.toast.on { opacity: 1 } .toast button { background: none; border: 0; color: #93C5FD; font-weight: 600; cursor: pointer; padding: 0 }
+
+/* History + handover + testing */
+.three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start }
+.tile3 { background: #fff; border: 1px solid var(--rule); border-radius: 16px; padding: 16px; display: grid; gap: 10px; align-content: start; font-family: var(--app); font-size: 13.5px; color: #334155 }
+.tile3 h4 { font: 700 18px var(--display); color: var(--ink) }
+.tile3 > p { font: 400 15px/1.45 var(--body); color: #2B2F37 }
+.ver { display: grid; grid-template-columns: 12px 1fr auto; gap: 10px; align-items: start; padding: 8px 0; border-top: 1px solid #F1F2EF }
+.ver i { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; background: #CBD5E1 } .ver i.n { background: var(--green) } .ver i.cur { background: var(--ink) }
+.ver b { display: block; color: var(--rp-ink); font-weight: 600 } .ver small { color: #94A3B8 }
+.spec { border: 1px solid var(--rp-line); border-radius: 12px; padding: 12px; display: grid; gap: 8px; background: #F8FAFC }
+.spec .tk { display: flex; flex-wrap: wrap; gap: 6px } .spec .tk span { font: 600 11px var(--mono); background: #fff; border: 1px solid #BFDBFE; color: #1D4ED8; border-radius: 6px; padding: 2px 6px }
+.funnel { display: grid; gap: 6px }
+.fstep { display: grid; grid-template-columns: 110px 1fr 38px; gap: 8px; align-items: center; font-size: 12.5px }
+.fstep .bar { height: 14px; background: #EEF0EC; border-radius: 4px; overflow: hidden } .fstep .bar i { display: block; height: 100%; background: var(--green); border-radius: 4px; transition: width .6s ease }
+.fstep .bar i.low { background: #F59E0B }
+.fstep span:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600 }
+
+/* Impact */
+.nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+.chart { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 20px }
+.chart svg { width: 100%; height: auto; display: block }
+.chart text { font: 500 12px var(--app); fill: #475569 }
+.chart .lbl { font: 700 13px var(--display); fill: var(--ink) }
+.chart .val { font: 600 12px var(--mono); fill: var(--ink) }
+.reflect { display: grid; grid-template-columns: 1fr 1fr; gap: 24px }
+.reflect div { display: grid; gap: 8px; align-content: start }
+.reflect ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 16.5px }
+footer { padding: 28px 0 48px; font: 500 12px var(--mono); color: var(--muted); border-top: 1px solid var(--rule) }
+
+
+/* Meet the studio */
+.tour { display: grid; gap: 14px }
+.tour .tabs { display: flex; flex-wrap: wrap; gap: 8px }
+.tour .tabs button { border: 1px solid var(--rule); background: var(--card); border-radius: 999px; padding: 8px 14px; font: 600 13.5px var(--display); cursor: pointer; color: var(--muted); display: inline-flex; gap: 8px; align-items: center }
+.tour .tabs button i { font: 500 11px var(--mono); font-style: normal; color: var(--muted) }
+.tour .tabs button[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: #fff } .tour .tabs button[aria-selected="true"] i { color: #C9CDC6 }
+.frame { background: #fff; border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(20,30,25,.05), 0 30px 70px -40px rgba(20,40,30,.45) }
+.frame .chrome { height: 30px; display: flex; align-items: center; gap: 7px; padding: 0 12px; background: #F3F4F1; border-bottom: 1px solid var(--rule) }
+.frame .chrome i { width: 10px; height: 10px; border-radius: 50%; background: #D5D9D3 }
+.frame .chrome span { margin-left: 12px; font: 500 11.5px var(--mono); color: var(--muted) }
+.frame img { display: block; width: 100%; height: auto; aspect-ratio: 1600 / 1000; background: #F6F7F5 }
+.tour .cap { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap }
+.tour .cap b { font: 700 18px var(--display) } .tour .cap span { font-size: 16.5px; color: #2B2F37; max-width: 70ch }
+@media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation: none !important; transition: none !important } }
+@media (max-width: 960px) {
+  .hero, .reflect, .shapes, .flowx, .ds, .states, .na, .review { grid-template-columns: 1fr } .hero .art { grid-row: 1; width: min(100%, 360px) }
+  ul.pain, .principles { grid-template-columns: 1fr 1fr } .projects { grid-template-columns: repeat(2, 1fr) } .three { grid-template-columns: 1fr } .nums { grid-template-columns: 1fr 1fr }
+  .meta { grid-template-columns: repeat(2, auto) } .side { order: 2 }
+}
+@media (max-width: 560px) {
+  .canvas, .chart { overflow-x: auto } .canvas svg { min-width: 720px } .chart svg { min-width: 560px }
+  body { font-size: 17.5px } .strip { grid-template-columns: 1fr } ul.pain, .principles { grid-template-columns: 1fr } .projects { grid-template-columns: 1fr }
+  .shp-list { grid-template-columns: repeat(2, 1fr) } .trk { grid-template-columns: 1fr } .frow { grid-template-columns: 1fr auto } .frow .k { grid-column: 1 / -1 }
+}
+
+/* System bar: the three tools as one series */
+.sys { position: sticky; top: 0; z-index: 40; background: rgba(251,251,248,.92); backdrop-filter: saturate(1.4) blur(8px); -webkit-backdrop-filter: saturate(1.4) blur(8px); border-bottom: 1px solid var(--rule) }
+.sys .wrap { display: flex; align-items: center; gap: 10px; min-height: 52px; flex-wrap: wrap; padding-top: 6px; padding-bottom: 6px }
+.sys .lab { font: 500 11.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-right: 4px }
+.sys a { font: 600 13.5px var(--display); color: var(--ink); text-decoration: none; border: 1px solid var(--rule); background: var(--card); border-radius: 999px; padding: 6px 12px; display: inline-flex; gap: 7px; align-items: center }
+.sys a i { width: 8px; height: 8px; border-radius: 50%; display: inline-block }
+.sys a[aria-current="page"] { background: var(--ink); color: #fff; border-color: var(--ink) }
+.sys a:hover:not([aria-current]) { border-color: #B9BFB7 }
+.sys .all { margin-left: auto; background: transparent; border-color: transparent; color: var(--green) }
+@media (max-width: 720px) { .sys .lab { display: none } .sys .all { margin-left: 0 } .sys a { font-size: 12.5px; padding: 5px 10px } }
+
+/* Talks to: how this tool calls on the other two */
+.talks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px }
+.talk { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 18px 20px; display: grid; gap: 8px; align-content: start }
+.talk .who { display: flex; gap: 8px; align-items: center; font: 700 17px var(--display) }
+.talk .who i { width: 10px; height: 10px; border-radius: 50%; display: inline-block }
+.talk .when { font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted) }
+.talk p { font-size: 16px; line-height: 1.5; color: #2B2F37 }
+.talk ol { margin: 4px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 15.5px; line-height: 1.45; color: #2B2F37 }
+
+/* Decision log: what I decided, against what */
+.calls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px }
+.call { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 18px 20px; display: grid; gap: 8px; align-content: start }
+.call .k { font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--green) }
+.call b { font: 700 18px/1.25 var(--display) }
+.call .was { font-size: 15px; line-height: 1.45; color: var(--muted) }
+.call .was s { color: var(--muted) }
+.call p { font-size: 15.5px; line-height: 1.5; color: #2B2F37 }
+
+/* Outcomes: before → after */
+.outs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+.out { border-top: 3px solid var(--green); padding-top: 10px; display: grid; gap: 4px }
+.out .ba { font: 800 26px/1.1 var(--display); letter-spacing: -.02em; font-variant-numeric: tabular-nums }
+.out .ba s { color: #9AA09A; text-decoration-thickness: 2px; font-weight: 700 }
+.out span { font-size: 15px; line-height: 1.4; color: #2B2F37 }
+
+/* Next in the system */
+.nextsys { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px }
+.nextsys a { text-decoration: none; color: inherit; background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 20px 22px; display: grid; gap: 6px; transition: border-color .15s }
+.nextsys a:hover { border-color: var(--ink) }
+.nextsys .label { display: flex; gap: 8px; align-items: center }
+.nextsys .label i { width: 9px; height: 9px; border-radius: 50%; display: inline-block }
+.nextsys b { font: 800 26px/1.1 var(--display); letter-spacing: -.02em }
+.nextsys p { font-size: 16px; color: #2B2F37 }
+.fict { font: 500 12px var(--mono); color: var(--muted); margin-top: 6px }
+@media (max-width: 900px) { .talks, .calls, .nextsys { grid-template-columns: 1fr } .outs { grid-template-columns: 1fr 1fr } }
+
+/* Design Kit page exhibits */
+.same { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px }
+.sm-col { border: 1px solid var(--rule); border-radius: 14px; padding: 16px; display: grid; gap: 12px; background: #FCFCFA }
+.sm-col .t { font: 600 14px var(--display); display: flex; gap: 8px; align-items: center }
+.sm-col .t i { width: 9px; height: 9px; border-radius: 50%; display: inline-block }
+.sm-btn { font: 600 15px var(--appd); color: #fff; border: 0; display: flex; align-items: center; justify-content: center; transition: background .4s, border-radius .4s, height .4s, letter-spacing .4s }
+.sm-vals { font: 500 11.5px/1.7 var(--mono); color: var(--muted); display: grid }
+.sm-vals b { color: var(--ink); font-weight: 500 }
+.sm-vals .bad { color: var(--red) }
+
+.layers { display: grid; grid-template-columns: .9fr 1.1fr; gap: 18px; align-items: stretch }
+.lprev { display: grid; place-items: center; min-height: 340px }
+.lcard { width: min(100%, 380px); background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; display: grid; gap: 12px; font-family: Poppins, system-ui, sans-serif; transition: padding .35s, gap .35s; box-shadow: 0 8px 24px -16px rgba(15,23,42,.35) }
+.lcard .lh { display: flex; justify-content: space-between; align-items: center; gap: 8px }
+.lcard .lt { font: 600 16px/24px Poppins, sans-serif; color: #1E293B }
+.lcard .chip { font: 600 12px/16px Poppins, sans-serif; padding: 2px 8px; border-radius: 999px; background: #F3F9FF; color: #3B82F6 }
+.lcard .kv { display: flex; justify-content: space-between; font: 400 14px/20px Poppins, sans-serif; color: #64748B; border-bottom: 1px dashed #E2E8F0; transition: padding .35s }
+.lcard .kv b { color: #1E293B; font-weight: 600 }
+.lcard .cta { border: 0; color: #fff; width: 100%; height: 48px; border-radius: 12px; background: #46BE88; font: 600 18px/24px Poppins, sans-serif; letter-spacing: -.3px }
+.lcard .meta2 { font: 500 11px var(--mono); color: #94A3B8 }
+
+.pipe { display: grid; gap: 16px }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px }
+.steps li { border-top: 3px solid var(--rule); padding-top: 8px; font: 600 13.5px var(--display); color: var(--muted); display: grid; gap: 2px; transition: border-color .25s, color .25s }
+.steps li small { font: 500 11px var(--mono); color: var(--muted); font-weight: 500 }
+.steps li.done { border-color: var(--green); color: var(--ink) }
+.steps li.on { border-color: var(--ink); color: var(--ink) }
+.steps li.chg { border-color: var(--amber); color: var(--ink) }
+.pcard { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; align-items: start }
+.pdoc { border: 1px solid var(--rule); border-radius: 14px; padding: 16px; display: grid; gap: 8px; font-family: var(--app); font-size: 14px; color: #334155; background: #FCFCFA }
+.pdoc .ph2 { display: flex; justify-content: space-between; gap: 10px; align-items: center }
+.pdoc .ph2 b { font: 700 16px var(--display); color: var(--ink) }
+.pill2 { font: 600 11px var(--mono); padding: 3px 8px; border-radius: 999px; background: #EEF1EC; color: var(--muted); white-space: nowrap }
+.pill2.g { background: var(--green-soft); color: var(--green) } .pill2.a { background: #FFF4DB; color: #8A5A00 } .pill2.k { background: var(--ink); color: #fff }
+.pdoc code, .chk code { font: 500 12px var(--mono); background: #EEF1EC; padding: 1px 5px; border-radius: 4px }
+.chk { display: grid; gap: 8px; font-size: 14.5px; line-height: 1.45 }
+.chk div { display: flex; gap: 8px; align-items: flex-start }
+.chk i { font-style: normal; width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; font: 700 11px var(--app); flex: none; margin-top: 2px }
+.chk .y { background: var(--green-soft); color: var(--green) } .chk .n { background: #FFF4DB; color: #8A5A00 } .chk .w { background: #EEF1EC; color: var(--muted) }
+.studios { display: grid; gap: 8px }
+.studio { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--rule); border-radius: 12px; padding: 10px 12px; font: 600 14px var(--display); background: #fff }
+.studio span { display: flex; gap: 8px; align-items: center } .studio i { width: 8px; height: 8px; border-radius: 50%; display: inline-block }
+
+.contract { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; align-items: start }
+.code { margin: 0; background: #14161B; color: #D7DCE3; border-radius: 16px; padding: 18px; font: 500 12.5px/1.65 var(--mono); overflow-x: auto; white-space: pre }
+.code .c { color: #7D8590 } .code .h { color: #FFD94A } .code .f { color: #9FE0C2 } .code .k2 { color: #8AB4F8 }
+.chain { display: grid; gap: 10px }
+.chain .lk { background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 14px 16px; display: grid; gap: 4px; cursor: pointer; text-align: left; font: inherit }
+.chain .lk[aria-pressed="true"] { border-color: var(--ink) }
+.chain .lk small { font: 500 11px var(--mono); color: var(--muted); letter-spacing: .04em; text-transform: uppercase }
+.chain .lk b { font: 600 15px var(--mono); display: flex; gap: 8px; align-items: center }
+.chain .lk b i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; border: 1px solid rgba(0,0,0,.08) }
+.chain .arw { text-align: center; color: var(--muted); font: 500 12px var(--mono) }
+.chain .note { font-size: 15px; color: #2B2F37; line-height: 1.5 }
+
+.sot { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch }
+.sotc { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 20px 22px; display: grid; gap: 8px; align-content: start }
+.sotc b { font: 800 24px/1.1 var(--display); letter-spacing: -.02em }
+.sotc ul { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: 16px; line-height: 1.45 }
+.sotc.dark { background: var(--ink); color: #fff; border-color: var(--ink) } .sotc.dark .label { color: #9FE0C2 }
+.sotm { display: grid; place-items: center; align-content: center; gap: 6px; text-align: center; padding: 0 6px }
+.sotm span { font: 500 11.5px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--green) }
+.sotm i { font-style: normal; font: 800 34px var(--display); color: var(--green) }
+.sotm small { font: 500 11px var(--mono); color: var(--muted); max-width: 12ch }
+
+.parity { display: grid; gap: 14px }
+.pbar { display: flex; height: 42px; border-radius: 12px; overflow: hidden; font: 600 13px var(--display) }
+.pbar div { display: flex; align-items: center; padding: 0 12px; color: #fff; white-space: nowrap; overflow: hidden; transition: flex .6s }
+.plist { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px }
+.plist div { display: grid; gap: 4px; font-size: 14.5px; line-height: 1.45; color: #2B2F37 }
+.plist b { font: 700 15px var(--display); color: var(--ink); display: flex; gap: 8px; align-items: center }
+.plist b i { width: 10px; height: 10px; border-radius: 3px; display: inline-block }
+
+.brk { display: grid; grid-template-columns: .8fr 1.2fr; gap: 18px; align-items: start }
+.brk-l { display: grid; gap: 8px }
+.brk-l button { text-align: left; border: 1px solid var(--rule); background: var(--card); border-radius: 12px; padding: 12px 14px; cursor: pointer; font: 600 14.5px var(--display); display: grid; gap: 2px }
+.brk-l button small { font: 400 13px var(--body); color: var(--muted) }
+.brk-l button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 3px 0 0 var(--ink) }
+.brk-r { border: 1px solid var(--rule); border-radius: 14px; padding: 16px; background: #FCFCFA; display: grid; gap: 10px; min-height: 210px; align-content: start }
+.brk-r pre { margin: 0; font: 500 12.5px/1.6 var(--mono); background: #14161B; color: #D7DCE3; border-radius: 10px; padding: 12px; white-space: pre-wrap }
+.brk-r .flag { display: grid; gap: 4px; border-left: 3px solid var(--amber); padding: 4px 0 4px 12px; font-size: 15.5px; line-height: 1.45 }
+.brk-r .flag b { font: 700 15px var(--display) }
+.brk-r .fix { justify-self: start }
+.brk-r .okf { border-left-color: var(--green) }
+.nextsys-wrap { margin-top: 10px }
+
+@media (max-width: 900px) {
+  .same, .layers, .pcard, .contract, .brk { grid-template-columns: 1fr }
+  .steps { grid-template-columns: repeat(5, minmax(0, 1fr)) } .steps li { font-size: 11.5px } .steps li small { display: none }
+  .sot { grid-template-columns: 1fr } .sotm { padding: 4px 0 } .sotm i { transform: rotate(90deg) }
+  .plist { grid-template-columns: 1fr 1fr }
+}
+
+.cdf { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+.cdf li { background: var(--card); border: 1px solid var(--rule); border-top: 3px solid var(--amber); border-radius: 12px; padding: 14px 16px; font-size: 15.5px; line-height: 1.45; color: #2B2F37 }
+.cdf b { display: block; font: 700 16.5px var(--display); color: var(--ink); margin-bottom: 4px }
+@media (max-width: 900px) { .cdf { grid-template-columns: 1fr 1fr } }
+@media (max-width: 560px) { .cdf { grid-template-columns: 1fr } }
+
+/* hero: four tiles, one flow */
+.hx-in { opacity: 0; animation: hxIn .8s cubic-bezier(0, 0, .2, 1) forwards }
+@keyframes hxIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+.hx-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: hxDraw .75s cubic-bezier(.4, 0, .2, 1) forwards }
+@keyframes hxDraw { to { stroke-dashoffset: 0 } }
+@media (prefers-reduced-motion: reduce) { .hx-in { animation: none; opacity: 1 } .hx-draw { animation: none; stroke-dashoffset: 0 } }
+
+.cdtags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px }
+.cdtags span { display: inline-flex; gap: 8px; align-items: baseline; background: #F4F6F2; border: 1px solid var(--rule); border-radius: 999px; padding: 6px 14px; font-size: 14.5px; color: #2B2F37 }
+.cdtags b { font: 700 14px var(--display); color: var(--ink) }
+@media (max-width: 1000px) { .same { grid-template-columns: repeat(2, 1fr) } }
+@media (max-width: 560px) { .same { grid-template-columns: 1fr } }
+
+/* propose, review, release: track + frame */
+.prr { display: grid; gap: 18px }
+.prr-track { position: relative; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr) }
+.prr-top { display: flex; justify-content: center }
+.prr-track li { position: relative; z-index: 1; display: flex; justify-content: center }
+.prr-track button { display: grid; justify-items: center; gap: 4px; background: none; border: 0; cursor: pointer; padding: 0 4px; font: inherit; color: inherit }
+.prr-track i { width: 46px; height: 46px; border-radius: 14px; background: #fff; border: 2px solid #CFD8D2; display: grid; place-items: center; font-style: normal; font-size: 19px; transition: border-color .3s, box-shadow .3s, background .3s }
+.prr-track b { font: 700 14px var(--display) }
+.prr-track span { font: 500 11px var(--mono); color: var(--muted) }
+.prr-track button.on i { border-color: var(--ink); box-shadow: 0 0 0 5px rgba(21,23,28,.08) }
+.prr-track button.done i { border-color: var(--green); background: var(--green-soft) }
+.prr-line { position: absolute; left: 12.5%; right: 12.5%; top: 23px; height: 2px; background: #CFD8D2; z-index: 0 }
+.prr-line span { display: block; height: 100%; width: 0; background: var(--green); transition: width .5s cubic-bezier(.4, 0, .2, 1) }
+.prr-body { display: grid; grid-template-columns: 1.3fr .7fr; gap: 22px; align-items: center }
+.prr-vis { background: var(--desk); border-radius: 16px; min-height: 250px; padding: 22px; display: grid; place-items: center }
+.prr-vis.in > * { animation: prrIn .5s cubic-bezier(0, 0, .2, 1) both }
+@keyframes prrIn { from { opacity: 0; transform: translateX(18px) } to { opacity: 1; transform: none } }
+.prr-txt { display: grid; gap: 8px; align-content: center }
+.prr-n { font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--green) }
+.prr-txt b { font: 800 26px/1.1 var(--display); letter-spacing: -.02em }
+.prr-txt p { font-size: 16.5px; line-height: 1.5; color: #2B2F37 }
+.prr-ctl { display: flex; gap: 8px; margin-top: 6px }
+.pv-chat { display: grid; gap: 10px; width: min(100%, 360px) }
+.bub { font: 400 13px/1.45 Poppins, sans-serif; padding: 10px 12px; border-radius: 14px; max-width: 88% }
+.bub small { display: block; font: 600 9.5px var(--mono); opacity: .6; margin-bottom: 2px }
+.bub.pm { background: #fff; border: 1px solid var(--rule); justify-self: end; border-radius: 14px 14px 2px 14px }
+.bub.ai { background: var(--ink); color: #fff; border-radius: 14px 14px 14px 2px; animation: prrIn .5s .35s both }
+.pv-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: center }
+.pc { width: 210px; background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 13px; position: relative; box-shadow: 0 14px 30px -18px rgba(15,23,42,.45); font-family: Poppins, sans-serif; transition: transform .4s }
+.pc.small { transform: scale(.82) }
+.pc-t { font: 600 13.5px Poppins, sans-serif; color: #1E293B; display: flex; justify-content: space-between; align-items: center; white-space: nowrap }
+.pc-t em { font: 600 9.5px Poppins, sans-serif; font-style: normal; color: #3B82F6; background: #F3F9FF; border-radius: 999px; padding: 1px 7px }
+.pc-kv { display: flex; justify-content: space-between; font-size: 11px; color: #64748B; margin-top: 8px } .pc-kv b { color: #1E293B; font-weight: 600 }
+.pc-btn { margin-top: 11px; height: 28px; border-radius: 8px; background: #46BE88; color: #fff; font: 600 11px/28px Poppins, sans-serif; text-align: center }
+.pc-sk { position: absolute; inset: 42px 13px 13px; display: grid; gap: 8px; align-content: start; opacity: 0 }
+.pc-sk i { display: block; height: 10px; border-radius: 4px; background: #EEF2F6 } .pc-sk i.b { height: 28px; margin-top: 4px }
+.pc.filling .pc-sk { animation: skOut 1.1s ease both } .pc.filling .pc-f { animation: fIn 1.1s ease both }
+@keyframes skOut { 0%, 45% { opacity: 1 } 100% { opacity: 0 } }
+@keyframes fIn { 0%, 45% { opacity: 0 } 100% { opacity: 1 } }
+.pv-tag { font: 600 10.5px var(--mono); color: #8A5A00; background: #FFF4DB; border-radius: 999px; padding: 4px 10px }
+.pv-chk { display: grid; gap: 7px; font: 500 12px var(--mono); color: #1F7A52 }
+.pv-chk > span { animation: prrIn .4s both } .pv-chk > span:nth-child(2) { animation-delay: .25s } .pv-chk > span:nth-child(3) { animation-delay: .5s }
+.pv-acts { display: flex; gap: 10px; align-items: center; margin-top: 6px; animation: prrIn .4s .75s both }
+.pv-acts span { font: 600 12px Poppins, sans-serif; background: var(--green); color: #fff; border-radius: 8px; padding: 6px 14px }
+.pv-acts small { font: 500 11.5px Poppins, sans-serif; color: #8A5A00 }
+.pv-ship { display: grid; gap: 8px }
+.pv-ship div { display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 220px; background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 9px 12px; font: 600 13px var(--display); animation: prrIn .4s both }
+.pv-ship div:nth-child(2) { animation-delay: .2s } .pv-ship div:nth-child(3) { animation-delay: .4s }
+.pv-ship small { font: 600 10px var(--mono); color: var(--green) }
+.pv-ship i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 7px }
+@media (max-width: 800px) { .prr-body { grid-template-columns: 1fr } .prr-track span { display: none } }
+@media (prefers-reduced-motion: reduce) { .prr-vis.in > *, .bub.ai, .pv-chk > span, .pv-acts, .pv-ship div { animation: none } .pc.filling .pc-sk { animation: none; opacity: 0 } .pc.filling .pc-f { animation: none } }
+
+.prr-n { display: flex; gap: 10px; align-items: center; flex-wrap: wrap }
+.prr-who { font: 600 11px var(--mono); font-style: normal; text-transform: none; letter-spacing: 0; color: var(--ink); background: #F4F6F2; border: 1px solid var(--rule); border-radius: 999px; padding: 2px 9px }
+
+.prr-track button.rej i { border-color: #E0B54A }
+.prr-track button.rej.on i { border-color: #B45309; box-shadow: 0 0 0 5px rgba(180,83,9,.12) }
+.prr-track button.rej.done i { border-color: #B45309; background: #FFF4DB }
+.pv-chk .x { color: #B45309 }
+.pv-note { margin-top: 6px; max-width: 250px; background: #fff; border: 1px solid #F1D9A6; border-left: 3px solid #E0A526; border-radius: 10px; padding: 8px 10px; font: 400 12px/1.45 Poppins, sans-serif; color: #334155; animation: prrIn .4s .6s both }
+.pv-note b { display: block; font: 600 10px var(--mono); color: #8A5A00; margin-bottom: 2px }
+.pv-pin { position: relative }
+.pin { position: absolute; right: -9px; top: 96px; width: 22px; height: 22px; border-radius: 50% 50% 50% 2px; background: #E0A526; color: #fff; font: 700 11px/22px var(--mono); text-align: center; box-shadow: 0 4px 10px -4px rgba(0,0,0,.3); animation: prrIn .4s .4s both }
+.pv-vs { gap: 14px }
+.pv-old { opacity: .55; filter: grayscale(.3) }
+.pv-arrow { font: 800 24px var(--display); color: var(--green) }
+.pc-hint { font: 400 9.5px Poppins, sans-serif; color: #94A3B8; text-align: right; margin-top: 2px }
+.pc.v2 { border-color: #9FE0C2; box-shadow: 0 0 0 3px rgba(70,190,136,.18), 0 14px 30px -18px rgba(15,23,42,.45) }
+.pv-js { width: min(100%, 420px); background: #fff; border: 1px solid #D5DBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 14px 30px -20px rgba(15,23,42,.45) }
+.pv-jsbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #E2E8F0; background: #F8FAFC; font-size: 12px }
+.pv-jsbar i { width: 8px; height: 8px; border-radius: 50%; background: #2563EB } .pv-jsbar b { font: 600 12.5px var(--display) } .pv-jsbar span { margin-left: auto; font: 500 10px var(--mono); color: var(--muted) }
+.pv-jsbody { padding: 12px; display: grid; gap: 10px }
+.pv-banner { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: #EEF4FF; border: 1px solid #C9D9F7; border-radius: 10px; padding: 8px 10px; font: 600 12px Poppins, sans-serif; color: #1D4ED8 }
+.pv-banner div { display: flex; gap: 6px } .pv-banner span { font: 600 11px Poppins, sans-serif; border-radius: 7px; padding: 4px 10px }
+.pv-banner .ok { background: var(--green); color: #fff } .pv-banner .no { background: #fff; color: #B45309; border: 1px solid #F1D9A6 }
+.pv-thread { display: grid; gap: 8px }
+.pv-thread div { font: 400 12px/1.45 Poppins, sans-serif; color: #334155; background: #FFF8E6; border-radius: 10px; padding: 8px 10px; max-width: 88%; animation: prrIn .4s .3s both }
+.pv-thread div.me { justify-self: end; background: #F1F5F9; animation-delay: .7s }
+.pv-thread b { display: block; font: 600 10px var(--mono); color: #5E6470; margin-bottom: 2px }
+@media (max-width: 800px) { .prr-track b { font-size: 12px } .prr-track i { width: 38px; height: 38px } }
+
+.pv-cta { font: 600 12.5px Poppins, sans-serif; border-radius: 8px; padding: 7px 16px; cursor: pointer; border: 1px solid transparent; transition: transform .1s, box-shadow .2s }
+.pv-cta:hover { box-shadow: 0 6px 14px -8px rgba(0,0,0,.35) } .pv-cta:active { transform: scale(.97) }
+.pv-cta.ok { background: var(--green); color: #fff } .pv-cta.no { background: #fff; color: #B45309; border-color: #F1D9A6 }
+.pv-cta.sm { font-size: 11px; padding: 4px 10px }
+.pv-cta:focus-visible { outline: 2px solid #2563EB; outline-offset: 2px }
+.pv-acts .pv-cta.ok { animation: ctaPulse 1.8s 1.2s ease-in-out 2 }
+@keyframes ctaPulse { 50% { box-shadow: 0 0 0 6px rgba(0,132,90,.18) } }
+.pv-keep { display: grid; gap: 6px } .pv-keep small { font: 500 11px var(--mono); color: var(--muted) }
+.prr-track button:disabled { opacity: .45; cursor: default }
+
+/* Claude reads the kit */
+.crd { display: grid; gap: 16px }
+.crd-top { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap }
+.crd-ask { justify-self: start; max-width: 360px }
+.crd-body { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; align-items: stretch }
+.crd-l { display: block; font: 500 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px }
+.crd-code .code { min-height: 190px }
+.code .bad { color: #FCA5A5; text-decoration: underline wavy #F87171 1px; text-underline-offset: 3px }
+.crd-res { display: grid; align-content: start }
+.crd-scr { background: var(--desk); border-radius: 14px; padding: 16px; display: grid; place-items: center }
+.crd-ph { width: 230px; background: #fff; border: 1px solid #D5DBE5; border-radius: 22px; overflow: hidden; font-family: Poppins, sans-serif; box-shadow: 0 14px 30px -20px rgba(15,23,42,.45) }
+.crd-h { padding: 12px 14px; font-size: 13px; color: #64748B; border-bottom: 1px solid #F1F5F9 } .crd-h b { color: #1E293B; font-weight: 600 }
+.crd-ln { height: 9px; border-radius: 4px; background: #EEF2F6; margin: 12px 14px 0 } .crd-ln.s { width: 55% }
+.crd-bar { margin-top: 26px; padding: 12px 14px 14px; border-top: 1px solid #E2E8F0 }
+.crd-bar button { width: 100%; border: 0; color: #fff; font: 600 16px Poppins, sans-serif; transition: all .35s }
+.crd-scr.no .crd-bar button { outline: 2px dashed #F59E0B; outline-offset: 3px }
+.crd-flags { display: grid; gap: 4px; margin-top: 10px; font-size: 14px; color: #2B2F37 }
+.crd-flags .fl { font: 700 15px var(--display); margin-bottom: 2px }
+.crd-flags .fl.bad { color: #B45309 } .crd-flags .fl.ok { color: var(--green) }
+@media (max-width: 860px) { .crd-body { grid-template-columns: 1fr } }
+
+.tmap { display: grid; grid-template-columns: minmax(0, 520px) 1fr; gap: 26px; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 18px 22px }
+.tmap svg { width: 100%; height: auto; display: block }
+.tmap ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px }
+.tmap li { display: grid; gap: 2px; padding-left: 14px; border-left: 3px solid var(--c, var(--rule)) }
+.tmap li b { font: 700 16px var(--display) }
+.tmap li span { font-size: 15.5px; line-height: 1.4; color: #2B2F37 }
+@media (max-width: 820px) { .tmap { grid-template-columns: 1fr } }
+
+.inst { font: 600 10.5px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); background: #F1F3EE; border-radius: 999px; padding: 2px 8px; margin-right: 6px; vertical-align: 1px }
+.call .was, .dc .was { color: var(--muted) }
+
+/* Try to break it: live checks */
+.tb { display: grid; grid-template-columns: .9fr 1.1fr; gap: 22px; align-items: start }
+.tb-form { display: grid; gap: 14px }
+.tb-f { display: grid; gap: 6px }
+.tb-f label { font: 600 13.5px var(--display); display: flex; justify-content: space-between }
+.tb-f label b { font: 500 12px var(--mono); color: var(--muted) }
+.tb-in { font: 500 14px var(--mono); border: 1px solid var(--rule); border-radius: 10px; padding: 8px 10px; background: #fff; color: var(--ink) }
+select.tb-in { font-family: var(--display) }
+.tb-sw { display: flex; gap: 8px }
+.tb-sw button { width: 30px; height: 30px; border-radius: 9px; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--rule); cursor: pointer }
+.tb-sw button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--ink) }
+.tb-f input[type=range] { accent-color: var(--green) }
+.tb-out { display: grid; gap: 14px }
+.tb-prev { background: var(--desk); border-radius: 14px; padding: 26px; display: grid; place-items: center }
+.tb-prev button { width: min(100%, 260px); height: 48px; border: 0; font: 600 18px Poppins, sans-serif; letter-spacing: -.3px; transition: all .25s }
+.tb-chk { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.tb-chk li { display: flex; gap: 10px; align-items: center; font-size: 15px; line-height: 1.4; padding: 8px 10px; border-radius: 10px; background: #F6F8F5 }
+.tb-chk li.no { background: #FFF8E9 }
+.tb-chk i { font-style: normal; flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--display) }
+.tb-chk li.ok i { background: var(--green-soft); color: var(--green) } .tb-chk li.no i { background: #FDE7B8; color: #8A5A00 }
+.tb-chk span { flex: 1 }
+.tb-send { display: flex; gap: 12px; align-items: center; flex-wrap: wrap }
+@media (max-width: 860px) { .tb { grid-template-columns: 1fr } }
+
+.lprev { align-content: center; gap: 12px }
+.lmeta { font: 500 11.5px var(--mono); color: var(--muted) }
+
+.lcard .cta { display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: background-color .15s ease, transform .08s ease, box-shadow .15s ease }
+.lcard .cta:hover { background: #35A170 }
+.lcard .cta:active { transform: scale(.98) }
+.lcard .cta:focus-visible { outline: 2px solid #2563EB; outline-offset: 2px }
+.lcard .cta .cta-sp { order: -1; display: none; width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; animation: ctaSpin .8s linear infinite }
+.lcard .cta.loading { background: #35A170; cursor: progress }
+.lcard .cta.loading .cta-sp { display: block }
+@keyframes ctaSpin { to { transform: rotate(360deg) } }
+@media (prefers-reduced-motion: reduce) { .lcard .cta .cta-sp { animation-duration: 2.4s } }
+
+.lcard .cta.loading .cta-l { display: none }
+
+/* reflection */
+.refl3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px }
+.rc { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 18px 20px; display: grid; gap: 10px; align-content: start }
+.rc.nx { background: var(--ink); color: #fff; border-color: var(--ink) }
+.rk { font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--green) }
+.rc.nx .rk { color: #9FE0C2 }
+.rc ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; counter-reset: r }
+.rc li { counter-increment: r; display: grid; gap: 3px; font-size: 15.5px; line-height: 1.45; color: #2B2F37; padding-left: 28px; position: relative }
+.rc li::before { content: counter(r); position: absolute; left: 0; top: 1px; width: 20px; height: 20px; border-radius: 6px; background: #F1F3EE; font: 700 11px/20px var(--display); text-align: center; color: var(--ink) }
+.rc.nx li { color: #D9DED9 } .rc.nx li::before { background: rgba(255,255,255,.12); color: #fff }
+.rc li b { font: 700 16px/1.3 var(--display); color: var(--ink) } .rc.nx li b { color: #fff }
+@media (max-width: 900px) { .refl3 { grid-template-columns: 1fr } }
+
+/* impact spacing */
+.imp { display: grid; gap: 48px; margin-top: 12px }
+.ig { display: grid; gap: 16px }
+.ig .gl { font: 600 12px/1 var(--mono, ui-monospace, monospace); letter-spacing: .12em; text-transform: uppercase; color: #6B7280 }
+.ig.lb { margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--rule) }
+.nums, .outs { gap: 28px }
+.stat, .out { align-content: start }
+.out .was { font: 600 11.5px/1 var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: #555B54; justify-self: start; background: #ECEEE9; padding: 5px 7px; border-radius: 4px; margin-bottom: 4px }
+
+/* impact v2 */
+.imp { gap: 28px }
+.chg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+.cg { background: #fff; border: 1px solid var(--rule); border-radius: 14px; padding: 20px 20px 18px; display: grid; gap: 6px; align-content: start }
+.cg > b { font: 800 34px/1.05 var(--display); letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums }
+.cg .cp { font-size: 15px; line-height: 1.4; color: #2B2F37; min-height: 2.8em }
+.cg .cbars { display: grid; gap: 8px; margin-top: 10px; padding-top: 14px; border-top: 1px dashed var(--rule) }
+.br { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; font: 500 11.5px/1 var(--mono) }
+.br .bk { text-transform: uppercase; letter-spacing: .08em; color: #555B54 }
+.br .bv { color: #555B54; font-variant-numeric: tabular-nums; min-width: 52px; text-align: right; white-space: nowrap }
+.br.now .bv { color: var(--green); font-weight: 700 }
+.bt { height: 8px; border-radius: 4px; background: #EEF0EC; position: relative; overflow: hidden }
+.bt > i { position: absolute; inset: 0 auto 0 0; width: var(--w); border-radius: 4px; background: #A9AFA8; transition: width 1s cubic-bezier(.2,.7,.2,1) }
+.br.now .bt > i { background: var(--green); min-width: 0 }
+.br.now .bt > i[style*="0%"] { width: 0 }
+.br.now .bt::before { content: ""; position: absolute; left: 0; top: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--green) }
+.bt.sg { background: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; overflow: visible }
+.bt.sg i { height: 8px; border-radius: 4px; background: #EEF0EC; position: static; transition: background .6s }
+.br.was .bt.sg i.on { background: #A9AFA8 } .br.now .bt.sg i.on { background: var(--green) }
+.br.now .bt.sg::before { display: none }
+.imp:not(.in) .bt > i { width: 0 }
+.kt { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 0; padding: 16px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule) }
+.kt .gl { margin-right: 22px; font: 600 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #6B7280 }
+.kt .ki { font-size: 15px; color: #2B2F37; padding: 0 18px; border-left: 1px solid var(--rule) }
+.kt .ki:first-of-type { border-left: 0; padding-left: 0 }
+.kt .ki b { font: 800 20px/1 var(--display); letter-spacing: -.02em; color: var(--ink); margin-right: 4px }
+@media (max-width: 900px) { .chg { grid-template-columns: 1fr 1fr } .kt .ki { border-left: 0; padding: 0 16px 0 0 } }
+@media (prefers-reduced-motion: reduce) { .bt > i, .bt.sg i { transition: none } }
+
+.br.now.nz .bt > i { min-width: 14px }
+.br.now .bt.sg i:not(.on) { background: #EEF0EC }
+.fg-yr { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 16px }
+.fg-yr .panel { display: grid; gap: 14px; align-content: start }
+.fg-img { padding: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: #fff; cursor: zoom-in; display: block; width: 100% }
+.fg-img img { display: block; width: 100%; height: auto }
+.fg-then .fg-img img { aspect-ratio: 16 / 10; object-fit: cover; object-position: 0 0 }
+.fg-facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.fg-facts li { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: baseline; font: 500 14.5px/1.45 var(--app); color: #3A3F48 }
+.fg-facts b { font: 800 22px/1 var(--display); color: var(--ink); text-align: right }
+.fg-then .fg-facts b { color: #8B9089 }
+.fg-now .fg-facts li { grid-template-columns: 72px 1fr }
+.fg-lnk { justify-self: start; border: 0; background: none; padding: 0; font: 700 13.5px var(--app); color: var(--green); cursor: pointer; text-decoration: underline; text-underline-offset: 3px }
+.fg-tiers { list-style: none; margin: 0; padding: 0; display: grid; gap: 0 }
+.fg-tiers li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; position: relative; padding-bottom: 14px }
+.fg-tiers li:not(:last-child)::after { content: ""; position: absolute; left: 13px; top: 28px; bottom: 2px; width: 2px; background: #CFE8DC }
+.fg-tn { width: 28px; height: 28px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font: 700 12.5px var(--app) }
+.fg-tiers b { font: 700 16px var(--display) } .fg-tiers em { font: 500 12px var(--mono); font-style: normal; color: var(--muted); margin-left: 8px }
+.fg-tiers p { margin: 2px 0 6px; font: 500 14px/1.45 var(--app); color: #3A3F48 }
+.fg-tiers code { font: 500 12px var(--mono); background: #F3F4F1; border: 1px solid var(--rule); border-radius: 6px; padding: 3px 7px; color: #2B2F37; display: inline-block }
+.fg-modes { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px } .fg-modes i { font: 600 11px var(--app); font-style: normal; background: #EEF2FF; color: #3730A3; border-radius: 999px; padding: 2px 9px } .fg-modes i.s { background: #ECFDF5; color: #166534 }
+.fg-btn { display: grid; grid-template-columns: 260px minmax(0, 1fr); border: 1px solid #E5E5E5; border-radius: 14px; overflow: hidden; background: #fff; font-family: Inter, var(--app) }
+.fg-pp { border-right: 1px solid #E5E5E5; display: grid; align-content: start }
+.fg-pph { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid #E5E5E5; font-size: 12.5px } .fg-pph b { font-weight: 600 } .fg-pph small { margin-left: auto; color: #8C8C8C; font-size: 11px }
+.fg-ci { width: 12px; height: 12px; transform: rotate(45deg); border: 1.6px solid #9747FF; border-radius: 2px }
+.fg-ppb { padding: 10px 14px 14px; display: grid; gap: 9px }
+.fg-row { display: grid; grid-template-columns: 86px 1fr; align-items: center; gap: 8px; font-size: 11.5px; color: #333 } .fg-row > span { color: #6B6B6B; display: flex; align-items: center; gap: 5px }
+.fg-row > span i { width: 9px; height: 9px; border: 1.3px solid #9747FF; border-radius: 2px; transform: rotate(45deg); flex: none }
+.fg-row > span i.b { transform: none; border-radius: 50%; border-color: #8C8C8C } .fg-row > span i.t { transform: none; border: 0; font: 700 9px Inter, var(--app); font-style: normal; color: #8C8C8C; width: auto; height: auto }
+.fg-row select, .fg-row input[type=text] { font: 500 11.5px Inter, var(--app); border: 1px solid transparent; background: #F5F5F5; border-radius: 5px; padding: 5px 6px; color: #1E1E1E; width: 100%; min-width: 0 }
+.fg-row select:hover, .fg-row input[type=text]:hover { border-color: #E0E0E0 } .fg-row select:focus, .fg-row input[type=text]:focus { outline: none; border-color: #0D99FF; background: #fff }
+.fg-sw { display: flex; gap: 2px; background: #F5F5F5; border-radius: 5px; padding: 2px } .fg-sw button { flex: 1; border: 0; background: none; border-radius: 4px; font: 500 11px Inter, var(--app); padding: 4px 0; color: #6B6B6B; cursor: pointer } .fg-sw button[aria-pressed="true"] { background: #fff; color: #1E1E1E; box-shadow: 0 1px 2px rgba(0,0,0,.12) }
+.fg-tg { justify-self: start; width: 28px; height: 16px; border-radius: 999px; background: #D9D9D9; border: 0; position: relative; cursor: pointer; padding: 0 } .fg-tg::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: left .15s } .fg-tg[aria-pressed="true"] { background: #0D99FF } .fg-tg[aria-pressed="true"]::after { left: 14px }
+.fg-div { height: 1px; background: #EFEFEF; margin: 2px 0 }
+.fg-cv { display: grid; grid-template-rows: auto auto auto; gap: 14px; padding: 14px; background: #fff; align-content: start; min-width: 0 }
+.fg-canvas { position: relative; min-height: 170px; background: #F5F5F5; background-image: radial-gradient(#E2E2E2 1px, transparent 1px); background-size: 16px 16px; border-radius: 10px; display: grid; place-items: center; padding: 30px 16px }
+.fg-cvl { position: absolute; left: 12px; top: 10px; font: 500 11px Inter, var(--app); color: #9747FF }
+#fgB { outline: 1px dashed #9747FF; outline-offset: 10px; border-radius: 6px }
+.fg-b { display: inline-flex; align-items: center; justify-content: center; font-family: Poppins, var(--app); font-weight: 600; white-space: nowrap; box-sizing: border-box; border: 1px solid transparent; transition: background .15s, color .15s, border-color .15s, box-shadow .15s }
+.fg-b svg { flex: none }
+.fg-vars { display: grid; gap: 8px; min-width: 0 }
+#fgVars { display: grid; gap: 0; border: 1px solid #EFEFEF; border-radius: 8px; overflow: hidden }
+.fg-v { display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 7px 10px; font: 500 12px Inter, var(--app); border-top: 1px solid #F2F2F2 } .fg-v:first-child { border-top: 0 }
+.fg-v > span { color: #6B6B6B } .fg-v code { font: 500 11.5px var(--mono); color: #1E1E1E; overflow-wrap: anywhere }
+.fg-v code.ch { background: #FFF7D6; border-radius: 3px; box-shadow: 0 0 0 2px #FFF7D6; transition: background .6s }
+.fg-v em { font: 500 11.5px var(--mono); font-style: normal; color: #6B6B6B; display: flex; align-items: center; gap: 6px; white-space: nowrap } .fg-v em i { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,.12) }
+.fg-cap { font: 500 13px/1.55 var(--mono); color: var(--muted); max-width: 820px; margin: 0 } .fg-cap a { color: var(--green) }
+.fg-range { display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
+.fg-range figure { margin: 0; display: grid; gap: 12px; align-content: start }
+.fg-range .fg-img { background: #F8FAFC; padding: 14px; display: grid; place-items: center; min-height: 220px } .fg-range .fg-img img { width: auto; max-width: 100%; max-height: 260px; border-radius: 8px }
+.fg-range .fg-img img.fg-crop { width: 100%; max-height: 260px; object-fit: cover; object-position: 0 0 }
+.fg-range figcaption { font: 500 14.5px/1.5 var(--app); color: #3A3F48 } .fg-range figcaption b { display: block; font: 700 16px var(--display); color: var(--ink); margin-bottom: 3px }
+.fg-lbx { position: fixed; inset: 0; z-index: 60; background: rgba(15,18,22,.82); display: grid; place-items: center; padding: 3vw } .fg-lbx[hidden] { display: none }
+.fg-lbc { position: relative; background: #fff; border-radius: 16px; padding: 14px; max-width: min(1200px, 94vw); max-height: 92vh; display: grid; gap: 10px; grid-template-rows: minmax(0, 1fr) auto }
+.fg-lbc img { max-width: 100%; max-height: 78vh; object-fit: contain; margin: 0 auto; display: block }
+.fg-lbf { display: flex; gap: 12px; align-items: center; justify-content: space-between } .fg-lbf p { margin: 0; font: 500 14px var(--app); text-align: center }
+.fg-x { position: absolute; top: -14px; right: -14px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--ink); color: #fff; font-size: 20px; cursor: pointer }
+@media (max-width: 900px) { .fg-yr, .fg-range { grid-template-columns: 1fr } .fg-btn { grid-template-columns: 1fr } .fg-pp { border-right: 0; border-bottom: 1px solid #E5E5E5 } }
+/* TL;DR toggle: shared across the three case studies */
+.tlt { position: relative; display: inline-grid; grid-auto-flow: column; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: 999px; padding: 3px; isolation: isolate; flex: none }
+.tlt button { position: relative; z-index: 1; border: 0; background: none; font: 600 13px var(--display); padding: 6px 13px; border-radius: 999px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: color .24s; display: inline-flex; align-items: center; gap: 6px }
+.tlt button small { font: 500 11.5px var(--mono); opacity: .8 }
+.tlt button[aria-pressed="true"] { color: #fff }
+.tlt button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px }
+.tlt .tlt-th { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 999px; background: var(--ink); transition: transform .26s cubic-bezier(.2,.8,.2,1), width .26s cubic-bezier(.2,.8,.2,1); pointer-events: none }
+.tlt .tl-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--spark); box-shadow: 0 0 0 2px rgba(255,217,74,.35) }
+.tlt button[aria-pressed="true"] .tl-dot { box-shadow: none }
+.sys .tlt { margin-left: auto } .sys .tlt + .all { margin-left: 0 }
+.sys .tlt button { font-size: 12.5px; padding: 5px 11px } .sys .tlt button small { display: none }
+.tl-hero { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 22px }
+.tl-hero .tlt { border-color: #D5D9D2; box-shadow: 0 10px 28px -16px rgba(20,40,30,.35) }
+.tl-hero .tlt button { font-size: 15px; padding: 10px 18px }
+.tl-hero .tlt button small { font-size: 12.5px }
+.tl-hero > span { font: 500 13px var(--mono); color: var(--muted) }
+.tl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+/* The TL;DR block */
+.tl { display: none }
+html[data-mode="tldr"] .tl { display: grid; gap: 18px; padding: 44px 0 60px; border-bottom: 0 }
+html[data-mode="tldr"] main > :not(.hero):not(.tl) { display: none !important }
+.tl-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap } .tl-h h2 { font-size: clamp(26px, 3vw, 34px) } .tl-h .label { color: var(--green) }
+.tl-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px }
+.tl-cols > div { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 18px 18px 20px; display: grid; gap: 8px; align-content: start }
+.tl-k { font: 500 11.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--green); display: flex; align-items: center; gap: 8px }
+.tl-k i { font: 800 12px var(--display); font-style: normal; width: 22px; height: 22px; border-radius: 50%; background: var(--green-soft); color: var(--green); display: grid; place-items: center }
+.tl-cols p { margin: 0; font: 500 15.5px/1.5 var(--app, var(--display)); color: #2B2F37 }
+.tl-slot { display: grid; gap: 14px; min-width: 0 }
+.tl-slot:empty { display: none }
+.tl-lesson { margin: 0; font-size: 17px; line-height: 1.5; color: #2B2F37; max-width: 760px } .tl-lesson b { font-family: var(--display) }
+.tl-end { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding-top: 6px; border-top: 1px solid var(--rule); padding-top: 22px }
+.tl-end a { font: 700 14.5px var(--app, var(--display)); color: var(--green); text-decoration: underline; text-underline-offset: 3px }
+@media (max-width: 900px) { .tl-cols { grid-template-columns: 1fr } }
+@media (max-width: 720px) { .sys .tlt button small { display: none } .sys .tlt { margin-left: 0 } }
+/* Motion */
+::view-transition-group(*) { animation-duration: .42s; animation-timing-function: cubic-bezier(.2,.8,.2,1) }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .28s; animation-timing-function: ease }
+::view-transition-new(tl-sec) { animation: tl-rise .34s .08s cubic-bezier(.2,.8,.2,1) both }
+::view-transition-old(tl-sec) { animation: tl-drop .18s ease both }
+::view-transition-group(sysnav) { animation: none } ::view-transition-old(sysnav) { animation: none; opacity: 0 } ::view-transition-new(sysnav) { animation: none }
+@keyframes tl-out { to { opacity: 0 } } @keyframes tl-in { from { opacity: 0 } }
+@keyframes tl-rise { from { opacity: 0; transform: translateY(14px) } } @keyframes tl-drop { to { opacity: 0; transform: translateY(8px) } }
+html.tl-fade main { transition: opacity .16s ease; opacity: 0 } html.tl-fadein main { transition: opacity .22s ease }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important } .tlt .tlt-th { transition: none } }
+.tl-try { color: var(--green) !important; margin-bottom: -10px }
+html[data-mode="tldr"] .hero .meta { display: none }
+html[data-mode="tldr"] .hero { padding-bottom: 36px }
+html[data-mode="tldr"] .tl { padding-top: 30px }
+.sys .lab { background: none; border: 0; padding: 0; border-radius: 0; box-shadow: none }
+@media (min-width: 721px) { .sys .lab { display: inline } }
+</style>
+</head>
+<body>
+<nav class="sys" aria-label="The system"><div class="wrap"><span class="lab">One system · three tools</span><a href="/case-study/design-kit" aria-current="page"><i style="background:#00845A"></i>Design Kit</a><a href="/case-study/journey-studio"><i style="background:#2563EB"></i>Journey Studio</a><a href="/case-study/illustration-studio"><i style="background:#C98A00"></i>Illustration Studio</a><div class="tlt" role="group" aria-label="Reading length"><span class="tlt-th" style="view-transition-name:tl-th-n"></span><button type="button" data-tlm="full" aria-pressed="true" style="view-transition-name:tl-bf-n">Full story <small>· 9 min</small></button><button type="button" data-tlm="tldr" aria-pressed="false" style="view-transition-name:tl-bt-n"><span class="tl-dot" aria-hidden="true"></span>TL;DR <small>· 2 min</small></button></div><a class="all" href="/case-study/rupyy-design-system">See the whole system →</a></div></nav>
+<main class="wrap">
+<header class="hero">
+  <div>
+    <p class="label">Case study · Rupyy · 2026 · <span style="color:var(--green)">Shipped</span></p>
+    <h1 style="margin-top:14px">Design Kit</h1>
+    <p class="kick">One design system, <em>released like software.</em></p>
+    <p class="dek">Our Figma library, turned into a contract every tool reads. Tokens and parts are written once, each product adds only what differs, and each release puts a change on every screen the same day.</p>
+    <div class="tl-hero"><div class="tlt" role="group" aria-label="Reading length"><span class="tlt-th" style="view-transition-name:tl-th-h"></span><button type="button" data-tlm="full" aria-pressed="true" style="view-transition-name:tl-bf-h">Full story <small>· 9 min</small></button><button type="button" data-tlm="tldr" aria-pressed="false" style="view-transition-name:tl-bt-h"><span class="tl-dot" aria-hidden="true"></span>TL;DR <small>· 2 min</small></button></div><span>Short on time? The TL;DR is one page.</span></div>
+    <div class="meta">
+      <div><span class="label">Role</span><b>Designed and built it</b></div>
+      <div><span class="label">Time</span><b>Oct–Nov 2026 · 11 releases</b></div>
+      <div><span class="label">Used by</span><b>The product team · 6 PMs, devs, design</b></div>
+      <div><span class="label">Built with</span><b>Figma and Claude</b></div>
+    </div>
+  </div>
+  <div class="art">
+    <svg id="heroSvg" viewBox="0 0 440 440" role="img" aria-label="Figma feeds the Design Kit. The kit supplies Illustration Studio and Journey Studio, and Illustration Studio supplies Journey Studio, where the Sales, Ops and Partner work lives.">
+      <defs><filter id="hxsh" x="-40%" y="-30%" width="180%" height="180%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#14281E" flood-opacity=".16"/></filter></defs>
+      <!-- connectors -->
+      <g fill="none" stroke="#CDD6D0" stroke-width="2" stroke-linecap="round">
+        <path id="hxF" class="hx-draw" style="animation-delay:0.48s" pathLength="1" d="M220 108 L220 126"/>
+        <path id="hxL" class="hx-draw" style="animation-delay:1.28s" pathLength="1" d="M206 262 C 196 276, 128 270, 120 286"/>
+        <path id="hxR" class="hx-draw" style="animation-delay:1.28s" pathLength="1" d="M234 262 C 244 276, 312 270, 320 286"/>
+        <path id="hxC" class="hx-draw" style="animation-delay:2.16s" pathLength="1" d="M164 326 L276 326"/>
+      </g>
+      <g font-family="Bricolage Grotesque, system-ui" text-anchor="middle">
+        <!-- Figma -->
+        <g class="hx-in" style="animation-delay:0s">
+          <rect x="196" y="20" width="48" height="48" rx="14" fill="#F3EEFF"/>
+          <path d="M208 54 C 211 38, 229 38, 232 54" stroke="#7C3AED" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <rect x="204.5" y="51.5" width="7" height="7" rx="1.5" fill="#fff" stroke="#7C3AED" stroke-width="1.6"/><rect x="228.5" y="51.5" width="7" height="7" rx="1.5" fill="#fff" stroke="#7C3AED" stroke-width="1.6"/><circle cx="220" cy="42" r="2.6" fill="#7C3AED"/>
+          <text x="220" y="86" font-size="13" font-weight="700" fill="#15171C">Figma</text>
+          <text x="220" y="100" font-family="JetBrains Mono, monospace" font-size="9" fill="#5E6470">design master</text>
+        </g>
+        <!-- Design Kit -->
+        <g class="hx-in" style="animation-delay:0.72s">
+          <rect x="176" y="130" width="88" height="88" rx="24" fill="#15171C" filter="url(#hxsh)"/>
+          <rect x="198" y="153" width="44" height="10" rx="4" fill="#9FE0C2"/><rect x="198" y="169" width="44" height="10" rx="4" fill="#46BE88"/><rect x="198" y="185" width="44" height="10" rx="4" fill="#2E9E6B"/>
+          <text x="220" y="238" font-size="15" font-weight="800" fill="#15171C">Design Kit</text>
+          <text x="220" y="252" font-family="JetBrains Mono, monospace" font-size="9" fill="#1F7A52">core + layers</text>
+        </g>
+        <!-- Illustration Studio -->
+        <g class="hx-in" style="animation-delay:1.6s">
+          <rect x="84" y="290" width="72" height="72" rx="20" fill="#FFF4D6"/>
+          <circle cx="119" cy="328" r="14" fill="#F4B740"/><circle cx="119" cy="328" r="8" fill="#FCD34D"/>
+          <circle cx="130" cy="316" r="7" fill="#46BE88"/><path d="M126.8 316l2.3 2.3 4.2-4.2" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <text x="120" y="380" font-size="13" font-weight="700" fill="#15171C">Illustration Studio</text>
+          <text x="120" y="394" font-family="JetBrains Mono, monospace" font-size="9" fill="#9A6A00">state graphics</text>
+        </g>
+        <!-- Journey Studio -->
+        <circle cx="320" cy="326" r="36" fill="none" stroke="#93B4F5" stroke-width="2" opacity="0">
+          <animate attributeName="r" values="36;50;50" keyTimes="0;.5;1" dur="3.4s" begin="3.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values=".5;0;0" keyTimes="0;.5;1" dur="3.4s" begin="3.2s" repeatCount="indefinite"/>
+        </circle>
+        <g class="hx-in" style="animation-delay:1.76s">
+          <rect x="284" y="290" width="72" height="72" rx="20" fill="#EEF4FF"/>
+          <path d="M298 340 C 308 340, 308 314, 320 314 S 334 336, 342 328" stroke="#2563EB" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <circle cx="298" cy="340" r="4.5" fill="#2563EB"/><circle cx="320" cy="314" r="4.5" fill="#fff" stroke="#2563EB" stroke-width="2"/><circle cx="342" cy="328" r="4.5" fill="#2563EB"/>
+          <text x="320" y="380" font-size="13" font-weight="700" fill="#15171C">Journey Studio</text>
+          <text x="310" y="394" font-family="JetBrains Mono, monospace" font-size="9" fill="#1D4ED8">Sales · Ops · Partner</text><circle cx="378" cy="391" r="6.5" fill="#DCE7FB"/><path d="M378 388v6M375 391h6" stroke="#1D4ED8" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
+      </g>
+      <!-- dots: each moves on its own -->
+      <circle r="4" fill="#7C3AED">
+        <animateMotion dur="4s" begin="0s" repeatCount="indefinite" keyPoints="0;1;0" keyTimes="0;.5;1" calcMode="spline" keySplines=".4 0 .6 1;.4 0 .6 1"><mpath href="#hxF"/></animateMotion>
+      </circle>
+      <circle r="4.5" fill="#46BE88" opacity="0">
+        <animateMotion dur="3s" begin="2.6s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1" keyTimes="0;1" keySplines=".4 0 .6 1"><mpath href="#hxL"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.88;1" dur="3s" begin="2.6s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="4.5" fill="#46BE88" opacity="0">
+        <animateMotion dur="3.6s" begin="3.4s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1" keyTimes="0;1" keySplines=".4 0 .6 1"><mpath href="#hxR"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.88;1" dur="3.6s" begin="3.4s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="4" fill="#E0A526" opacity="0">
+        <animateMotion dur="2.6s" begin="3s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1" keyTimes="0;1" keySplines=".4 0 .6 1"><mpath href="#hxC"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.88;1" dur="2.6s" begin="3s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  </div>
+  <div class="strip">
+    <div class="stat"><b>0 raw values</b><span>across 175 screens: every colour, size and space on a screen comes from a kit token</span></div>
+    <div class="stat"><b>Up to 92%</b><span>of a product's theme is the shared core; each product writes only what differs</span></div>
+    <div class="stat"><b>1 release, same day</b><span>a change reaches every studio and screen in 20 minutes, not half a day per tool</span></div>
+  </div>
+</header>
+
+<section class="tl" id="tldr" aria-label="TL;DR">
+  <div class="tl-h"><span class="label">TL;DR</span><h2>The Design Kit, in short.</h2></div>
+  <div class="tl-cols" data-a="cols"><div><span class="tl-k"><i>1</i>The problem</span><p>Our PMs prototyped in Claude Design, and Journey Studio and Illustration Studio each carried their own copy of the system. When Claude lacked a value it picked a close one, so every review began with which green was right.</p></div><div><span class="tl-k"><i>2</i>What I built</span><p>A kit written like an API. I rebuilt our Figma library as 1,637 variables in three tiers. The kit releases it as tokens and parts, each product adds only density, and Claude reads the catalogue before it builds.</p></div><div><span class="tl-k"><i>3</i>What changed</span><p>One release reaches every studio and screen the same day. Screens carry no hand-typed values, and a parity check keeps Figma and the kit in step.</p></div></div>
+  <span class="label tl-try">Try it · the button, as built in Figma</span>
+  <div class="tl-slot" data-slot="play"></div>
+  <span class="label tl-try">Try it · break the review checks</span>
+  <div class="tl-slot" data-slot="play2"></div>
+  <div class="tl-slot" data-slot="impact"></div>
+  <p class="tl-lesson"><b>What I learned.</b> Write the system for its reader. Claude reads the kit, so I wrote it like an API: a do, a don't and exact markup. That did more for consistency than any style guide.</p>
+  <div class="tl-end" data-a="tlend"><button class="btn" type="button" data-tlm="full">Read the full story · 9 min</button><a href="/case-study/journey-studio">Next in the system: Journey Studio →</a></div>
+</section>
+
+
+<section id="meet" data-a="demo">
+  <div class="beat"><span class="n">00</span><span class="label">Meet the kit</span></div>
+  <div class="col">
+    <h2>This is the Design Kit.</h2>
+    <p>Captures of the kit running on its real release data. Step through the seven views below.</p>
+  </div>
+  <div class="tour">
+    <div class="tabs" role="tablist" aria-label="Kit views" id="tourTabs"></div>
+    <div class="frame"><div class="chrome"><i></i><i></i><i></i><span id="tourUrl">Rupyy Design Kit · Overview</span></div><img id="tourImg" src="shots/overview.jpg" width="1600" height="1000" alt=""></div>
+    <div class="cap" aria-live="polite"><b id="tourT"></b><span id="tourD"></span></div>
+  </div>
+</section>
+
+<section data-a="problem">
+  <div class="beat"><span class="n">01</span><span class="label">The tension</span></div>
+  <div class="col">
+    <h2>Four places, four versions of the truth.</h2>
+    <p>Our PMs already prototyped in Claude Design. It's fast for a single screen, but every prototype carried its own copy of our design system. Journey Studio and Illustration Studio, which I built with Claude, carried theirs, and Figma held the library. When Claude needed a value it didn't have, it picked a close one, so the first question in every review was which green was the right one.</p>
+  </div>
+  <figure>
+    <div class="panel">
+      <div class="toolbar" style="margin-bottom:16px">
+        <div class="seg" role="group" aria-label="Before or after the kit" id="sameSeg"><button type="button" aria-pressed="true" data-v="before">Before the kit</button><button type="button" aria-pressed="false" data-v="after">With the kit</button></div>
+        <span class="hint" id="sameHint">Same button, four places, four answers</span>
+      </div>
+      <div class="same" id="same"></div>
+    </div>
+    <div class="cdtags" aria-label="Where Claude Design fell short for us">
+      <span><b>Uneven on-brand</b>Our system applied differently per prototype</span>
+      <span><b>A copy per project</b>A kit change never reached old prototypes</span>
+      <span><b>Screens, not journeys</b>One person on one path, no handovers</span>
+    </div>
+    <figcaption>The primary button as it lived in Figma, in a Claude Design prototype and in two tools built from copied values. With the kit there is one definition and every place reads it.</figcaption>
+  </figure>
+  <ul class="pain">
+    <li><b>Copies drift</b>Five studio exports held 43 tokens that disagreed with the Figma library.</li>
+    <li><b>AI fills gaps</b>Asked for a part it didn't have, Claude invented one that was nearly right.</li>
+    <li><b>Changes stop short</b>A Figma update reached Figma. Screens and graphics kept the old value.</li>
+    <li><b>No one to ask</b>PMs couldn't tell which version was right, so every review started there.</li>
+  </ul>
+</section>
+
+<section data-a="insight">
+  <div class="beat"><span class="n">02</span><span class="label">The insight</span></div>
+  <div class="col">
+    <h2>AI-built tools need a contract, not a library.</h2>
+    <p>A library is something people browse. Claude doesn't browse; it reads what it's given and builds. So the kit is written like an API: a versioned catalogue Claude reads before it builds any screen part, and a rule that nothing reaches a tool except through a release.</p>
+  </div>
+  <div class="principles">
+    <div class="pr"><i>01</i><b>One core, thin layers</b><p>Tokens and parts live once. Each product adds only what truly differs: its density and its own parts.</p></div>
+    <div class="pr"><i>02</i><b>Released, not synced</b><p>Studios change only when a release is applied, so a half-made change never breaks a review.</p></div>
+    <div class="pr"><i>03</i><b>Read before you build</b><p>Every studio's Claude reads the catalogue first and uses kit classes exactly. No hex, no new class.</p></div>
+    <div class="pr"><i>04</i><b>Figma stays the master</b><p>Designers design in Figma; everyone else builds from the kit. A parity check keeps them equal.</p></div>
+  </div>
+</section>
+
+<section data-a="build">
+  <div class="beat"><span class="n">03</span><span class="label">The build</span></div>
+  <div class="col">
+    <h2>A core, a layer per product, and a release.</h2>
+    <p>Everything below is a working slice of the kit, rebuilt for this page with its real tokens and parts.</p>
+  </div>
+
+  <div class="sub" id="figmaLayer">
+    <div class="sub-h"><h3>The Figma layer</h3><span class="k">Where the system is designed</span></div>
+    <div class="col"><p>Everything in the kit starts in our Figma library. A year ago that library was 15 colour swatches and three button styles. I rebuilt it as 1,637 variables in three tiers and wired the components to them, so the kit has something exact to match.</p></div>
+    <div class="fg-yr">
+      <div class="panel fg-then">
+        <span class="label">2025 · Library v1</span>
+        <button class="fg-img" type="button" data-lb="0" aria-label="Enlarge the old colour page"><img src="shots/fg-old-colors.jpg" alt="The 2025 colour page: 15 swatches labelled only with hex codes" loading="lazy"></button>
+        <ul class="fg-facts">
+          <li><b>15</b>colours, drawn as rectangles and named by their hex</li>
+          <li><b>3</b>button styles plus disabled, in one size, with no hover or focus</li>
+          <li><b>282</b>icon variants for 60 icons, one copy per size</li>
+        </ul>
+        <button class="fg-lnk" type="button" data-lb="7">From the library's change log →</button>
+      </div>
+      <div class="panel fg-now">
+        <span class="label">Today · Library v2</span>
+        <ol class="fg-tiers">
+          <li><span class="fg-tn">1</span><div><b>Brand</b><em>363</em><p>Raw values, hidden from every picker, so no one can pick a raw hex.</p><code>Color/primary green/500 = #46BE88</code></div></li>
+          <li><span class="fg-tn">2</span><div><b>Alias</b><em>167</em><p>Names with meaning, pointing at Brand.</p><code>Brand/500 · Padding/24</code></div></li>
+          <li><span class="fg-tn">3</span><div><b>Mapped</b><em>1,056</em><p>What components use, scoped to where they apply, with modes.</p><code>CTA/Surface/Solid/Default/Primary</code><span class="fg-modes"><i>Light</i><i>Dark</i><i class="s">Desktop</i><i class="s">Tablet</i><i class="s">Mobile</i></span></div></li>
+        </ol>
+        <ul class="fg-facts">
+          <li><b>9</b>collections, 1,637 variables. Grid, motion, elevation and breakpoints are variables too.</li>
+          <li><b>~900</b>of them reach the kit as tokens. Where Figma keeps a value in two tiers, the kit keeps one token (Scale/24 and Padding/24 are both space-24), and one token can cover a family of states (CTA/Label/Solid/Default/* is cta-label-on-solid).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="fg-btn">
+      <div class="fg-pp" aria-label="Button properties">
+        <div class="fg-pph"><span class="fg-ci" aria-hidden="true"></span><b>Button</b><small>640 variants</small></div>
+        <div class="fg-ppb" id="fgProps"></div>
+      </div>
+      <div class="fg-cv">
+        <div class="fg-canvas"><span class="fg-cvl" id="fgName"></span><div id="fgB"></div></div>
+        <div class="fg-vars"><span class="label">Bound variables</span><div id="fgVars"></div></div>
+        <button class="fg-lnk" type="button" data-lb="2">See all 640 variants →</button>
+      </div>
+    </div>
+    <p class="fg-cap">Change a property and the button and its variables update. The panel is rebuilt from the button's real properties and bindings in our library: 5 sizes × 4 variants × 4 types × 4 states × 2 radii, on 198 button variables.</p>
+    <div class="fg-range">
+      <figure class="panel"><button class="fg-img" type="button" data-lb="3" aria-label="Enlarge the calendar components"><img src="shots/fg-calendar.jpg" alt="The desktop date-range calendar with a quick-select sidebar" loading="lazy"></button><figcaption><b>Calendar · one day cell, six states</b>Default, Hover, Selected, In Range, Disabled and Empty are one component with a number property. Desktop and mobile share the day cell, the month and year pickers and the date label; only quick select differs.</figcaption></figure>
+      <figure class="panel"><button class="fg-img" type="button" data-lb="5" aria-label="Enlarge the icon library"><img class="fg-crop" src="shots/fg-icon-library.jpg" alt="The icon library: the Icon component at six sizes, then 95 icons grouped by category" loading="lazy"></button><figcaption><b>Icons · one master per icon</b>In 2025 the library held 60 icons as 282 size variants. Now 95 icons are single masters, placed through one Icon component with a size (xs–xxl) and a glyph swap that survives a size change.</figcaption></figure>
+    </div>
+    <p class="fg-cap">These variable names are what the <a href="#parity">parity check</a> compares with the kit.</p>
+    <div class="fg-lbx" id="fgLbx" hidden role="dialog" aria-modal="true" aria-label="Figma capture"><div class="fg-lbc"><button class="fg-x" type="button" id="fgX" aria-label="Close">×</button><img id="fgLImg" alt=""><div class="fg-lbf"><button class="btn sm" type="button" id="fgP">← Prev</button><p id="fgLT"></p><button class="btn sm" type="button" id="fgN">Next →</button></div></div></div>
+  </div>
+
+  <div class="sub">
+    <div class="sub-h"><h3>Core plus thin product layers</h3><span class="k">Only density changes</span></div>
+    <div class="col"><p>Every product is the core plus a thin layer. The layer changes density, the padding and spacing that suit how that team works, and nothing that carries the brand or meaning: colour, type, radius, status colours and button sizes stay in the core. Publishing rebuilds each product's theme, so studios still get one complete theme.</p></div>
+    <div class="layers">
+      <div class="panel" style="display:grid;gap:14px;align-content:start">
+        <div class="seg" role="group" aria-label="Product layer" id="layerSeg"></div>
+        <pre class="patch" id="layerDiff" aria-label="What this layer overrides"></pre>
+        <p id="layerNote" style="font-size:15.5px;line-height:1.5;color:#2B2F37"></p>
+      </div>
+      <div class="desk lprev"><div class="lcard" id="lcard"></div><span class="lmeta" id="layerMeta"></span></div>
+    </div>
+  </div>
+
+  <div class="sub">
+    <div class="sub-h"><h3>Propose, review, release</h3><span class="k">How a part gets in</span></div>
+    <div class="col"><p>A PM asks in a studio chat, Claude builds it from the kit, I review it, and the next release ships it everywhere.</p></div>
+    <div class="panel prr" id="prr">
+      <ol class="prr-track" id="prrTrack" aria-label="Steps"></ol>
+      <div class="prr-body">
+        <div class="prr-vis" id="prrVis" aria-live="polite"></div>
+        <div class="prr-txt"><span class="prr-n"><span id="prrN"></span><em class="prr-who" id="prrWho"></em></span><b id="prrT"></b><p id="prrD"></p>
+          <div class="prr-ctl"><button class="btn sm" type="button" id="prrBack">Back</button><button class="btn sm primary" type="button" id="prrNext">Next</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">
+    <div class="sub-h"><h3>Claude reads the kit before it builds</h3><span class="k">catalogue.md · every release</span></div>
+    <div class="col"><p>Same request, two ways. Every studio's Claude reads the kit's catalogue before it builds, which is how 175 screens end up with 0 raw values.</p></div>
+    <div class="panel crd">
+      <div class="crd-top">
+        <div class="bub pm crd-ask"><small>PM · Sales</small>Add a Continue button to the review screen.</div>
+        <div class="seg" role="group" aria-label="Catalogue" id="crdSeg"><button type="button" aria-pressed="true" data-c="no">Without the catalogue</button><button type="button" aria-pressed="false" data-c="yes">With the catalogue</button></div>
+      </div>
+      <div class="crd-body">
+        <div class="crd-code"><span class="crd-l">What Claude writes</span><pre class="code" id="crdCode"></pre></div>
+        <div class="crd-res"><span class="crd-l">What the PM sees</span><div class="crd-scr" id="crdScr"></div><div class="crd-flags" id="crdFlags" aria-live="polite"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">
+    <div class="sub-h"><h3>It talks to the other two when it needs to</h3><span class="k">One system</span></div><div class="tmap"><svg viewBox="0 0 520 250" role="img" aria-label="How this tool connects to the rest of the system"><defs><marker id="tmA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9z" fill="#9DB8A8"/></marker></defs><path d="M260 62 L260 98" fill="none" stroke="#9DB8A8" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4"/><text x="296" y="84" font-family="JetBrains Mono, monospace" font-size="10" fill="#1F7A52" text-anchor="middle">⇄ parity</text><path d="M236 124 C 196 128, 132 146, 122 180" fill="none" stroke="#9DB8A8" stroke-width="2" stroke-linecap="round"/><text x="92" y="146" font-family="JetBrains Mono, monospace" font-size="10" fill="#1F7A52" text-anchor="middle">palette →</text><text x="92" y="159" font-family="JetBrains Mono, monospace" font-size="10" fill="#1F7A52" text-anchor="middle">← graphics</text><path d="M284 124 C 324 128, 388 146, 398 180" fill="none" stroke="#9DB8A8" stroke-width="2" stroke-linecap="round"/><text x="440" y="146" font-family="JetBrains Mono, monospace" font-size="10" fill="#1F7A52" text-anchor="middle">parts · releases →</text><text x="440" y="159" font-family="JetBrains Mono, monospace" font-size="10" fill="#1F7A52" text-anchor="middle">← proposals</text><path d="M150 206 L370 206" fill="none" stroke="#E4E6E1" stroke-width="1.5" stroke-linecap="round"/><g opacity="1"><rect x="243.0" y="23.0" width="34" height="34" rx="10" fill="#F3EEFF"/><circle cx="260" cy="40" r="5.5" fill="#7C3AED"/><text x="285.0" y="44" font-family="Bricolage Grotesque, system-ui" font-size="12" font-weight="700" fill="#15171C" text-anchor="start">Figma</text></g><g opacity="1"><rect x="238.0" y="102.0" width="44" height="44" rx="12" fill="#15171C"/><circle cx="260" cy="124" r="7" fill="#46BE88"/><text x="260" y="160.0" font-family="Bricolage Grotesque, system-ui" font-size="13" font-weight="800" fill="#15171C" text-anchor="middle">Design Kit</text></g><g opacity="1"><rect x="103.0" y="187.0" width="34" height="34" rx="10" fill="#FFF4D6"/><circle cx="120" cy="204" r="5.5" fill="#C98A00"/><text x="120" y="235.0" font-family="Bricolage Grotesque, system-ui" font-size="12" font-weight="700" fill="#15171C" text-anchor="middle">Illustration Studio</text></g><g opacity="1"><rect x="383.0" y="187.0" width="34" height="34" rx="10" fill="#EEF4FF"/><circle cx="400" cy="204" r="5.5" fill="#2563EB"/><text x="400" y="235.0" font-family="Bricolage Grotesque, system-ui" font-size="12" font-weight="700" fill="#15171C" text-anchor="middle">Journey Studio</text></g></svg><ul><li style="--c:#2563EB"><b>Journey Studio</b><span>Asks for parts, gets every release.</span></li><li style="--c:#C98A00"><b>Illustration Studio</b><span>Takes our colours, sends back approved graphics.</span></li><li style="--c:#7C3AED"><b>Figma</b><span>Stays the master; a parity check keeps them equal.</span></li></ul></div>
+  </div>
+
+  <div class="role"><b style="font-family:var(--display)">I design the system; Claude builds it.</b>I set the rules and make every call; Claude reads Figma, writes the kit and prepares the comparisons I decide on.</div>
+  <div class="calls">
+    <div class="call"><span class="k">Call 01 · Delivery</span><b>Releases, not live sync</b><p class="was"><span class="inst">Instead of</span>Studios read the kit live</p><p>A half-finished change never reaches a PM's review.</p></div>
+    <div class="call"><span class="k">Call 02 · Structure</span><b>One core, thin layers</b><p class="was"><span class="inst">Instead of</span>A full theme per product</p><p>A fix in the core lands in every product.</p></div>
+    <div class="call"><span class="k">Call 03 · Truth</span><b>Designers get it wrong too</b><p class="was"><span class="inst">Instead of</span>Figma is always right</p><p>8 of the 43 values I’d set in Figma failed contrast. The kit’s checks caught them, so Figma changed, not the kit.</p></div>
+  </div>
+</section>
+
+<section id="parity" data-a="guard">
+  <div class="beat"><span class="n">04</span><span class="label">The guardrails</span></div>
+  <div class="col">
+    <h2>Two sources, one truth.</h2>
+    <p>Figma and the kit serve different people, and both have to stay true. Designers design and scale the system in Figma. PMs, stakeholders, the studios and developers build from the kit. A parity check is the bridge between them.</p>
+  </div>
+  <div class="sot">
+    <div class="sotc"><span class="label">Figma · the design master</span><b>For the design team</b><ul><li>Where components are explored, drawn and scaled.</li><li>Our safeguard: if Claude is down, or we move to another AI platform, nothing is lost.</li><li>Kept current by rule: nothing lives only in an AI tool.</li></ul></div>
+    <div class="sotm"><span>parity check</span><i>⇄</i><small>no release ships out of parity</small></div>
+    <div class="sotc dark"><span class="label">Design Kit · the released contract</span><b>For PMs, studios and devs</b><ul><li>What every screen and graphic is built from.</li><li>Versioned and reviewed: 11 releases while we built it, one every two weeks from here.</li><li>Exports as plain tokens, CSS and a catalogue, readable by any tool.</li></ul></div>
+  </div>
+
+
+  <div class="sub">
+    <div class="sub-h"><h3>Try to break it</h3><span class="k">Live review checks</span></div>
+    <div class="col"><p>Propose a change to the kit's primary button. Every proposal runs these checks before it reaches me; it can't be sent until they pass.</p></div>
+    <div class="panel tb">
+      <div class="tb-form">
+        <div class="tb-f"><label>Fill</label><div class="tb-sw" id="tbFill"></div><input id="tbHex" class="tb-in mono" maxlength="7" aria-label="Fill hex"></div>
+        <div class="tb-f"><label for="tbLabel">Label colour</label><select id="tbLabel" class="tb-in"><option value="#FFFFFF">White</option><option value="#E2E8F0">slate-200</option><option value="#94A3B8">slate-400</option><option value="#1E293B">slate-800</option></select></div>
+        <div class="tb-f"><label for="tbRad">Corner radius <b id="tbRadV"></b></label><input id="tbRad" type="range" min="4" max="22" step="1"></div>
+        <div class="tb-f"><label for="tbId">Id</label><input id="tbId" class="tb-in mono"></div>
+        <div class="tb-f"><label for="tbFig">Figma node</label><input id="tbFig" class="tb-in mono" placeholder="e.g. 4083:4165"></div>
+      </div>
+      <div class="tb-out">
+        <div class="tb-prev"><button type="button" tabindex="-1" id="tbBtn">Continue</button></div>
+        <ul class="tb-chk" id="tbChk" aria-live="polite"></ul>
+        <div class="tb-send"><button type="button" class="btn primary" id="tbSend">Send to review</button><span class="hint" id="tbMsg"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-a="impact">
+  <div class="beat"><span class="n">05</span><span class="label">The impact</span></div>
+  <div class="col">
+    <h2>One change, every screen, the same day.</h2>
+    <p>The whole product team builds from the kit. Every screen in Journey Studio and every graphic in Illustration Studio comes from it.</p>
+  </div>
+  <div class="imp">
+    <div class="ig"><span class="gl">What changed</span>
+    <div class="chg">
+      <div class="cg"><b>20 min</b><span class="cp">to roll one change into every studio</span><div class="cbars"><div class="br was"><span class="bk">Was</span><span class="bt"><i style="--w:100%"></i></span><span class="bv">½ day</span></div><div class="br now nz"><span class="bk">Now</span><span class="bt"><i style="--w:8.3%"></i></span><span class="bv">20 min</span></div></div></div>
+      <div class="cg"><b>0</b><span class="cp">tokens where a tool and Figma disagree</span><div class="cbars"><div class="br was"><span class="bk">Was</span><span class="bt"><i style="--w:100%"></i></span><span class="bv">43</span></div><div class="br now"><span class="bk">Now</span><span class="bt"><i style="--w:0%"></i></span><span class="bv">0</span></div></div></div>
+      <div class="cg"><b>0</b><span class="cp">screens with a hand-typed colour</span><div class="cbars"><div class="br was"><span class="bk">Was</span><span class="bt"><i style="--w:30%"></i></span><span class="bv">30%</span></div><div class="br now"><span class="bk">Now</span><span class="bt"><i style="--w:0%"></i></span><span class="bv">0%</span></div></div></div>
+      <div class="cg"><b>1 link</b><span class="cp">answers "which one is right?" for every PM</span><div class="cbars"><div class="br was"><span class="bk">Was</span><span class="bt sg"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="bv">3 places</span></div><div class="br now"><span class="bk">Now</span><span class="bt sg"><i class="on"></i><i class=""></i><i class=""></i></span><span class="bv">1 link</span></div></div></div>
+    </div></div>
+    <div class="kt"><span class="gl">The kit today</span>
+      <span class="ki"><b>11</b> releases</span><span class="ki"><b>7</b> product themes, one core</span><span class="ki"><b>40+</b> shared parts</span><span class="ki"><b>175</b> screens from kit parts only</span>
+    </div>
+  </div>
+  <div class="ig lb"><span class="gl">Looking back</span>
+  <div class="refl3">
+    <div class="rc"><span class="rk">What I learned</span>
+      <ol>
+        <li><b>Write the system for its reader.</b>Claude reads the kit, so I wrote it like an API: a do, a don't and exact markup. That did more for consistency than any style guide.</li>
+        <li><b>Truth depends on who's asking.</b>Designers need Figma; PMs and tools need a release. Naming both ended the "which one is right" debate.</li>
+        <li><b>Strict rules keep layers thin.</b>Once a product could only change spacing, products stopped drifting apart.</li>
+      </ol></div>
+    <div class="rc"><span class="rk">What I'd do differently</span>
+      <ol>
+        <li><b>Build the checks before the parts.</b>The review checks stopped more drift than the first three releases did. I'd start with them.</li>
+        <li><b>Put PMs in the loop from day one.</b>The PM approval step came late. It belongs in the very first release.</li>
+        <li><b>Bring a developer in early.</b>So tokens reach production code from the start, not only prototypes.</li>
+      </ol></div>
+    <div class="rc nx"><span class="rk">What's next</span>
+      <ol>
+        <li><b>Tokens in production.</b>The same releases feed the live app, with 0 raw values in shipped screens as the bar.</li>
+        <li><b>Fix our own contrast.</b>White on the brand green is 2.3:1. Agree a darker button green with brand.</li>
+        <li><b>Usage before change.</b>Live where-used from every studio, so each part shows what it touches before it changes.</li>
+      </ol></div>
+  </div></div>
+  <div class="nextsys-wrap"><div class="nextsys"><a href="/case-study/journey-studio"><span class="label"><i style="background:#2563EB"></i>Next in the system</span><b>Journey Studio</b><p>Where the kit becomes journeys: screens the whole team taps through and hands to developers.</p></a><a href="/case-study/illustration-studio"><span class="label"><i style="background:#C98A00"></i>Next in the system</span><b>Illustration Studio</b><p>State graphics PMs make themselves, in the kit's colours, sent back to the kit when approved.</p></a></div></div>
+</section>
+</main>
+<footer><div class="wrap">Design Kit · data as of 23 Nov 2026 · Built with Claude<div class="fict">All names, cases and figures shown inside product screens are fictional.</div></div></footer>
+
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s) };
+  var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)) };
+  function press(group, btn) { $$('button', group).forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false') }) }
+  var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hs = $('#heroSvg'); if (RM && hs && hs.pauseAnimations) hs.pauseAnimations();
+  var hr = $('#heroReplay'); if (hr) hr.addEventListener('click', function () { var s = $('#heroSvg'), c = s.cloneNode(true); s.parentNode.replaceChild(c, s) });
+
+
+  /* 03 The Figma layer: button properties rebuilt from the real component and its variable bindings */
+  (function () {
+    function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) }
+    var HX = { // [fill, label, stroke] for Default, Hover, Disabled (Focus uses Default + a focus ring)
+      Solid: { Primary: [['#46be88', '#ffffff'], ['#35a170', '#ffffff'], ['#cbd5e1', '#f1f5f9']], Secondary: [['#3b82f6', '#ffffff'], ['#2563eb', '#ffffff'], ['#cbd5e1', '#f1f5f9']], Neutral: [['#1e293b', '#ffffff'], ['#0f172a', '#ffffff'], ['#cbd5e1', '#f1f5f9']], Destructive: [['#ef4444', '#ffffff'], ['#dc2626', '#ffffff'], ['#cbd5e1', '#f1f5f9']] },
+      Tonal: { Primary: [['#d3ffec', '#24714d'], ['#a9f8d5', '#24714d'], ['#f8fafc', '#cbd5e1']], Secondary: [['#dbeafe', '#1d4ed8'], ['#bfdbfe', '#1d4ed8'], ['#f8fafc', '#cbd5e1']], Neutral: [['#f1f5f9', '#1e293b'], ['#e2e8f0', '#1e293b'], ['#f8fafc', '#cbd5e1']], Destructive: [['#fee2e2', '#b91c1c'], ['#fecaca', '#b91c1c'], ['#f8fafc', '#cbd5e1']] },
+      Outline: { Primary: [['#ffffff', '#46be88', '#e2e8f0'], ['#46be88', '#ffffff', '#46be88'], ['#ffffff', '#cbd5e1', '#cbd5e1']], Secondary: [['#ffffff', '#3b82f6', '#e2e8f0'], ['#3b82f6', '#ffffff', '#3b82f6'], ['#ffffff', '#cbd5e1', '#cbd5e1']], Neutral: [['#ffffff', '#1e293b', '#e2e8f0'], ['#f8fafc', '#1e293b', '#e2e8f0'], ['#ffffff', '#cbd5e1', '#cbd5e1']], Destructive: [['#ffffff', '#ef4444', '#e2e8f0'], ['#ef4444', '#ffffff', '#ef4444'], ['#ffffff', '#cbd5e1', '#cbd5e1']] },
+      Text: { Primary: [['#ffffff', '#46be88'], ['#edfff7', '#46be88'], ['#ffffff', '#cbd5e1']], Secondary: [['#ffffff', '#3b82f6'], ['#f3f9ff', '#3b82f6'], ['#ffffff', '#cbd5e1']], Neutral: [['#ffffff', '#1e293b'], ['#fafafa', '#1e293b'], ['#ffffff', '#cbd5e1']], Destructive: [['#ffffff', '#ef4444'], ['#fef2f2', '#ef4444'], ['#ffffff', '#cbd5e1']] }
+    };
+    var SZ = { xs: [20, 8, 4, 6, 10], sm: [24, 12, 4, 8, 12], md: [32, 16, 6, 8, 14], lg: [40, 20, 8, 10, 16], xl: [48, 24, 8, 12, 18] }; // height, h-pad, v-pad, radius, font
+    var P = { Size: 'md', Variant: 'Solid', Type: 'Primary', State: 'Default', Radius: 'Default', 'Show Label': true, 'Left Icon': false, 'Right Icon': true, Label: 'Continue' }, last = {};
+    var OPT = { Size: ['xs', 'sm', 'md', 'lg', 'xl'], Variant: ['Solid', 'Tonal', 'Outline', 'Text'], Type: ['Primary', 'Secondary', 'Neutral', 'Destructive'], State: ['Default', 'Hover', 'Focus', 'Disabled'], Radius: ['Default', 'Pill'] };
+    var box = $('#fgProps'), h = '';
+    ['Size', 'Variant', 'Type', 'State', 'Radius'].forEach(function (k) {
+      h += '<label class="fg-row"><span><i></i>' + k + '</span>' + (k === 'Size' || k === 'Radius' ? '<span class="fg-sw" role="group" aria-label="' + k + '">' + OPT[k].map(function (o) { return '<button type="button" data-k="' + k + '" data-v="' + o + '" aria-pressed="' + (P[k] === o) + '">' + o + '</button>' }).join('') + '</span>' : '<select data-k="' + k + '">' + OPT[k].map(function (o) { return '<option' + (P[k] === o ? ' selected' : '') + '>' + o + '</option>' }).join('') + '</select>') + '</label>' });
+    h += '<div class="fg-div"></div>';
+    ['Show Label', 'Left Icon', 'Right Icon'].forEach(function (k) { h += '<div class="fg-row"><span><i class="b"></i>' + k + '</span><button type="button" class="fg-tg" data-b="' + k + '" aria-pressed="' + P[k] + '" aria-label="' + k + '"></button></div>' });
+    h += '<label class="fg-row"><span><i class="t">T</i>Label</span><input type="text" id="fgLabel" value="' + P.Label + '" maxlength="18"></label>';
+    box.innerHTML = h;
+    box.addEventListener('change', function (e) { var s = e.target.closest('select'); if (s) { P[s.dataset.k] = s.value; draw() } });
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-k]'); if (b && b.tagName === 'BUTTON') { P[b.dataset.k] = b.dataset.v; $$('[data-k="' + b.dataset.k + '"]', box).forEach(function (x) { x.setAttribute('aria-pressed', x === b) }); draw() }
+      var t = e.target.closest('[data-b]'); if (t) { P[t.dataset.b] = !P[t.dataset.b]; t.setAttribute('aria-pressed', P[t.dataset.b]); draw() }
+    });
+    $('#fgLabel').addEventListener('input', function () { P.Label = this.value || 'Button'; draw() });
+    function ic(d, s) { return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>' }
+    function draw() {
+      var si = P.State === 'Hover' ? 1 : P.State === 'Disabled' ? 2 : 0, c = HX[P.Variant][P.Type][si], z = SZ[P.Size], vn = P.Variant === 'Outline' ? 'Ghost' : P.Variant, sn = P.State === 'Focus' ? 'Default' : P.State, isz = Math.round(z[4] + 4);
+      var st = 'height:' + z[0] + 'px;padding:0 ' + z[1] + 'px;border-radius:' + (P.Radius === 'Pill' ? 999 : z[3]) + 'px;font-size:' + z[4] + 'px;gap:' + Math.max(4, z[1] / 3) + 'px;background:' + c[0] + ';color:' + c[1] + ';border-color:' + (c[2] || c[0]) + (P.State === 'Focus' ? ';box-shadow:0 0 0 2px #fff,0 0 0 4px #3B82F6' : '') + (P.State === 'Disabled' ? ';cursor:not-allowed' : '');
+      $('#fgB').innerHTML = '<span class="fg-b" style="' + st + '">' + (P['Left Icon'] ? ic('<path d="M12 5v14M5 12h14"/>', isz) : '') + (P['Show Label'] || (!P['Left Icon'] && !P['Right Icon']) ? esc(P.Label) : '') + (P['Right Icon'] ? ic('<path d="M5 12h14M13 6l6 6-6 6"/>', isz) : '') + '</span>';
+      $('#fgName').textContent = 'Size=' + P.Size + ', Variant=' + P.Variant + ', Type=' + P.Type + ', State=' + P.State + ', Radius=' + P.Radius;
+      var R = [['Fill', 'CTA/Surface/' + vn + '/' + sn + '/' + P.Type, c[0]], ['Label', 'CTA/Label/' + vn + '/' + sn + '/' + P.Type, c[1]]];
+      if (P.Variant === 'Outline') R.push(['Stroke', 'CTA/Stroke/Ghost/' + sn + '/' + P.Type, c[2]]);
+      R.push(['H-padding', 'CTA/Button Tokens/' + P.Size + '/H-Padding', z[1]], ['V-padding', 'CTA/Button Tokens/' + P.Size + '/V-Padding', z[2]]);
+      if (P.Radius === 'Default') R.push(['Radius', 'CTA/Button Tokens/' + P.Size + '/Radius', z[3]]);
+      if (P.State === 'Focus') R.push(['Focus ring', 'Focus Ring layer, shown only in Focus', '']);
+      $('#fgVars').innerHTML = R.map(function (r) { var ch = last[r[0]] !== undefined && last[r[0]] !== r[1]; return '<div class="fg-v"><span>' + r[0] + '</span><code' + (ch ? ' class="ch"' : '') + '>' + esc(r[1]) + '</code><em>' + (typeof r[2] === 'string' && r[2][0] === '#' ? '<i style="background:' + r[2] + '"></i>' + r[2].toUpperCase() : r[2] === '' ? '' : r[2] + ' px') + '</em></div>' }).join('');
+      last = {}; R.forEach(function (r) { last[r[0]] = r[1] });
+      setTimeout(function () { $$('#fgVars code.ch').forEach(function (x) { x.classList.remove('ch') }) }, 900);
+    }
+    draw();
+    var LB = [['shots/fg-old-colors.jpg', '2025 · the colour page: 15 swatches, named by hex'], ['shots/fg-old-buttons.jpg', '2025 · the button page: three styles plus disabled'], ['shots/fg-button-grid.jpg', 'Today · Button: 640 variants'], ['shots/fg-calendar-all.jpg', 'Today · Calendar components, desktop and mobile'], ['shots/fg-calendar.jpg', 'Today · Calendar / Desktop'], ['shots/fg-icon-library.jpg', 'Today · 95 icons, single masters, by category'], ['shots/fg-icon-card.jpg', 'Today · the Icon component: size and glyph'], ['shots/fg-changelog.jpg', 'The library change log: v1 (Sep 2025) and v2 (Aug 2026)']], li = 0, lbx = $('#fgLbx');
+    function lb(i) { li = (i + LB.length) % LB.length; $('#fgLImg').src = LB[li][0]; $('#fgLImg').alt = LB[li][1]; $('#fgLT').textContent = LB[li][1]; lbx.hidden = false; $('#fgX').focus() }
+    $$('#figmaLayer [data-lb]').forEach(function (b) { b.addEventListener('click', function () { lb(+b.dataset.lb) }) });
+    $('#fgX').addEventListener('click', function () { lbx.hidden = true }); $('#fgP').addEventListener('click', function () { lb(li - 1) }); $('#fgN').addEventListener('click', function () { lb(li + 1) });
+    lbx.addEventListener('click', function (e) { if (e.target === lbx) lbx.hidden = true });
+    document.addEventListener('keydown', function (e) { if (lbx.hidden) return; if (e.key === 'Escape') lbx.hidden = true; if (e.key === 'ArrowRight') lb(li + 1); if (e.key === 'ArrowLeft') lb(li - 1) });
+  })();
+
+  /* 00 Meet the kit */
+  var TV = [
+    ['overview', 'Overview', 'One core of tokens and parts, matched to Figma, plus a thin layer per product.', 'Every component tile links to its Figma node.'],
+    ['component', 'Component page', 'Every part has a page: its variants rendered live from the kit CSS, its Figma node, usage across screens, and a do and a don\u2019t.', 'Click any variant and the Inspect panel reads its real size, colours, type and tokens.'],
+    ['colour', 'Foundations', 'Primitive ramps feed semantic tokens, each checked against its Figma variable.', 'Screens use semantic tokens only; primitives just define them.'],
+    ['layers', 'Product layers', 'Each product theme is the core plus a small layer of overrides, for Sales, Ops and Partner. Publishing rebuilds every theme.', 'Show in switches the whole kit to any product.'],
+    ['item', 'An item', 'gfx-ct-task-created: a graphic made in Illustration Studio, released like any other part, with the Create Task screen that uses it.', 'Propose a change starts a new version without touching the released one.'],
+    ['review', 'Review', 'A proposal from a studio chat: a loan summary card for Sales, built only from kit parts, rendered on the Sales theme.', 'Only the owner approves, requests changes or rejects; a note is required for the last two.'],
+    ['releases', 'Releases', 'Each release is a kit version with its full change log. Studios apply it from their Home in one click.', 'The latest release carried the Figma parity work: 34 differences decided, 0 open.']
+  ];
+  var tt = $('#tourTabs');
+  TV.forEach(function (v, i) { var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', i === 0 ? 'true' : 'false'); b.innerHTML = '<i>0' + (i + 1) + '</i>' + v[1]; b.addEventListener('click', function () { showTour(i) }); tt.appendChild(b) });
+  function showTour(i) { var v = TV[i]; $$('button', tt).forEach(function (b, k) { b.setAttribute('aria-selected', k === i ? 'true' : 'false') }); var im = $('#tourImg'); im.src = 'shots/' + v[0] + '.jpg'; im.alt = 'Rupyy Design Kit, ' + v[1] + ' view. ' + v[2]; $('#tourUrl').textContent = 'Rupyy Design Kit · ' + v[1]; $('#tourT').textContent = v[1]; $('#tourD').textContent = v[2] + ' ' + v[3] }
+  showTour(0);
+  TV.forEach(function (v) { var p = new Image(); p.src = 'shots/' + v[0] + '.jpg' });
+
+  /* 01 Same button, three places */
+  var SAME = {
+    before: [
+      ['Figma library', '#7C3AED', { bg: '#46BE88', r: 8, h: 48, ls: 0, font: 'Poppins 600 16' }, [['fill', '#46BE88'], ['radius', '8'], ['height', '48'], ['tracking', '-0.3']]],
+      ['Journey Studio theme', '#2563EB', { bg: '#3FB27F', r: 10, h: 46, ls: 0, font: 'Poppins 600 16' }, [['fill', '#3FB27F', 1], ['radius', '10', 1], ['height', '46', 1], ['tracking', '0', 1]]],
+      ['Illustration Studio', '#C98A00', { bg: '#4CC08C', r: 12, h: 44, ls: .2, font: 'DM Sans 600 15' }, [['fill', '#4CC08C', 1], ['radius', '12', 1], ['height', '44', 1], ['tracking', '0.2', 1]]],
+      ['Claude Design prototype', '#64748B', { bg: '#52C892', r: 14, h: 50, ls: 0 }, [['fill', '#52C892', 1], ['radius', '14', 1], ['height', '50', 1], ['tracking', '0', 1]]]
+    ],
+    after: [
+      ['Figma library', '#7C3AED', { bg: '#46BE88', r: 8, h: 48, ls: -.3 }, [['fill', 'Mapped/CTA/Solid/Primary'], ['radius', 'Radius/8'], ['height', 'Button/xl'], ['tracking', 'CTA/xl']]],
+      ['Journey Studio theme', '#2563EB', { bg: '#46BE88', r: 8, h: 48, ls: -.3 }, [['fill', 'cta-solid-primary'], ['radius', 'radius-8'], ['height', 'ds-xl'], ['tracking', 'cta-1-ls']]],
+      ['Illustration Studio', '#C98A00', { bg: '#46BE88', r: 8, h: 48, ls: -.3 }, [['fill', 'cta-solid-primary'], ['radius', 'radius-8'], ['height', 'ds-xl'], ['tracking', 'cta-1-ls']]],
+      ['Claude Design prototype', '#64748B', { bg: '#46BE88', r: 8, h: 48, ls: -.3 }, [['fill', 'cta-solid-primary'], ['radius', 'radius-8'], ['height', 'ds-xl'], ['tracking', 'cta-1-ls']]]
+    ]
+  };
+  function drawSame(v) {
+    $('#same').innerHTML = SAME[v].map(function (c) {
+      var st = c[2];
+      return '<div class="sm-col"><span class="t"><i style="background:' + c[1] + '"></i>' + c[0] + '</span>' +
+        '<button type="button" tabindex="-1" class="sm-btn" style="background:' + st.bg + ';border-radius:' + st.r + 'px;height:' + st.h + 'px;letter-spacing:' + st.ls + 'px">Continue</button>' +
+        '<span class="sm-vals">' + c[3].map(function (r) { return '<span>' + r[0] + ' <b class="' + (r[2] ? 'bad' : '') + '">' + r[1] + '</b></span>' }).join('') + '</span></div>';
+    }).join('');
+    $('#sameHint').textContent = v === 'before' ? 'Same button, four places, four answers' : 'One definition, read by every place';
+  }
+  $$('#sameSeg button').forEach(function (b) { b.addEventListener('click', function () { press($('#sameSeg'), b); drawSame(b.dataset.v) }) });
+  drawSame('before');
+
+  /* 03 Layers: a product changes density only; brand, type, radius and parts stay core */
+  var LAY = [
+    ['sales', 'Sales', { 'card-padding': 'space-20', 'row-gap': 'space-12' }, 20, 12, 'Sales: roomy. Field teams read on a phone, often outdoors, so cards breathe.'],
+    ['ops', 'Ops', { 'card-padding': 'space-12', 'row-gap': 'space-6' }, 12, 6, 'Ops: compact. Case workers scan many records on desktop, so more fits on screen.'],
+    ['partner', 'Partner', { 'card-padding': 'space-16', 'row-gap': 'space-8' }, 16, 8, 'Partner: the core default spacing.']
+  ];
+  var ls = $('#layerSeg');
+  LAY.forEach(function (l, i) { var b = document.createElement('button'); b.type = 'button'; b.textContent = l[1]; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false'); b.addEventListener('click', function () { press(ls, b); drawLayer(i) }); ls.appendChild(b) });
+  function drawLayer(i) {
+    var l = LAY[i], pad = l[3], gap = l[4], c = $('#lcard');
+    c.style.padding = pad + 'px'; c.style.gap = gap + 'px';
+    var kv = function (k, v) { return '<div class="kv" style="padding-bottom:' + gap + 'px">' + k + ' <b>' + v + '</b></div>' };
+    c.innerHTML = '<div class="lh"><span class="lt">Loan summary</span><span class="chip">In review</span></div>' + kv('Loan amount', '₹5,00,000') + kv('Tenure', '36 months') + kv('EMI', '₹16,580') +
+      '<button type="button" class="cta"><span class="cta-l">View sanction letter</span><span class="cta-sp" aria-hidden="true"></span></button>';
+    $('#layerMeta').textContent = 'padding ' + pad + ' · row gap ' + gap + ' · everything else core';
+    $('#layerNote').textContent = l[5];
+    $('#layerDiff').innerHTML = '<span style="color:#7D8590">// layer-' + l[0] + '.json</span>\n{\n  "extends": "core",\n  "overrides": {\n' + Object.keys(l[2]).map(function (k) { return '    "' + k + '": "' + l[2][k] + '"' }).join(',\n') + '\n  }\n}\n<span style="color:#7D8590">// colour, type, radius, buttons: core only</span>';
+  }
+  drawLayer(0);
+  $('#lcard').addEventListener('click', function (e) {
+    var b = e.target.closest('.cta'); if (!b || b.classList.contains('loading')) return;
+    b.classList.add('loading'); b.setAttribute('aria-busy', 'true'); b.setAttribute('aria-label', 'Loading');
+    setTimeout(function () { b.classList.remove('loading'); b.removeAttribute('aria-busy'); b.removeAttribute('aria-label') }, 1800);
+  });
+
+  /* 03 Propose, review, release: two paths, step by step */
+  var CARD = function (st, ver) { return '<div class="pc ' + st + '"><div class="pc-t">Loan summary <em>' + (ver || 'In review') + '</em></div><div class="pc-sk"><i></i><i></i><i></i><i class="b"></i></div><div class="pc-f"><div class="pc-kv">Loan amount <b>₹5,00,000</b></div><div class="pc-kv">Tenure <b>36 months</b></div><div class="pc-kv">EMI <b>₹16,580</b></div>' + (st.indexOf('v2') > -1 ? '<div class="pc-hint">Includes interest at 10.5% a year</div>' : '') + '<div class="pc-btn">View sanction letter</div></div></div>' };
+  var SHIP = '<div class="pv-ship"><div><span><i style="background:#2563EB"></i>Journey Studio</span><small>updated</small></div><div><span><i style="background:#7C3AED"></i>Partner</span><small>updated</small></div><div><span><i style="background:#C98A00"></i>Illustration Studio</span><small>updated</small></div></div>';
+  var S_ASK = ['Asked', 'PM', '💬', 'A PM building the Sales review screen asks for a card that sums up the loan. Nothing in the kit fits.',
+      '<div class="pv-chat"><div class="bub pm"><small>PM · Sales</small>The review screen needs a card that sums up the loan.</div><div class="bub ai"><small>Claude · Journey Studio</small>Nothing in the kit fits. Building it from kit parts and proposing it.</div></div>'];
+  var S_PROP = ['Proposed', 'Claude', '▦', 'Claude builds it only from kit tokens and parts, and sends it to the kit as a proposal with its Figma node.',
+      '<div class="pv-row">' + CARD('filling') + '<span class="pv-tag">sales-loan-summary · v1 · proposed</span></div>'];
+  var S_REV = ['Reviewed', 'Shivam · design', '✓', 'I check it against Figma, contrast and naming. Your call: approve it, or reject it.',
+      '<div class="pv-row">' + CARD('done') + '<div class="pv-chk"><span>✓ kit tokens only</span><span class="x">? EMI row: Figma has a hint line</span><span>✓ contrast 4.5:1</span><div class="pv-acts"><button type="button" class="pv-cta ok" data-act="approve">Approve</button><button type="button" class="pv-cta no" data-act="reject">Reject</button></div></div></div>'];
+  var S_REL = ['Released', 'Shivam · design', '⇪', 'The next release ships it. Every studio shows “A new release is ready” and updates in one click.',
+      '<div class="pv-row">' + CARD('done small') + SHIP + '</div>'];
+  var S_REJ = ['Rejected', 'Shivam · design', '✕', 'I reject it and say why, in a comment pinned to the card.',
+      '<div class="pv-row"><div class="pv-pin">' + CARD('done') + '<span class="pin">1</span></div><div class="pv-chk"><span>✓ kit tokens only</span><span class="x">✕ EMI row misses the Figma hint line</span><span>✓ contrast 4.5:1</span><div class="pv-note"><b>Shivam</b>EMI needs the hint line from Figma, so customers see the interest rate.</div></div></div>'];
+  var PM_NO = 'The rate is already shown above this card on our screen. Can the hint go?';
+  var S_COR = function (r) { var from = r + 1, to = r + 2; return ['Corrected', 'Shivam · design', '✎', r ? 'The PM sent it back, so I correct it again, as v' + to + ', and reply in the thread.' : 'I propose a corrected version myself, as v2, linked to my comment.',
+      '<div class="pv-row pv-vs"><div class="pv-old">' + CARD('done', 'v' + from) + '</div><span class="pv-arrow">→</span>' + CARD('done v2', 'v' + to) + (r ? '<div class="pv-note" style="animation-delay:.3s"><b>PM · Sales</b>' + PM_NO + '</div>' : '') + '</div>'] };
+  var S_PM = function (d, r) { var v = 'v' + (r + 2); return ['PM decides', 'PM', '◉', d === 'ok' ? 'The PM approved ' + v + ' on their journey.' : v + ' shows up on the PM’s journey in Journey Studio, with the thread. Approve or reject it as the PM; a rejection sends it back to design.',
+      '<div class="pv-js"><div class="pv-jsbar"><i></i><b>Sales · Review screen</b><span>Journey Studio</span></div><div class="pv-jsbody"><div class="pv-banner">Design proposed ' + v + ' of Loan summary<div>' + (d === 'ok' ? '<span class="ok">Approved</span>' : '<button type="button" class="pv-cta ok sm" data-act="pm-ok">Approve</button><button type="button" class="pv-cta no sm" data-act="pm-no">Reject</button>') + '</div></div><div class="pv-thread"><div><b>Shivam</b>EMI needs the hint line from Figma, so customers see the interest rate.</div>' + (r ? '<div class="me"><b>PM · Sales</b>' + PM_NO + '</div><div><b>Shivam</b>Kept the hint, made it lighter so it doesn’t repeat the headline rate.</div>' : '') + (d === 'ok' ? '<div class="me"><b>PM · Sales</b>Makes sense. Approving.</div>' : '') + '</div></div></div>'] };
+  var S_REL2 = function (r) { var v = 'v' + (r + 2); return ['Released', 'Shivam · design', '⇪', 'Approved by the PM, ' + v + ' goes out in the next release to every studio.',
+      '<div class="pv-row">' + CARD('done small v2', v) + SHIP + '</div>'] };
+  var round = 0;
+  var path = null, pm = null, ps = 0;
+  function steps() {
+    if (path === 'fix') return [S_ASK, S_PROP, S_REV, S_REJ, S_COR(round), S_PM(pm, round), S_REL2(round)];
+    return [S_ASK, S_PROP, S_REV, S_REL];
+  }
+  function drawTrack(P) {
+    var t = $('#prrTrack');
+    t.style.gridTemplateColumns = 'repeat(' + P.length + ', 1fr)';
+    t.innerHTML = P.map(function (s, i) { var locked = (i > 2 && !path) || (path === 'fix' && i > 5 && !pm); return '<li><button type="button" data-s="' + i + '"' + (locked ? ' disabled' : '') + ' class="' + (s[0] === 'Rejected' ? 'rej ' : '') + (i < ps ? 'done' : i === ps ? 'on' : '') + '"><i>' + s[2] + '</i><b>' + s[0] + '</b><span>' + s[1] + '</span></button></li>' }).join('') + '<div class="prr-line" style="left:' + (50 / P.length) + '%;right:' + (50 / P.length) + '%"><span style="width:' + (ps / (P.length - 1) * 100) + '%"></span></div>';
+    $$('button', t).forEach(function (b) { b.addEventListener('click', function () { ps = +b.dataset.s; drawPrr() }) });
+  }
+  function drawPrr() {
+    var P = steps(), s = P[ps];
+    drawTrack(P);
+    var v = $('#prrVis'); v.classList.remove('in'); void v.offsetWidth; v.innerHTML = s[4]; v.classList.add('in');
+    $('#prrN').textContent = 'Step ' + (ps + 1) + ' of ' + P.length; $('#prrWho').textContent = 'By ' + (s[1] === 'PM' ? 'the PM' : s[1]); $('#prrT').textContent = s[0]; $('#prrD').textContent = s[3];
+    var wait = (ps === 2 && !path) || (path === 'fix' && ps === 5 && !pm);
+    $('#prrBack').disabled = ps === 0;
+    $('#prrNext').disabled = wait;
+    $('#prrNext').textContent = wait ? 'Choose above' : ps === P.length - 1 ? 'Start again' : 'Next';
+  }
+  $('#prrVis').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var a = b.dataset.act;
+    if (a === 'approve') { path = 'ok'; pm = null; round = 0; ps = 3 }
+    else if (a === 'reject') { path = 'fix'; pm = null; round = 0; ps = 3 }
+    else if (a === 'pm-ok') { pm = 'ok'; ps = 6 }
+    else if (a === 'pm-no') { pm = null; round++; ps = 4 }
+    drawPrr();
+  });
+  $('#prrNext').addEventListener('click', function () { var P = steps(); if (ps === P.length - 1) { ps = 0; path = null; pm = null; round = 0 } else ps++; drawPrr() });
+  $('#prrBack').addEventListener('click', function () { if (ps > 0) { ps--; if (ps <= 2) { path = null; pm = null; round = 0 } else if (ps <= 5) pm = null; drawPrr() } });
+  drawPrr();
+
+  /* 03 Claude reads the kit before it builds */
+  var CR = {
+    no: { code: '<span class="c">// nothing to read, so Claude guesses</span>\n<span class="k2">&lt;button</span> style="\n  background: <span class="bad">#3FB27F</span>;\n  border-radius: <span class="bad">10px</span>;\n  height: <span class="bad">46px</span>"<span class="k2">&gt;</span>\n  Continue\n<span class="k2">&lt;/button&gt;</span>',
+      btn: 'background:#3FB27F;border-radius:10px;height:46px', flags: '<span class="fl bad">3 raw values</span><span>fill #3FB27F, kit is #46BE88</span><span>radius 10, kit is 12</span><span>height 46, kit is 48</span>' },
+    yes: { code: '<span class="c">// read: catalogue.md › Button · ds-btn</span>\n<span class="c">// "One solid primary per screen;</span>\n<span class="c">//  on phones it sits in the CTA bar."</span>\n<span class="k2">&lt;button</span> class="<span class="f">ds-btn ds-solid ds-primary ds-xl</span>"<span class="k2">&gt;</span>\n  <span class="k2">&lt;span&gt;</span>Continue<span class="k2">&lt;/span&gt;</span>\n<span class="k2">&lt;/button&gt;</span>',
+      btn: 'background:#46BE88;border-radius:12px;height:48px;letter-spacing:-.3px', flags: '<span class="fl ok">0 raw values</span><span>the kit button, exactly</span><span>in the CTA bar, as the catalogue says</span>' }
+  };
+  function drawCr(k) {
+    var c = CR[k];
+    $('#crdCode').innerHTML = c.code;
+    $('#crdScr').innerHTML = '<div class="crd-ph"><div class="crd-h">‹ <b>Review case</b></div><div class="crd-ln"></div><div class="crd-ln s"></div><div class="crd-ln"></div><div class="crd-bar"><button type="button" tabindex="-1" style="' + c.btn + '">Continue</button></div></div>';
+    $('#crdFlags').innerHTML = c.flags;
+    $('#crdScr').className = 'crd-scr ' + k;
+  }
+  $$('#crdSeg button').forEach(function (b) { b.addEventListener('click', function () { press($('#crdSeg'), b); drawCr(b.dataset.c) }) });
+  drawCr('no');
+
+  /* 04 Try to break it: live checks */
+  var TOK = { '#46BE88': 'cta-solid-primary', '#3B82F6': 'cta-solid-secondary', '#1E293B': 'cta-solid-neutral', '#EF4444': 'cta-solid-destructive' };
+  var RADII = [0, 2, 4, 6, 8, 10, 12, 16, 20];
+  var T = { fill: '#3FB27F', label: '#E2E8F0', rad: 9, id: 'ds-btn', fig: '4083:4165' };
+  var sw = $('#tbFill');
+  ['#46BE88', '#3FB27F', '#3B82F6', '#4CC08C'].forEach(function (h) { var b = document.createElement('button'); b.type = 'button'; b.style.background = h; b.title = h; b.setAttribute('aria-label', 'Fill ' + h); b.addEventListener('click', function () { T.fill = h; sync() }); sw.appendChild(b) });
+  function lum(h) { var c = h.replace('#', '').match(/../g).map(function (x) { x = parseInt(x, 16) / 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4) }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2] }
+  function cr(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05) }
+  function checks() {
+    var hexOk = /^#[0-9A-F]{6}$/.test(T.fill), tok = TOK[T.fill], ratio = hexOk ? cr(T.fill, T.label) : 0;
+    return [
+      [!!tok, tok ? 'Fill is a kit token: ' + tok : 'Raw colour ' + T.fill + ': parts use tokens', 'Use cta-solid-primary', function () { T.fill = '#46BE88' }],
+      [T.label === '#FFFFFF', T.label === '#FFFFFF' ? 'Label is the kit pair: cta-label-on-solid' : 'Label is off-token, and only ' + ratio.toFixed(1) + ':1 on this fill', 'Use cta-label-on-solid', function () { T.label = '#FFFFFF' }],
+      [RADII.indexOf(T.rad) > -1, RADII.indexOf(T.rad) > -1 ? 'Radius ' + T.rad + 'px is a token: radius-' + T.rad : 'Radius ' + T.rad + 'px is not a kit radius', 'Snap to radius-12', function () { T.rad = 12 }],
+      [T.id === 'ds-btn', T.id === 'ds-btn' ? 'Id is stable: ds-btn' : 'Renaming ds-btn breaks 412 uses on screens', 'Keep ds-btn', function () { T.id = 'ds-btn' }],
+      [/^\d+:\d+$/.test(T.fig), /^\d+:\d+$/.test(T.fig) ? 'Mapped to Figma ' + T.fig : 'No Figma node: the design master would miss it', 'Use 4083:4165', function () { T.fig = '4083:4165' }]
+    ];
+  }
+  function sync() {
+    $('#tbHex').value = T.fill; $('#tbLabel').value = T.label; $('#tbRad').value = T.rad; $('#tbRadV').textContent = T.rad + 'px'; $('#tbId').value = T.id; $('#tbFig').value = T.fig;
+    $$('#tbFill button').forEach(function (b) { b.setAttribute('aria-pressed', b.title === T.fill ? 'true' : 'false') });
+    var btn = $('#tbBtn'); btn.style.background = /^#[0-9A-F]{6}$/.test(T.fill) ? T.fill : '#CBD5E1'; btn.style.color = T.label; btn.style.borderRadius = T.rad + 'px';
+    var C = checks(), bad = C.filter(function (c) { return !c[0] }).length;
+    $('#tbChk').innerHTML = C.map(function (c, i) { return '<li class="' + (c[0] ? 'ok' : 'no') + '"><i>' + (c[0] ? '✓' : '!') + '</i><span>' + c[1] + '</span>' + (c[0] ? '' : '<button type="button" class="btn sm" data-fix="' + i + '">' + c[2] + '</button>') + '</li>' }).join('');
+    $$('#tbChk [data-fix]').forEach(function (b) { b.addEventListener('click', function () { C[+b.dataset.fix][3](); sync() }) });
+    var s = $('#tbSend'); s.disabled = bad > 0; $('#tbMsg').textContent = bad ? bad + ' check' + (bad > 1 ? 's' : '') + ' to fix first' : 'All checks pass';
+  }
+  $('#tbHex').addEventListener('input', function () { var v = this.value.trim().toUpperCase(); if (/^#[0-9A-F]{6}$/.test(v)) { T.fill = v; sync() } });
+  $('#tbLabel').addEventListener('change', function () { T.label = this.value; sync() });
+  $('#tbRad').addEventListener('input', function () { T.rad = +this.value; sync() });
+  $('#tbId').addEventListener('input', function () { T.id = this.value.trim(); var p = this.selectionStart; sync(); this.setSelectionRange(p, p) });
+  $('#tbFig').addEventListener('input', function () { T.fig = this.value.trim(); var p = this.selectionStart; sync(); this.setSelectionRange(p, p) });
+  $('#tbSend').addEventListener('click', function () { $('#tbMsg').textContent = 'Sent. Waiting in Review for Shivam.'; this.disabled = true });
+  sync();
+})();
+
+;(function(){var el=document.querySelector('.imp');if(!el)return;
+if(!('IntersectionObserver' in window)){el.classList.add('in');return}
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){el.classList.add('in');io.disconnect()}})},{threshold:.3});io.observe(el)})();
+
+</script>
+<script>window.TLCFG = {"moves": [{"sel": "#figmaLayer .fg-btn", "slot": "play", "vt": "tl-play"}, {"sel": "#figmaLayer .fg-btn + .fg-cap", "slot": "play"}, {"sel": ".panel.tb", "slot": "play2", "vt": "tl-play2"}, {"sel": ".imp > .ig", "slot": "impact", "vt": "tl-impact"}], "portal": ["#fgLbx"], "map": {"tldr": {"problem": "cols", "demo": "cols", "insight": "cols", "build": "cols", "guard": "cols", "impact": "tlend"}, "full": {"cols": "problem", "tlend": "impact"}}};
+/* TL;DR toggle: one page, two modes. Shared across the three case studies; each page sets window.TLCFG. */
+(function () {
+  var C = window.TLCFG; if (!C) return;
+  var D = document, H = D.documentElement, RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function $(s, r) { return (r || D).querySelector(s) } function $$(s, r) { return [].slice.call((r || D).querySelectorAll(s)) }
+  (C.portal || []).forEach(function (s) { var e = $(s); if (e) D.body.appendChild(e) });
+  var nav = $('nav.sys'); if (nav) nav.style.viewTransitionName = 'sysnav';
+  var tl = $('.tl'); if (tl) tl.style.viewTransitionName = 'tl-sec';
+  var hs = $('.hero .strip'); if (hs) hs.style.viewTransitionName = 'tl-strip';
+  var ha = $('.hero .art'); if (ha) ha.style.viewTransitionName = 'tl-art';
+  var moves = (C.moves || []).map(function (m) { var el = $(m.sel), slot = $('[data-slot="' + m.slot + '"]'); if (!el || !slot) return null; var ph = D.createComment('tl:' + m.slot); el.parentNode.insertBefore(ph, el); if (m.vt) el.style.viewTransitionName = m.vt; return { el: el, ph: ph, slot: slot } }).filter(Boolean);
+  function place(mode) { moves.forEach(function (m) { if (mode === 'tldr') m.slot.appendChild(m.el); else m.ph.parentNode.insertBefore(m.el, m.ph.nextSibling) }) }
+  var mode = /[?&]v=tldr\b/.test(location.search) || location.hash === '#tldr' ? 'tldr' : 'full';
+  var live = D.createElement('p'); live.className = 'tl-sr'; live.setAttribute('aria-live', 'polite'); D.body.appendChild(live);
+  function thumbs() { $$('.tlt').forEach(function (g) { var on = $('button[aria-pressed="true"]', g), th = $('.tlt-th', g); if (on && th) { th.style.width = on.offsetWidth + 'px'; th.style.transform = 'translateX(' + on.offsetLeft + 'px)' } }) }
+  function sync() {
+    $$('.tlt button[data-tlm]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.tlm === mode ? 'true' : 'false') }); thumbs();
+    $$('a[href*="claude.ai/artifact/"]').forEach(function (a) { var u = a.getAttribute('href').replace(/[?&]v=tldr\b/, ''); a.setAttribute('href', mode === 'tldr' ? u + (u.indexOf('?') < 0 ? '?' : '&') + 'v=tldr' : u) });
+  }
+  function navH() { return nav ? nav.getBoundingClientRect().height : 0 }
+  function anchor() { // a moved block that fills a good part of the top of the screen wins; otherwise the section in view
+    var top = navH(), lo = top + (innerHeight - top) * .55, band = lo - top, pick = function (list, min) { var best = null, bv = min; list.forEach(function (p) { var r = p[0].getBoundingClientRect(); if (!r.height) return; var v = Math.min(r.bottom, lo) - Math.max(r.top, top); if (v > bv) { bv = v; best = { el: p[0], key: p[1], y: r.top } } }); return best };
+    if (scrollY < 40) return { hero: true };
+    return pick(moves.map(function (m) { return [m.el, 'el'] }), band * .35) || pick($$('[data-a]').map(function (e) { return [e, e.dataset.a] }), 0) || { hero: true };
+  }
+  function restore(a, to) {
+    if (!a || a.hero) { scrollTo({ top: 0, behavior: 'instant' }); return }
+    var t = a.key === 'el' ? a.el : $('[data-a="' + ((C.map[to] || {})[a.key] || 'hero') + '"]');
+    if (!t || !t.getBoundingClientRect().height) { scrollTo({ top: 0, behavior: 'instant' }); return }
+    var want = a.key === 'el' ? a.y : navH() + 16;
+    var fix = function () { scrollTo({ top: Math.max(0, scrollY + t.getBoundingClientRect().top - want), behavior: 'instant' }) }; fix();
+    if (window.ResizeObserver) { var ro = new ResizeObserver(fix), stop = function () { ro.disconnect(); removeEventListener('wheel', stop); removeEventListener('touchstart', stop); removeEventListener('keydown', stop) }; ro.observe(D.body); setTimeout(stop, 1200); addEventListener('wheel', stop, { passive: true }); addEventListener('touchstart', stop, { passive: true }); addEventListener('keydown', stop) }
+  }
+  function apply(m, a) { mode = m; place(m); H.dataset.mode = m; sync(); restore(a, m); try { var u = new URL(location.href); if (m === 'tldr') u.searchParams.set('v', 'tldr'); else u.searchParams.delete('v'); history.replaceState(null, '', u) } catch (e) { } window.dispatchEvent(new Event('resize')); window.dispatchEvent(new CustomEvent('tlmode', { detail: m })) }
+  var busy = false;
+  function setMode(m, src) {
+    if (m === mode || busy) return; var a = anchor();
+    live.textContent = m === 'tldr' ? 'Showing the TL;DR, the short version.' : 'Showing the full story.';
+    if (RM) { apply(m, a); return }
+    if (D.startViewTransition) { busy = true; var t = D.startViewTransition(function () { apply(m, a) }); t.finished.then(function () { busy = false }, function () { busy = false }); return }
+    busy = true; H.classList.add('tl-fade');
+    setTimeout(function () { apply(m, a); H.classList.remove('tl-fade'); H.classList.add('tl-fadein'); requestAnimationFrame(function () { setTimeout(function () { H.classList.remove('tl-fadein'); busy = false }, 240) }) }, 170);
+  }
+  D.addEventListener('click', function (e) { var b = e.target.closest('[data-tlm]'); if (b) { e.preventDefault(); setMode(b.dataset.tlm, b) } });
+  $$('.tlt').forEach(function (g) { g.addEventListener('keydown', function (e) { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; var bs = $$('button', g), i = bs.indexOf(D.activeElement); if (i < 0) return; var n = bs[(i + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length]; n.focus(); setMode(n.dataset.tlm, n) }) });
+  addEventListener('resize', thumbs); if (D.fonts && D.fonts.ready) D.fonts.ready.then(thumbs);
+  if (mode === 'tldr') { place('tldr'); H.dataset.mode = 'tldr' } else H.dataset.mode = 'full';
+  sync(); requestAnimationFrame(thumbs);
+})();
+</script>
+</body>
+</html>

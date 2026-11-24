@@ -13,11 +13,12 @@ const ROWS = [
 
 export function TldrView({ meta }: { meta: PageMeta }) {
   const t = meta.tldr!;
+  const title = t.title ?? [`${meta.name}, in `, 'one', ' minute.'];
   return (
     <main className="pc-tldr">
       <p className="pc-tldr-label">{t.kind} · TL;DR</p>
       <h1 className="pc-tldr-title">
-        {t.title[0]}<span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>{t.title[1]}</span>{t.title[2]}
+        {title[0]}<span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>{title[1]}</span>{title[2]}
       </h1>
       <dl className="pc-tldr-facts">
         {ROWS.map(([k, v]) => (

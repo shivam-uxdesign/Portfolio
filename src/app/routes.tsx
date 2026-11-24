@@ -1,11 +1,9 @@
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, Navigate } from 'react-router';
 import { RootLayout } from './components/RootLayout';
 import { ErrorPage } from './pages/ErrorPage';
 import { SheetHome as Home } from './pages/SheetHome';
 import { GridPanelPage } from './pages/GridPanelPage';
-import { BMDashboardCaseStudy } from './pages/BMDashboardCaseStudy';
-import { DesignSystemCaseStudy } from './pages/DesignSystemCaseStudy';
-import { MobileAppCaseStudy } from './pages/MobileAppCaseStudy';
+import { SalesCaseCardPage, JourneyStudioPage, DesignKitPage, IllustrationStudioPage, RupyySystemPage } from './pages/WorkCaseStudies';
 import { ComicsPage } from './pages/ComicsPage';
 import { DrawingsPage } from './pages/DrawingsPage';
 import { CoolStuffPage } from './pages/CoolStuffPage';
@@ -31,17 +29,25 @@ export const router = createBrowserRouter([
         Component: GridPanelPage,
       },
       {
+        // Placeholder case study, replaced by the real one.
         path: '/case-study/bm-dashboard',
-        Component: BMDashboardCaseStudy,
+        element: <Navigate to="/case-study/sales-case-card" replace />,
       },
       {
+        // Placeholder case study, replaced by the real one.
         path: '/case-study/design-system',
-        Component: DesignSystemCaseStudy,
+        element: <Navigate to="/case-study/design-kit" replace />,
       },
       {
+        // Placeholder case study, replaced by the real one.
         path: '/case-study/mobile-app',
-        Component: MobileAppCaseStudy,
+        element: <Navigate to="/case-study/journey-studio" replace />,
       },
+      { path: '/case-study/sales-case-card', Component: SalesCaseCardPage },
+      { path: '/case-study/rupyy-design-system', Component: RupyySystemPage },
+      { path: '/case-study/journey-studio', Component: JourneyStudioPage },
+      { path: '/case-study/design-kit', Component: DesignKitPage },
+      { path: '/case-study/illustration-studio', Component: IllustrationStudioPage },
       {
         path: '/comics',
         Component: ComicsPage,

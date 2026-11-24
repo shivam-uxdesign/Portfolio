@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales Case Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@500&family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  /* Third in the portfolio series (Illustration Studio, Journey Studio): white paper, ink type, Rupyy green for structure, spark yellow used once per section.
+     Layout: seven beats, each a claim headline + a working exhibit built from the real case cards. Product UI inside exhibits uses the app's own tokens (Poppins, nd-*). */
+  --paper: #FBFBF8; --card: #FFFFFF; --ink: #15171C; --ink2: #2B2F37; --muted: #5E6470; --rule: #E4E6E1; --green: #00845A; --green-soft: #E4F3EC; --spark: #FFD94A; --desk: #EEF1EC;
+  --red: #C0392B; --red-soft: #FBEAE8; --blue: #1D4ED8; --amber: #B7791F; --old: #9AA1AC;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif; --body: "Source Serif 4", Georgia, serif; --mono: "JetBrains Mono", ui-monospace, monospace; --app: "Poppins", system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { -webkit-text-size-adjust: 100% }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 18.5px/1.6 var(--body) }
+img { max-width: 100%; height: auto; display: block }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 22px }
+.col { max-width: 660px; display: grid; gap: 14px }
+h1, h2, h3, h4 { font-family: var(--display); margin: 0; text-wrap: balance }
+p { margin: 0 }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted) }
+button { font: inherit; color: inherit }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 3px }
+.mark { background: linear-gradient(transparent 60%, var(--spark) 60% 92%, transparent 92%) }
+.num { font-variant-numeric: tabular-nums }
+
+/* Hero */
+.hero { padding: 60px 0 52px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 44px; align-items: center; border-bottom: 1px solid var(--rule) }
+.hero h1 { font-size: clamp(44px, 7vw, 88px); font-weight: 800; line-height: .94; letter-spacing: -.04em }
+.hero h1 .pills { display: inline-flex; gap: .18em; align-items: center; vertical-align: .06em }
+.hero h1 .pl { font: 700 .5em/1 var(--app); letter-spacing: -.01em; color: #fff; background: #3B82F6; border-radius: .32em; padding: .2em .42em .22em }
+.hero h1 .pl.s { background: #EFF6FF; color: #155DFC }
+.hero .kick { font: 700 clamp(21px, 2.4vw, 28px)/1.22 var(--display); letter-spacing: -.015em; margin-top: 20px; max-width: 24ch }
+.hero .dek { margin-top: 14px; font-size: 19px; line-height: 1.5; color: var(--ink2); max-width: 40ch }
+.meta { margin-top: 24px; display: grid; grid-template-columns: repeat(4, auto); gap: 6px 26px; justify-content: start }
+.meta div { display: grid; gap: 2px } .meta b { font: 600 15px/1.3 var(--display) }
+.pair { display: grid; gap: 10px; justify-items: center }
+.pair .tag { font: 500 11.5px/1.3 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); justify-self: start; display: flex; gap: 8px; align-items: center }
+.pair .tag i { width: 8px; height: 8px; border-radius: 50% }
+.pair .arrow { font: 600 13px var(--mono); color: var(--muted) }
+.strip { margin-top: 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; grid-column: 1 / -1 }
+.stat { border-top: 3px solid var(--ink); padding-top: 10px; display: grid; gap: 4px; align-content: start }
+.stat b { font: 800 32px/1.05 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums }
+.stat span { font-size: 15px; line-height: 1.4; color: var(--ink2) }
+
+section { padding: 72px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 26px; grid-template-columns: minmax(0, 1fr) }
+section > *, .sub > *, .desk > *, .scrub > *, .tix > *, .sitx > *, .anat > *, .anno > *, .sim > *, .hyp > *, .two > *, .vs > *, .bars > *, .hero > * { min-width: 0 }
+.sub { grid-template-columns: minmax(0, 1fr) }
+.beat { display: flex; gap: 14px; align-items: baseline }
+.beat .n { font: 800 15px var(--display); color: var(--green) }
+h2 { font-size: clamp(32px, 4.4vw, 50px); font-weight: 800; letter-spacing: -.03em; line-height: 1.02 }
+h3 { font-size: 23px; font-weight: 700; letter-spacing: -.015em }
+.sub { display: grid; gap: 18px; margin-top: 22px }
+.sub .col p { font-size: 17.5px }
+figure { margin: 0; display: grid; gap: 10px; min-width: 0 }
+figcaption { font: 500 12.5px/1.5 var(--mono); color: var(--muted) }
+.desk { background: var(--desk); border-radius: 22px; padding: clamp(14px, 2.8vw, 30px) }
+.panel { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 20px; box-shadow: 0 1px 2px rgba(20,30,25,.04) }
+.src { font: 500 12px/1.5 var(--mono); color: var(--muted) }
+
+/* Controls */
+.btn { font: 600 14px var(--display); border: 1px solid var(--rule); background: var(--card); color: var(--ink); border-radius: 999px; padding: 8px 14px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center }
+.btn:hover { border-color: #B9BFB7 }
+.btn:disabled { opacity: .45; cursor: default }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; padding: 3px; background: var(--card); flex-wrap: wrap; gap: 2px }
+.seg button { border: 0; background: none; font: 600 13px var(--display); padding: 6px 13px; border-radius: 999px; cursor: pointer; color: var(--muted) }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff }
+.hint { font: 500 12px var(--mono); color: var(--muted) }
+
+/* 01 annotated dashboard */
+.anno { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 34px; align-items: start }
+.shot { position: relative; border-radius: 30px; border: 8px solid #1A1F2C; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -32px rgba(20,40,30,.5) }
+.pin { position: absolute; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; font: 700 13px/26px var(--display); text-align: center; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.3); cursor: pointer; padding: 0 }
+.pin.good { background: var(--green) }
+.pin[aria-pressed="true"] { background: var(--spark); color: var(--ink); transform: translate(-50%, -50%) scale(1.15) }
+.notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: n }
+.notes li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid transparent; font-size: 16.5px; line-height: 1.48; cursor: pointer; transition: background .2s, border-color .2s }
+.notes li:hover, .notes li.on { background: var(--card); border-color: var(--rule) }
+.notes li i { font: 700 13px/26px var(--display); font-style: normal; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; text-align: center }
+.notes li.good i { background: var(--green) }
+.notes b { font-family: var(--display); font-size: 17px; display: block; margin-bottom: 1px }
+ul.pain { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px }
+ul.pain li { border-top: 2px solid var(--red); padding-top: 10px; font-size: 16px; line-height: 1.45 }
+ul.pain b { display: block; font-family: var(--display); font-size: 17px; margin-bottom: 2px }
+
+/* tickets */
+.tix { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; align-items: start }
+.bars { display: grid; gap: 14px }
+.bar { display: grid; gap: 6px }
+.bar .t { display: flex; justify-content: space-between; gap: 4px 12px; flex-wrap: wrap; font: 600 15px/1.3 var(--display) }
+.bar .t span { font: 500 13px var(--mono); color: var(--muted); white-space: nowrap }
+.bar .track { height: 14px; border-radius: 4px; background: #EEF0EC; position: relative; overflow: hidden }
+.bar .fill { position: absolute; inset: 0 auto 0 0; background: var(--ink); border-radius: 4px }
+.bar small { font-size: 14px; line-height: 1.45; color: var(--ink2) }
+.bar.sum .fill { background: var(--green) }
+.subjects { display: grid; gap: 10px }
+.subj { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; display: grid; gap: 4px }
+.subj q { font: 500 14px/1.4 var(--mono); quotes: none; color: var(--ink) }
+.subj span { font: 500 12px var(--mono); color: var(--muted) }
+
+/* 02 principles */
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px }
+.pr { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 18px 18px 16px; display: grid; gap: 8px; align-content: start }
+.pr .q { font: 800 25px/1.1 var(--display); letter-spacing: -.02em }
+.pr .a { font: 500 12px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--green) }
+.pr p { font-size: 15.5px; line-height: 1.45; color: var(--ink2) }
+.sitx { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start }
+.chips { display: grid; gap: 12px; grid-column: 1 / -1 }
+.chips .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center }
+.chips .row > span { font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); width: 84px; flex: none }
+.chip { border: 1px solid var(--rule); background: var(--card); border-radius: 999px; padding: 5px 11px; font: 600 13px var(--display); cursor: pointer; color: var(--ink2) }
+.chip:hover { border-color: #B9BFB7 }
+.chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink) }
+.chip.r[aria-pressed="true"] { background: var(--red); border-color: var(--red) }
+.chip.w[aria-pressed="true"] { background: var(--blue); border-color: var(--blue) }
+.side-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap }
+.side-h b { font: 700 15px var(--display) }
+.changed { font: 500 12px var(--mono); color: var(--muted) }
+.changed.same { color: var(--red) }
+.facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+.rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; counter-reset: r }
+.rule { border-top: 2px solid var(--ink); padding-top: 10px; display: grid; gap: 4px; font-size: 15.5px; line-height: 1.45; color: var(--ink2) }
+.rule b { font: 700 16.5px var(--display); color: var(--ink) }
+
+/* App ground + cards */
+.ph { padding: 12px; border-radius: 18px; background: #F2F4F7; border: 1px solid #E3E7EE; width: 100%; max-width: 372px; position: relative }
+.ph.dim { opacity: .9 }
+
+/* Old card (rebuilt from Figma, Dashboard file node 8091:25706) */
+.oc { background: #fff; border-radius: 16px; border: 1px solid #EEF0F3; padding: 16px 16px 10px; font-family: var(--app); color: #1E293B; display: grid; gap: 10px }
+.oc-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start }
+.oc-who { display: grid; gap: 2px; min-width: 0 }
+.oc-who b { font: 600 15.5px/1.3 var(--app); color: #1E293B }
+.oc-who span { font: 400 13px/1.3 var(--app); color: #475569 }
+.oc-st { display: grid; grid-template-columns: auto 6px; gap: 0 7px; align-items: center; justify-items: end; flex: none }
+.oc-pill { font: 500 9.5px/1 var(--app); color: #fff; background: #3B82F6; border-radius: 7px; padding: 5px 8px }
+.oc-pill.g { background: #2DB57E }
+.oc-tag { font: 500 9.5px/1 var(--app); color: #155DFC; background: #EFF6FF; border-radius: 7px; padding: 5px 8px; white-space: nowrap }
+.oc-tag.a { color: #D97706; background: #FFF7E6 }
+.oc-dot { width: 6px; height: 6px; border-radius: 50%; background: #3B82F6 }
+.oc-dot.g { background: #2DB57E } .oc-dot.a { background: #F59E0B }
+.oc-ln { width: 1px; height: 10px; background: #CBD5E1; justify-self: center; grid-column: 2 }
+.oc-x { grid-column: 1; font: 600 8px var(--app); color: #155DFC; margin-top: 3px }
+.oc-meta { display: flex; gap: 10px; align-items: center; font: 400 11.5px var(--app); color: #475569 }
+.oc-meta b { font-weight: 600; color: #1E293B }
+.oc-meta i { width: 1px; height: 12px; background: #CBD5E1 }
+.oc-foot { display: flex; justify-content: space-between; border-top: 1px solid #EEF0F3; padding-top: 10px; font: 500 12.5px var(--app); color: #1677FF }
+
+/* New card (Used Car Case Cards, 18 Nov 2026) */
+.nd { --nd-line: #e6e9ef; --nd-soft: #f1f4f8; --nd-ink: #0f172a; --nd-ink2: #1e293b; --nd-ink3: #475569; --nd-mute: #94a3b8; --nd-mute2: #6b7688; --nd-link: #3b82f6; --nd-track: #e8ecf0; font-family: var(--app); color: var(--nd-ink); font-size: 14px; line-height: normal; -webkit-font-smoothing: antialiased }
+.nd :where(button) { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer }
+.nd-mc { position: relative; background: #fff; border: 1px solid var(--nd-line); border-radius: 16px; box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 14px rgba(15,23,42,.04); transition: box-shadow .3s }
+.nd-mc-b { display: flex; flex-direction: column; gap: 14px; padding: 16px 16px 14px }
+.nd-mc-top { display: flex; align-items: flex-start; gap: 10px }
+.nd-who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding-top: 1px }
+.nd-n { font-weight: 700; font-size: 15px; color: var(--nd-ink); line-height: 1.2 }
+.nd-m { font-size: 10.5px; color: var(--nd-mute2) }
+.nd-r { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; text-align: right }
+.nd-rl { font-size: 8.5px; font-weight: 700; letter-spacing: .08em; color: var(--nd-mute2); text-transform: uppercase }
+.nd-rn { font-size: 12px; font-weight: 600; color: var(--nd-ink2) }
+.nd-step { border-radius: 10px; padding: 10px 12px 11px; display: flex; flex-direction: column; gap: 4px; transition: background .3s }
+.nd-step-h { font-weight: 700; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase }
+.nd-step p { margin: 0; font-size: 13px; color: var(--nd-ink); line-height: 1.45 }
+.t-g { background: rgba(70,190,136,.07); border-left: 3px solid #2d9a67 } .t-g .nd-step-h { color: #1a5c3a }
+.t-b { background: rgba(29,78,216,.06); border-left: 3px solid #1d4ed8 } .t-b .nd-step-h { color: #1e3a8a }
+.t-r { background: rgba(185,28,28,.06); border-left: 3px solid #b91c1c } .t-r .nd-step-h { color: #7f1d1d }
+.t-n { background: #f6f8fa; border-left: 3px solid #64748b } .t-n .nd-step-h { color: #334155 }
+.nd-stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px }
+.nd-stg { display: flex; flex-direction: column; gap: 6px; padding: 6px 0; margin: -6px 0; border-radius: 6px; text-align: left }
+.nd-stg span { font-size: 10.5px; font-weight: 500; color: var(--nd-mute2); white-space: nowrap }
+.nd-stg:hover span, .nd-stg.on span { color: var(--nd-ink) }
+.sg { display: grid; gap: 2px }
+.sg i { height: 4px; border-radius: 2px; background: var(--nd-track); transition: background .3s }
+.sg i.done { background: #46BE88 } .sg i.amber { background: #c2820a } .sg i.red { background: #b91c1c }
+.nd-tip { position: absolute; z-index: 6; width: 232px; background: #fff; border: 1px solid #e4e8ee; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.1), 0 2px 6px rgba(0,0,0,.06) }
+.nd-tip-h { margin: 0; font-weight: 700; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--nd-ink) }
+.nd-tip-r { display: flex; align-items: center; gap: 10px; font-size: 11.5px; line-height: 1.3 }
+.nd-dot { width: 18px; height: 18px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center }
+.nd-dot.done { background: #46BE88 } .nd-dot.cur { background: #D97706 } .nd-dot.cur::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff } .nd-dot.todo { border: 2px solid #e2e8f0; background: #fff } .nd-dot.bad { background: #b91c1c }
+.nd-foot { display: flex; align-items: center; gap: 6px; padding-top: 8px; margin: 2px -8px 0; border-top: 1px solid var(--nd-soft) }
+.nd-foot .sp { flex: 1 }
+.nd-btn { height: 34px; padding: 0 12px; border-radius: 10px; font: 500 12.5px var(--app); display: flex; align-items: center; color: var(--nd-link) }
+.nd-btn.off { color: #b8c2d0 }
+.nd-btn.lead { color: #1677FF; font-weight: 600 }
+.flash .nd-mc { box-shadow: 0 0 0 3px rgba(255,217,74,.85) }
+
+/* 03 anatomy */
+.anat { display: grid; grid-template-columns: 372px minmax(0, 1fr); gap: 34px; align-items: start }
+.anat .ph { position: relative }
+.cal { position: absolute; width: 22px; height: 22px; border-radius: 50%; background: var(--spark); color: var(--ink); font: 800 12px/22px var(--display); text-align: center; box-shadow: 0 0 0 2px #fff; pointer-events: none }
+.anat ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px }
+.anat li { display: grid; grid-template-columns: 26px 1fr; gap: 12px; font-size: 16.5px; line-height: 1.48 }
+.anat li i { font: 800 12px/22px var(--display); font-style: normal; width: 22px; height: 22px; border-radius: 50%; background: var(--spark); text-align: center; margin-top: 2px }
+.anat li b { font-family: var(--display); font-size: 17px; display: block }
+.tones { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px }
+.tones span { font: 600 10px var(--app); letter-spacing: .08em; text-transform: uppercase; padding: 4px 8px; border-radius: 6px }
+table.btns { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.4 }
+table.btns th { font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0 10px 8px 0; border-bottom: 1px solid var(--ink) }
+table.btns td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--rule); vertical-align: top }
+table.btns td:last-child { font: 600 13px var(--app); color: #1677FF; white-space: nowrap }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start }
+.words { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px }
+.words li { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font: 500 13px/1.4 var(--app) }
+.words li span { padding: 8px 10px; border-radius: 10px }
+.words li span:first-child { background: #F3F3F1; color: #6B7280; text-decoration: line-through; text-decoration-color: #C0392B80 }
+.words li span:last-child { background: var(--green-soft); color: #14532D }
+
+/* scrubber */
+.scrub { display: grid; gap: 18px }
+.steps { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px }
+.steps button { height: 34px; border: 1px solid var(--rule); background: var(--card); border-radius: 8px; font: 600 13px var(--display); cursor: pointer; color: var(--muted); padding: 0 }
+.steps button.seen { color: var(--ink) }
+.steps button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink) }
+.mo { display: grid; gap: 4px }
+.mo h4 { font: 800 24px/1.15 var(--display); letter-spacing: -.02em }
+.mo p { font-size: 16.5px; color: var(--ink2); line-height: 1.45 }
+.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start }
+.vs > div { display: grid; gap: 10px; justify-items: start }
+.vs .lab { font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; align-items: center }
+.verdict { font: 500 13px/1.45 var(--mono); padding: 8px 10px; border-radius: 10px; background: #F3F3F1; color: var(--ink2); max-width: 372px }
+.verdict.bad { background: var(--red-soft); color: #7F1D1D }
+.verdict.ok { background: var(--green-soft); color: #14532D }
+.navrow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap }
+
+/* 04 constraint */
+.made { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px }
+.made .pr .q { font-size: 34px }
+.sim { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 26px; align-items: start }
+.ctl { display: grid; gap: 16px }
+.ctl label { display: grid; gap: 6px; font: 600 14px var(--display) }
+.ctl select { font: 500 14px var(--app); padding: 9px 10px; border-radius: 10px; border: 1px solid #CDD3CB; background: #fff; color: var(--ink); width: 100% }
+.why { font-size: 15.5px; line-height: 1.5; color: var(--ink2); background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 14px 16px; display: grid; gap: 8px }
+.why b { font-family: var(--display) }
+.prio { display: grid; gap: 4px; font: 500 12.5px/1.35 var(--mono); color: var(--muted) }
+.prio span.on { color: var(--ink); font-weight: 700 }
+.lines { display: grid; gap: 4px; font: 500 11.5px var(--app); color: var(--nd-ink3) }
+.lines div { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; border-radius: 8px; background: #F6F8FA }
+.lines b { font-weight: 600; color: var(--nd-ink2) }
+.approved { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 22px; align-items: center; background: var(--ink); color: #fff; border-radius: 22px; padding: 26px 28px }
+.approved .seal { width: 84px; height: 84px; border-radius: 50%; background: var(--spark); color: var(--ink); display: grid; place-items: center; font: 800 13px/1.1 var(--display); text-align: center; text-transform: uppercase; letter-spacing: .04em }
+.approved h3 { color: #fff; font-size: 26px }
+.approved p { color: #D7DBE0; font-size: 16.5px; line-height: 1.5; margin-top: 6px }
+.approved ul { margin: 12px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px }
+.approved li { font: 600 13px var(--display); border: 1px solid #4B5260; border-radius: 999px; padding: 5px 12px; color: #fff }
+
+/* 05 evolution */
+.evo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px }
+.ver { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 18px; display: grid; gap: 12px; align-content: start }
+.ver .k { font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted) }
+.ver h4 { font: 800 20px/1.2 var(--display); letter-spacing: -.015em }
+.ver p { font-size: 15.5px; line-height: 1.45; color: var(--ink2) }
+.mini { background: #F2F4F7; border-radius: 12px; padding: 12px; font-family: var(--app); display: grid; gap: 8px }
+.mini .st4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px }
+.mini .st4 > div { display: grid; gap: 4px; font: 500 9.5px var(--app); color: #6b7688 }
+.mini .sg i { height: 4px }
+.mini .rowx { display: flex; justify-content: space-between; font: 500 10.5px var(--app); color: #475569; background: #fff; border-radius: 6px; padding: 6px 8px }
+.mini .rowx b { font-weight: 600; color: #1e293b }
+.mini .note { font: 500 11px/1.4 var(--app); color: #1e3a8a; background: rgba(29,78,216,.07); border-left: 3px solid #1d4ed8; border-radius: 8px; padding: 7px 9px }
+.ver.now { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.wrong { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px }
+.wrong div { border-top: 2px solid var(--amber); padding-top: 10px; font-size: 15.5px; line-height: 1.45; color: var(--ink2) }
+.wrong b { display: block; font: 700 16.5px var(--display); color: var(--ink); margin-bottom: 2px }
+
+/* 06 test */
+.method { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+.method div { display: grid; gap: 2px; border-left: 2px solid var(--rule); padding-left: 12px }
+.method b { font: 700 18px/1.2 var(--display) }
+.method span { font-size: 14.5px; line-height: 1.4; color: var(--ink2) }
+.res { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px }
+.rt { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 18px; display: grid; gap: 8px; align-content: start }
+.rt .k { font: 600 15px/1.3 var(--display) }
+.rt .ab { display: flex; align-items: baseline; gap: 10px; font-variant-numeric: tabular-nums }
+.rt .ab s { font: 700 22px var(--display); color: var(--old); text-decoration: none }
+.rt .ab em { font: 500 14px var(--mono); color: var(--muted); font-style: normal }
+.rt .ab b { font: 800 40px/1 var(--display); letter-spacing: -.03em }
+.rt small { font-size: 14px; line-height: 1.4; color: var(--muted) }
+.chart svg { width: 100%; height: auto; display: block }
+.chart text { font-family: var(--display) }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font: 500 12.5px var(--mono); color: var(--muted) }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px }
+.finds { display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
+.find { border-radius: 16px; padding: 18px 20px; display: grid; gap: 6px; font-size: 16px; line-height: 1.5 }
+.find b { font: 700 18px/1.25 var(--display) }
+.find.g { background: var(--green-soft) } .find.a { background: #FFF6DB }
+.quotes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px }
+.qt { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 18px 20px; display: grid; gap: 8px; align-content: start }
+.qt .o { font: 600 18px/1.35 var(--display); letter-spacing: -.01em }
+.qt .e { font-size: 15.5px; line-height: 1.45; color: var(--ink2); font-style: italic }
+.qt .w { font: 500 11.5px var(--mono); color: var(--muted); letter-spacing: .03em; display: flex; gap: 8px; align-items: center }
+.qt .w i { font-style: normal; padding: 2px 7px; border-radius: 6px; background: #F3F3F1 }
+.qt .w i.n { background: var(--green-soft); color: #14532D }
+.caveat { font-size: 15px; line-height: 1.5; color: var(--ink2); border-left: 3px solid var(--rule); padding-left: 14px; max-width: 760px }
+
+/* 07 impact */
+.hyp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: center }
+.big { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; font-variant-numeric: tabular-nums }
+.big s { font: 800 54px/1 var(--display); color: var(--old); text-decoration: none; letter-spacing: -.03em }
+.big b { font: 800 72px/1 var(--display); letter-spacing: -.04em }
+.big span { font: 500 14px var(--mono); color: var(--muted) }
+.tag2 { display: inline-block; font: 600 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; background: #FFF6CF; color: #8A6A00; border-radius: 6px; padding: 3px 8px }
+.measure { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; font-size: 15.5px; line-height: 1.45 }
+.measure li { display: grid; grid-template-columns: 22px 1fr; gap: 8px }
+.measure li::before { content: '→'; font-family: var(--mono); color: var(--green) }
+.reflect { display: grid; grid-template-columns: 1fr 1fr; gap: 28px }
+.reflect ul { margin: 10px 0 0; padding-left: 20px; display: grid; gap: 8px; font-size: 16.5px; line-height: 1.5 }
+.next { display: grid; grid-template-columns: 1fr 1fr; gap: 14px }
+.next a { display: grid; gap: 4px; padding: 18px 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--rule); text-decoration: none; color: var(--ink) }
+.next a:hover { border-color: var(--ink) }
+.next a b { font: 800 22px var(--display); letter-spacing: -.02em }
+.next a span { font-size: 15px; color: var(--ink2) }
+footer { padding: 30px 0 60px; font: 500 12.5px/1.6 var(--mono); color: var(--muted) }
+
+@media (max-width: 900px) {
+  .hero, .anno, .anat, .sim, .tix, .sitx, .hyp { grid-template-columns: 1fr }
+  .hero .pair { order: 2 }
+  .hero .strip { order: 3 }
+  ul.pain, .facts, .method { grid-template-columns: 1fr 1fr }
+  .three, .rules, .made, .evo, .wrong, .res, .quotes, .finds, .reflect, .next, .two { grid-template-columns: 1fr }
+  .anno .shot { max-width: 330px }
+  .strip { grid-template-columns: 1fr }
+  .steps { grid-template-columns: repeat(6, minmax(0, 1fr)) }
+}
+@media (max-width: 640px) {
+  .vs { grid-template-columns: 1fr }
+  .meta { grid-template-columns: repeat(2, auto) }
+  ul.pain, .facts, .method { grid-template-columns: 1fr }
+  .approved { grid-template-columns: 1fr }
+  .chips .row > span { width: 100% }
+  section { padding: 56px 0 }
+  .words li { grid-template-columns: 1fr }
+}
+/* Reading mode */
+.modebar { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; background: rgba(251,251,248,.94); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule) }
+.tl { padding: 44px 0 64px; display: grid; gap: 30px }
+.tl-head { display: grid; gap: 14px; max-width: 760px }
+.tl-head h1 { font-size: clamp(40px, 6vw, 72px); font-weight: 800; line-height: .95; letter-spacing: -.04em }
+.tl-lede { font: 700 clamp(20px, 2.3vw, 26px)/1.3 var(--display); letter-spacing: -.015em }
+.tl-nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px }
+.tl-try { background: var(--desk); border-radius: 22px; padding: clamp(14px, 2.8vw, 28px); display: grid; gap: 18px }
+.tl-try-h { display: grid; gap: 10px }
+.tl-chips { display: flex; flex-wrap: wrap; gap: 6px }
+.tl-chips button { border: 1px solid var(--rule); background: var(--card); border-radius: 999px; padding: 6px 12px; font: 600 13px var(--display); cursor: pointer; color: var(--ink2) }
+.tl-chips button:hover { border-color: #B9BFB7 }
+.tl-chips button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink) }
+.tl-chips button b { font: 500 11px var(--mono); opacity: .6; margin-right: 6px }
+.tl-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start }
+.tl-score { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px 12px; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 14px 16px; font: 600 14px var(--display) }
+.tl-score .cap { grid-column: 1 / -1; font: 500 12px var(--mono); color: var(--muted); letter-spacing: .03em }
+.tl-score .tr { height: 12px; border-radius: 4px; background: #EEF0EC; position: relative; overflow: hidden }
+.tl-score .tr i { position: absolute; inset: 0 auto 0 0; border-radius: 4px; transition: width .45s ease }
+.tl-score .v { font-variant-numeric: tabular-nums; min-width: 44px; text-align: right }
+.tl-cards > div { display: grid; gap: 10px; justify-items: start; min-width: 0 }
+.tl-cards .tag { font: 500 11.5px/1.3 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); display: flex; gap: 8px; align-items: center }
+.tl-cards .tag i { width: 8px; height: 8px; border-radius: 50% }
+.tl-story { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; max-width: 860px }
+.tl-story li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 18px; padding: 14px 0; border-top: 1px solid var(--rule) }
+.tl-story .k { font: 500 12px/1.9 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--green) }
+.tl-story p { font-size: 17.5px; line-height: 1.5 }
+@media (max-width: 900px) { .tl-nums { grid-template-columns: 1fr 1fr } }
+@media (max-width: 640px) { .tl-nums, .tl-cards { grid-template-columns: 1fr } .tl-chips button b { display: none } .tl-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -4px; padding: 2px 4px } .tl-chips button { flex: none } .tl-story li { grid-template-columns: 1fr; gap: 4px } .modebar .label { display: none } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
+</style>
+</head>
+<body>
+<main class="wrap">
+<div class="modebar">
+  <span class="label">Sales case card · case study</span>
+  <div class="seg" role="group" aria-label="Reading mode"><button type="button" data-mode="full" aria-pressed="true">Full story</button><button type="button" data-mode="tldr" aria-pressed="false">TL;DR · 1 min</button></div>
+</div>
+<div id="tldr" hidden>
+  <div class="tl">
+    <div class="tl-head">
+      <p class="label">TL;DR · Rupyy · 2026 · <span style="color:var(--green)">Shipped</span></p>
+      <h1>One status. Twelve situations.</h1>
+      <p class="tl-lede">I redesigned Rupyy's Sales case card around the three questions business managers (BMs) ask. It shipped to every loan type, and <span class="mark">“where is my case?” tickets fell from 98 to 12 a month.</span></p>
+      <div class="meta"><div><span class="label">Role</span><b>Research, design, test</b></div><div><span class="label">Users</span><b>Sales BMs</b></div><div><span class="label">Scope</span><b>All loan types</b></div></div>
+    </div>
+    <div class="tl-nums">
+      <div class="stat"><b>98 → 12</b><span>visibility tickets a month, −88%, two full months after launch</span></div>
+      <div class="stat"><b>32% → 93%</b><span>of answers knew what to do next, old card vs new</span></div>
+      <div class="stat"><b>57% → 10%</b><span>would call someone or raise a ticket</span></div>
+      <div class="stat"><b>6 of 6</b><span>BMs preferred the new card</span></div>
+    </div>
+    <div class="tl-try">
+      <div class="tl-try-h">
+        <span class="label">Try it · the 7 situations BMs were tested on</span>
+        <div class="tl-chips" role="group" aria-label="Test situations" id="tlChips"></div>
+      </div>
+      <div class="tl-cards">
+        <div><span class="tag"><i style="background:var(--old)"></i>Old card</span><div class="ph" id="tlOld"></div><div class="verdict" id="tlOV"></div></div>
+        <div><span class="tag"><i style="background:var(--green)"></i>New card · tap a stage</span><div class="ph nd" id="tlNew"></div><div class="verdict ok" id="tlNV"></div></div>
+      </div>
+      <div class="tl-score" id="tlScore" aria-live="polite"></div>
+    </div>
+    <ol class="tl-story">
+      <li><span class="k">Problem</span><p>The card showed the system's status. “Open · Open” covered twelve different situations, rejections included, and Payment Box and RTO collapsed into one pill. 197 of the 265 visibility tickets (74%) asked something the card couldn't say.</p></li>
+      <li><span class="k">Insight</span><p>BMs ask three things, in order: Whose move? What exactly? How far? Each got a fixed place on the card.</p></li>
+      <li><span class="k">Design</span><p>A colour-coded owner line, one plain sentence with no names or system codes, four stages (Disbursal, TU, Payments, RTO) that open a checklist, and a left button that follows the case.</p></li>
+      <li><span class="k">Proof</span><p>An informal test with 6 BMs, 84 answers. The newest BMs on the new card (86% right) beat experienced BMs on the old one (43%). The Product Head approved it for every loan type.</p></li>
+      <li><span class="k">Next</span><p>The Parallel moment is still the weakest (75%): an RTO line that says when nothing is needed from the BM.</p></li>
+    </ol>
+    <button class="btn" type="button" id="toFull" style="justify-self:start">Read the full story →</button>
+  </div>
+</div>
+<div id="full">
+<header class="hero">
+  <div>
+    <p class="label">Case study · Rupyy · 2026 · <span style="color:var(--green)">Shipped</span></p>
+    <h1 style="margin-top:14px">One status.<br>Twelve situations.</h1>
+    <p class="kick">A case card that tells a <span class="mark">BM whose move it is.</span></p>
+    <p class="dek">Rupyy's business managers (BMs) follow every car loan from a card on their phone. The old card showed the system's status. I rebuilt it around the three questions BMs actually ask, tested it with six of them, and shipped it for every loan type.</p>
+    <div class="meta">
+      <div><span class="label">Role</span><b>Research, design, test</b></div>
+      <div><span class="label">Time</span><b>Sep–Nov 2026</b></div>
+      <div><span class="label">Users</span><b>Sales BMs</b></div>
+      <div><span class="label">Scope</span><b>All loan types</b></div>
+    </div>
+  </div>
+  <div class="pair" aria-label="The same rejected bypass on the old card and on the new card">
+    <span class="tag"><i style="background:var(--old)"></i>Before · a rejected bypass</span>
+    <div class="ph" id="heroOld"></div>
+    <span class="arrow" aria-hidden="true">↓</span>
+    <span class="tag"><i style="background:var(--green)"></i>After · the same case</span>
+    <div class="ph nd" id="heroNew"></div>
+  </div>
+  <div class="strip">
+    <div class="stat"><b>98 → 12</b><span>“where is my case?” tickets a month, two full months after launch</span></div>
+    <div class="stat"><b>32% → 93%</b><span>of answers knew what to do next, old card vs new (6 BMs, informal test)</span></div>
+    <div class="stat"><b>6 of 6</b><span>BMs preferred the new card in testing. It shipped to every loan type.</span></div>
+  </div>
+</header>
+
+<section aria-labelledby="h01">
+  <div class="beat"><span class="n">01</span><span class="label">The tension</span></div>
+  <div class="col">
+    <h2 id="h01">Four teams. One loan. One pill.</h2>
+    <p>A used-car loan at Rupyy passes through Sales, the Doc Checker, Payment Box and RTO. Before disbursal it can wait on approvers for bypasses and deferrals. After disbursal, Payment Box and RTO work on the same case at the same time. The BM owns the customer the whole way, and their only window into all of it was this card.</p>
+  </div>
+  <div class="desk">
+    <div class="anno">
+      <figure>
+        <div class="shot" id="shot">
+          <img src="old-dash.jpg" width="720" height="1440" alt="The old Sales dashboard: a green header, three quick-filter tiles (PDD Overdue, Discrepancies, PDD Pending) and case cards that each show a status pill, a sub-status tag, and Resume and Take Action links.">
+        </div>
+        <figcaption>The Sales dashboard in Figma before this project. Tap a number.</figcaption>
+      </figure>
+      <ol class="notes" id="notes"></ol>
+    </div>
+  </div>
+  <ul class="pain">
+    <li><b>Rejections are invisible</b>A rejected bypass reads exactly like a draft. The BM finds out when they call.</li>
+    <li><b>Parallel work collapses</b>After disbursal, payment and RTO move at once. The card has room for one pill pair.</li>
+    <li><b>Buttons ignore the case</b>Resume is live on a case that is waiting on someone else.</li>
+    <li><b>No sense of distance</b>Nothing says how much of the loan is done, or what comes next.</li>
+  </ul>
+
+  <div class="sub">
+    <div class="col">
+      <h3>The tickets said it first.</h3>
+      <p>In September I read all 2,485 sales support tickets from July and August, every subject line, with the support team's labels hidden. Three themes were BMs asking where a case was, or why it hadn't moved.</p>
+    </div>
+    <div class="tix">
+      <div class="bars" id="bars"></div>
+      <div class="subjects">
+        <span class="label">Real subject lines</span>
+        <div class="subj"><q>##### | New Car | Case Stuck for Disbursal</q><span>open 358.5 hours · 27 messages</span></div>
+        <div class="subj"><q>Re: Case is not reflecting in BM’s UJ Dashboard.</q><span>open 142.8 hours · 11 messages</span></div>
+        <div class="subj"><q>Disbursal pending // #####</q><span>open 43.2 hours · 22 messages</span></div>
+        <p class="src">Source: my Sales ticket analysis, 2,485 tickets from 745 people, 2 Jul – 31 Aug 2026. Case-hours are directional. Loan IDs masked.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h02">
+  <div class="beat"><span class="n">02</span><span class="label">The insight</span></div>
+  <div class="col">
+    <h2 id="h02">Status is the system’s word. BMs ask three questions.</h2>
+    <p>Every one of those tickets asks one of three things. I gave each a fixed place on the card, in the order a BM reads it.</p>
+  </div>
+  <div class="three">
+    <div class="pr"><span class="a">The owner line</span><span class="q">Whose move?</span><p>Your step, Pending approval, In progress, Approval rejected. The colour says whether it's on the BM.</p></div>
+    <div class="pr"><span class="a">The note</span><span class="q">What exactly?</span><p>One plain sentence: what happened and what comes next. No approver names, no system codes.</p></div>
+    <div class="pr"><span class="a">The progress bar</span><span class="q">How far?</span><p>Four stages a BM already knows: Disbursal, TU, Payments, RTO. Tap one for its checklist.</p></div>
+  </div>
+
+  <div class="sub">
+    <div class="col">
+      <h3>“Open · Open”, twelve ways.</h3>
+      <p>Before filing, one status pair covers a draft, six kinds of wait and five kinds of rejection. Both cards start on the draft. Pick a wait or a rejection: only one of them notices.</p>
+    </div>
+    <div class="desk">
+      <div class="sitx">
+        <div class="chips" id="chips"></div>
+        <div style="display:grid;gap:10px;justify-items:start">
+          <div class="side-h" style="width:100%;max-width:372px"><b>Old card</b><span class="changed" id="oldChanged" aria-live="polite"></span></div>
+          <div class="ph" id="sitOld"></div>
+        </div>
+        <div style="display:grid;gap:10px;justify-items:start">
+          <div class="side-h" style="width:100%;max-width:372px"><b>New card</b><span class="changed" id="newChanged" aria-live="polite"></span></div>
+          <div class="ph nd" id="sitNew"></div>
+        </div>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="stat"><b>13</b><span>status and sub-status pairs in the system</span></div>
+      <div class="stat"><b>39</b><span>situations a BM can actually be in</span></div>
+      <div class="stat"><b>22</b><span>of them are an approval or a rejection</span></div>
+      <div class="stat"><b>Up to 3</b><span>situations can be live on one case at once</span></div>
+    </div>
+    <p class="src">From the mapping workbook I built from the status sheet: every situation against the pair it lives under. 17 situations appear under more than one pair.</p>
+  </div>
+
+  <div class="sub">
+    <div class="col"><h3>Three rules decide what the card says.</h3></div>
+    <div class="rules">
+      <div class="rule"><b>1 · Cancellation overrides</b>A cancellation in progress, or money returned to the bank, replaces everything else on the card.</div>
+      <div class="rule"><b>2 · Your step first</b>If anything needs the BM, the card shows only that, one message each.</div>
+      <div class="rule"><b>3 · Otherwise, one wait</b>Everything the BM can't act on folds into one line about who has the case.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h03">
+  <div class="beat"><span class="n">03</span><span class="label">The design</span></div>
+  <div class="col">
+    <h2 id="h03">One card, read top to bottom.</h2>
+    <p>Same footprint as the old card, same app styles. The difference is what each line is for.</p>
+  </div>
+  <div class="desk">
+    <div class="anat">
+      <div class="ph nd" id="anat"></div>
+      <ol>
+        <li><i>1</i><div><b>Who it is</b>Customer, loan type and case number, plus the RTO Coordinator once one is assigned.</div></li>
+        <li><i>2</i><div><b>Whose move</b>Four colours, one meaning each.<div class="tones"><span style="background:rgba(70,190,136,.12);color:#1a5c3a">Your step</span><span style="background:rgba(29,78,216,.08);color:#1e3a8a">Pending · In progress</span><span style="background:rgba(185,28,28,.08);color:#7f1d1d">Rejected · Discrepancy</span><span style="background:#eef1f4;color:#334155">Closed</span></div></div></li>
+        <li><i>3</i><div><b>What happened, in plain words</b>A rejection carries the approver's remark. The BM never sees “MIS”, “LB Pro” or a person's name.</div></li>
+        <li><i>4</i><div><b>How far</b>Each segment is a step: green done, amber now, red stuck. Tap a stage to open its checklist.</div></li>
+        <li><i>5</i><div><b>The button follows the case</b>Fix discrepancy, Resolve pendency, Raise payment. When there's nothing to do, Resume is greyed out.</div></li>
+      </ol>
+    </div>
+  </div>
+  <div class="two">
+    <div>
+      <h3 style="margin-bottom:12px">The left button, by situation</h3>
+      <table class="btns">
+        <thead><tr><th>Situation</th><th>Button</th></tr></thead>
+        <tbody>
+          <tr><td>Draft, or nothing blocking</td><td>Resume</td></tr>
+          <tr><td>Bypass rejected</td><td>Fix details</td></tr>
+          <tr><td>Deferral not approved</td><td>Fix deferral</td></tr>
+          <tr><td>Doc Checker or Payment Box discrepancy</td><td>Fix discrepancy</td></tr>
+          <tr><td>RTO pendency, or originals pending</td><td>Resolve pendency</td></tr>
+          <tr><td>RTO check running</td><td>Add seller details</td></tr>
+          <tr><td>TU signed</td><td>Raise payment</td></tr>
+          <tr><td>Float rejected</td><td>Re-raise Float</td></tr>
+          <tr><td>Waiting on anyone else</td><td style="color:#b8c2d0">Resume (inactive)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Words, before and after</h3>
+      <ul class="words">
+        <li><span>Under Disbursement</span><span>Doc Checker is reviewing the case.</span></li>
+        <li><span>Rejected by BH</span><span>Approval rejected · Remark: “…”</span></li>
+        <li><span>Waiting on Approvers · Approvers decide the deferrals</span><span>Deferrals sent for approval.</span></li>
+        <li><span>FC pending</span><span>Foreclosure pending sent for approval.</span></li>
+        <li><span>Additional doc required</span><span>The RTO check needs documents or corrections from you.</span></li>
+      </ul>
+      <p class="src" style="margin-top:12px">Rules: no approver or teammate names, no system names, “Foreclosure” in full, one sentence where one will do.</p>
+    </div>
+  </div>
+
+  <div class="sub">
+    <div class="col">
+      <h3>Walk one case, twelve moments.</h3>
+      <p>Case #2093, from draft to payment released, on both cards. Use the numbers or your arrow keys.</p>
+    </div>
+    <div class="desk scrub">
+      <div class="steps" role="group" aria-label="Moments of case 2093" id="steps"></div>
+      <div class="mo" aria-live="polite"><span class="label" id="moN"></span><h4 id="moT"></h4><p id="moD"></p></div>
+      <div class="vs">
+        <div><span class="lab"><i style="width:8px;height:8px;border-radius:50%;background:var(--old)"></i>Old card</span><div class="ph" id="moOld"></div><div class="verdict" id="moOV"></div></div>
+        <div><span class="lab"><i style="width:8px;height:8px;border-radius:50%;background:var(--green)"></i>New card</span><div class="ph nd" id="moNew"></div><div class="verdict" id="moNV"></div></div>
+      </div>
+      <div class="navrow"><button class="btn" type="button" id="prev">← Previous</button><button class="btn" type="button" id="next">Next →</button><span class="hint" id="oldSame"></span></div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h06">
+  <div class="beat"><span class="n">04</span><span class="label">The test</span></div>
+  <div class="col">
+    <h2 id="h06">Six BMs, seven situations, two cards.</h2>
+    <p>An informal test, run with a PM. Each BM saw the same seven situations on both cards, on a phone, and answered three questions: Who has this case now? What do you do next? Would you call someone or raise a ticket?</p>
+  </div>
+  <div class="method">
+    <div><b>6 BMs</b><span>3 in their first six months, 3 with two years or more</span></div>
+    <div><b>84 answers</b><span>7 situations, each on both cards</span></div>
+    <div><b>Both orders</b><span>half saw the old card first</span></div>
+    <div><b>10–15 min</b><span>per BM, seconds counted by hand</span></div>
+  </div>
+  <div class="res" id="res"></div>
+  <figure class="panel chart">
+    <div class="legend"><span><i style="background:var(--old)"></i>Old card</span><span><i style="background:var(--green)"></i>New card</span></div>
+    <div id="chart"></div>
+    <figcaption>Share of answers that knew what to do next, by situation. 6 answers per bar; partly right counts as half.</figcaption>
+  </figure>
+  <div class="finds">
+    <div class="find g"><b>A BM in their first six months, reading the new card, did twice as well as a two-year BM reading the old one.</b>86% knew what to do next on the new card, against 43% for the experienced BMs on the old card. The card now carries what used to live in experience.</div>
+    <div class="find a"><b>Parallel is still the hardest moment.</b>With a payment discrepancy and RTO running at once, the three newest BMs fixed the payment but weren't sure RTO needed nothing from them (75% overall, and they would still call). Next iteration: the RTO line says so in words.</div>
+  </div>
+  <div class="quotes" id="quotes"></div>
+  <p class="caveat">This was informal: six BMs, situations I chose, seconds counted by hand. The three newest BMs all saw the old card first, so order and experience can't be separated. I read it as a strong direction, not a measurement.</p>
+</section>
+
+<section aria-labelledby="h07">
+  <div class="beat"><span class="n">05</span><span class="label">The impact</span></div>
+  <div class="col">
+    <h2 id="h07">“Where is my case?” tickets fell from 98 to 12 a month.</h2>
+    <p>The Product Head approved the card for every loan type, on four things: the design, the UX, what the BMs answered and the ticket baseline. It is now live.</p>
+  </div>
+  <div class="hyp">
+    <div class="panel" style="display:grid;gap:12px">
+      <span class="tag2" style="justify-self:start;background:var(--green-soft);color:#14532D">Live · measured</span>
+      <div class="big"><s>98</s><span>→</span><b>12</b><span>tickets a month · −88%</span></div>
+      <p style="font-size:16.5px;line-height:1.5;color:var(--ink2)">The three themes the card answers, stuck for disbursal, case status and the missing button, counted the same way as the baseline and averaged over the first two full months after launch, across every loan type.</p>
+    </div>
+    <ul class="measure">
+      <li>Baseline: 197 tickets in Jul–Aug 2026, 98.5 a month.</li>
+      <li>Whole months only, because volume rises 61% in the last six days of a month.</li>
+      <li>It matches the test: “would call or raise a ticket” fell from 57% to 10%.</li>
+      <li>Other fixes can ship in the same months, so I count only the three themes the card targets.</li>
+    </ul>
+  </div>
+  <div class="reflect">
+    <div><h3>What I learned</h3><ul><li>Read the tickets before the screens. BMs had written the brief 197 times.</li><li>Pick the right denominator. 197 tickets were 7.9% of everything, and 74% of the tickets about case visibility.</li><li>Design for the newest BM. The experienced ones did better too.</li></ul></div>
+    <div><h3>What's next</h3><ul><li>Keep counting the three themes, and watch the re-raise rate, 14.9% before launch.</li><li>Fix the Parallel moment with an RTO line that says when nothing is needed.</li><li>Feed the in-app ticket form the card's own state, so nobody raises a ticket the card already answers.</li></ul></div>
+  </div>
+  <div class="next">
+    <a href="/case-study/journey-studio"><span class="label">Next project</span><b>Journey Studio</b><span>The studio these cards were prototyped in.</span></a>
+    <a href="/case-study/illustration-studio"><span class="label">Also</span><b>Illustration Studio</b><span>State illustrations, self-serve.</span></a>
+  </div>
+</section>
+</div>
+</main>
+<footer><div class="wrap">Sales case card · baseline tickets 2 Jul – 31 Aug 2026 · as of 25 Nov 2026. Customer and staff names on cards are demo data; BMs are anonymised.</div></footer>
+<script>window.__D={"sit": [{"g": "Your step", "l": "Draft in progress", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "g", "h": "Your step", "p": "Draft in progress. Finish the case details and file it.", "s": [{"h": "Disbursal", "r": [{"t": "Draft in progress", "s": "amber"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", false], ["Take Action", false]]}}, {"g": "Waiting", "l": "Age bypass sent for approval", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "b", "h": "Pending approval", "p": "Age bypass sent for approval.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Age bypass sent for approval", "s": "amber"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"g": "Waiting", "l": "Dedupe bypass sent for approval", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "b", "h": "Pending approval", "p": "Dedupe bypass sent for approval.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Dedupe bypass sent for approval", "s": "amber"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"g": "Waiting", "l": "Reg No bypass sent for approval", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "b", "h": "Pending approval", "p": "Reg No bypass sent for approval.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Reg No bypass sent for approval", "s": "amber"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"g": "Waiting", "l": "Ref ID bypass sent for approval", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "b", "h": "Pending approval", "p": "Ref ID bypass sent for approval.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Ref ID bypass sent for approval", "s": "amber"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"g": "Waiting", "l": "Link-loan bypass sent for approval", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "b", "h": "Pending approval", "p": "Link-loan bypass sent for approval.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Link-loan bypass sent for approval", "s": "amber"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"g": "Waiting", "l": "Deferrals sent for approval", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "b", "h": "Pending approval", "p": "Deferrals sent for approval.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Deferrals sent for approval", "s": "amber"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"g": "Rejected", "l": "Age bypass rejected", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "r", "h": "Approval rejected", "p": "Remark: “Applicant age is outside the policy range. Verify the DOB on the KYC document.”", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Age bypass rejected · re-raise it", "s": "red"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Fix details", false], ["Take Action", false]]}}, {"g": "Rejected", "l": "Dedupe bypass rejected", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "r", "h": "Approval rejected", "p": "Dedupe bypass not approved. Check the details and raise it again.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Dedupe bypass rejected · re-raise it", "s": "red"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Fix details", false], ["Take Action", false]]}}, {"g": "Rejected", "l": "Reg No bypass rejected", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "r", "h": "Approval rejected", "p": "Reg No bypass not approved. Check the details and raise it again.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Reg No bypass rejected · re-raise it", "s": "red"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Fix details", false], ["Take Action", false]]}}, {"g": "Rejected", "l": "Ref ID bypass rejected", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "r", "h": "Approval rejected", "p": "Ref ID bypass not approved. Check the details and raise it again.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Ref ID bypass rejected · re-raise it", "s": "red"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Fix details", false], ["Take Action", false]]}}, {"g": "Rejected", "l": "Link-loan bypass rejected", "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "r", "h": "Approval rejected", "p": "Link-loan bypass not approved. Check the details and raise it again.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Link-loan bypass rejected · re-raise it", "s": "red"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Fix details", false], ["Take Action", false]]}}], "mom": [{"t": "Draft in progress", "d": "The BM is still filling the case.", "o": {"pill": "Open", "pt": "b", "sub": "Open", "st": "b", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "g", "h": "Your step", "p": "Draft in progress. Finish the case details and file it.", "s": [{"h": "Disbursal", "r": [{"t": "Draft in progress", "s": "amber"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", false], ["Take Action", false]]}}, {"t": "Dedupe bypass sent for approval", "d": "The PAN matched an existing loan, so the BM asked for a bypass. Nothing to do but wait.", "o": {"pill": "Open", "pt": "b", "sub": "Open", "st": "b", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "b", "h": "Pending approval", "p": "Dedupe bypass sent for approval.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Dedupe bypass sent for approval", "s": "amber"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"t": "Bypass rejected", "d": "The approver said no. The BM has to fix the details and ask again.", "o": {"pill": "Open", "pt": "b", "sub": "Open", "st": "b", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "r", "h": "Approval rejected", "p": "Dedupe bypass not approved. Check the details and raise it again.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Dedupe bypass rejected · re-raise it", "s": "red"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Fix details", false], ["Take Action", false]]}}, {"t": "Filed, in the Doc Checker queue", "d": "The case is filed and waiting for a Doc Checker.", "o": {"pill": "Filed", "pt": "b", "sub": "Open", "st": "b", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "b", "h": "In progress", "p": "Case filed. Doc Checker review pending.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "In the Doc Checker queue", "s": "amber"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"t": "Doc Checker discrepancy", "d": "Two fields were flagged. The BM fixes them and resubmits.", "o": {"pill": "Filed", "pt": "b", "sub": "Discrepancy", "st": "a", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "r", "h": "Doc Checker discrepancy · 2 fields", "p": "Correct Name, Model and resubmit.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "Discrepancy · 2 fields", "s": "red"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Fix discrepancy", false], ["Take Action", false]]}}, {"t": "Resubmitted", "d": "Back with the Doc Checker for a re-check.", "o": {"pill": "Filed", "pt": "b", "sub": "Doc checker pending", "st": "b", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "b", "h": "Back with Doc Checker for re-check", "p": "Resubmitted. Re-verification pending on LB Pro.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "Resubmitted · re-verification pending", "s": "amber"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"t": "Disbursed, RTO check running", "d": "The loan is out. RTO checks the RC while the BM adds seller details.", "o": {"pill": "Disbursed", "pt": "g", "sub": "RTO Check Pending", "st": "b", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Neha K.", "t": "b", "h": "In progress", "p": "RTO check and RC Done By in progress.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "Doc Checker review", "s": "done"}, {"t": "Loan disbursed", "s": "done"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "done"}, {"t": "Add seller details now", "s": "amber"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Original pendency closed", "s": "todo"}, {"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check in progress", "s": "amber"}, {"t": "RTO check complete", "s": "todo"}, {"t": "Services selected", "s": "todo"}, {"t": "Originals collected", "s": "todo"}, {"t": "RC transfer", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Add seller details", false], ["Take Action", false]]}}, {"t": "RTO pendency raised", "d": "The RTO Coordinator needs documents from the BM.", "o": {"pill": "Disbursed", "pt": "g", "sub": "Additional doc required", "st": "a", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Neha K.", "t": "r", "h": "Pendency raised", "p": "The RTO check needs documents or corrections from you.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "Doc Checker review", "s": "done"}, {"t": "Loan disbursed", "s": "done"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "done"}, {"t": "Seller details added", "s": "done"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Original pendency closed", "s": "todo"}, {"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "Additional doc required", "s": "red"}, {"t": "RTO check complete", "s": "todo"}, {"t": "Services selected", "s": "todo"}, {"t": "Originals collected", "s": "todo"}, {"t": "RC transfer", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resolve pendency", false], ["Take Action", false]]}}, {"t": "TU signed", "d": "Buyer, seller and dealer have signed. The BM can raise the payment now.", "o": {"pill": "Disbursed", "pt": "g", "sub": "Original Pending", "st": "b", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Neha K.", "t": "g", "h": "TU signing complete", "p": "Buyer, seller and dealer have e-signed the TU and affidavits. Next: raise payment.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "Doc Checker review", "s": "done"}, {"t": "Loan disbursed", "s": "done"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "done"}, {"t": "Seller details added", "s": "done"}, {"t": "TU created", "s": "done"}, {"t": "TU and affidavit e-signed", "s": "done"}]}, {"h": "Payments · Tranche 1 of 2", "r": [{"t": "Close the pendency or request a deferral", "s": "amber"}, {"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "done"}, {"t": "RTO check complete", "s": "done"}, {"t": "Services selected", "s": "done"}, {"t": "Original documents pending", "s": "amber"}, {"t": "RC transfer", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Raise payment", false], ["Take Action", false]]}}, {"t": "Payment flagged, RTO running", "d": "Payment Box flagged the amount while RTO waits on PDD. Two teams, one card.", "o": {"pill": "Disbursed", "pt": "g", "sub": "PDD Pending", "st": "b", "x": "2/45 Days Left"}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Neha K.", "t": "r", "h": "Payment discrepancy", "p": "Net amount (₹5,00,000) doesn’t match the DO (₹5,20,000). Fix the amount.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "Doc Checker review", "s": "done"}, {"t": "Loan disbursed", "s": "done"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "done"}, {"t": "Seller details added", "s": "done"}, {"t": "TU created", "s": "done"}, {"t": "TU and affidavit e-signed", "s": "done"}]}, {"h": "Payments · Tranche 1 of 2", "r": [{"t": "Original pendency closed", "s": "done"}, {"t": "Payment raised", "s": "done"}, {"t": "Maker discrepancy · fix the amount", "s": "red"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "done"}, {"t": "RTO check complete", "s": "done"}, {"t": "Services selected", "s": "done"}, {"t": "Originals collected", "s": "done"}, {"t": "RC transfer", "s": "done"}, {"t": "PDD pending with RTO", "s": "amber"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Fix discrepancy", false], ["Take Action", false]]}}, {"t": "Payout at the bank", "d": "The fix went through. The bank is paying out.", "o": {"pill": "Disbursed", "pt": "g", "sub": "PDD Pending", "st": "b", "x": "9/45 Days Left"}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Neha K.", "t": "b", "h": "In progress", "p": "Payout in progress at the bank.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "Doc Checker review", "s": "done"}, {"t": "Loan disbursed", "s": "done"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "done"}, {"t": "Seller details added", "s": "done"}, {"t": "TU created", "s": "done"}, {"t": "TU and affidavit e-signed", "s": "done"}]}, {"h": "Payments · Tranche 1 of 2", "r": [{"t": "Original pendency closed", "s": "done"}, {"t": "Payment raised", "s": "done"}, {"t": "Maker review", "s": "done"}, {"t": "Checker review", "s": "done"}, {"t": "Payout in progress at the bank", "s": "amber"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "done"}, {"t": "RTO check complete", "s": "done"}, {"t": "Services selected", "s": "done"}, {"t": "Originals collected", "s": "done"}, {"t": "RC transfer", "s": "done"}, {"t": "PDD pending with RTO", "s": "amber"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Resume", true], ["Take Action", false]]}}, {"t": "Payment released", "d": "Payment released and PDD updated.", "o": {"pill": "Disbursed", "pt": "g", "sub": "PDD Updated", "st": "b", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Neha K.", "t": "n", "h": "Payment released", "p": "Payment released.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "Doc Checker review", "s": "done"}, {"t": "Loan disbursed", "s": "done"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "done"}, {"t": "Seller details added", "s": "done"}, {"t": "TU created", "s": "done"}, {"t": "TU and affidavit e-signed", "s": "done"}]}, {"h": "Payments · Tranche 2 of 2", "r": [{"t": "Original pendency closed", "s": "done"}, {"t": "Payment raised", "s": "done"}, {"t": "Maker review", "s": "done"}, {"t": "Checker review", "s": "done"}, {"t": "Bank payout", "s": "done"}, {"t": "Payment complete", "s": "done"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "done"}, {"t": "RTO check complete", "s": "done"}, {"t": "Services selected", "s": "done"}, {"t": "Originals collected", "s": "done"}, {"t": "RC transfer", "s": "done"}, {"t": "PDD submitted", "s": "done"}, {"t": "PDD verified by RTO HQ", "s": "done"}]}], "b": [["Resume", true], ["Take Action", false]]}}], "hero": {"o": {"pill": "Open", "pt": "b", "sub": "Open", "st": "b", "x": null}, "c": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Not assigned", "t": "r", "h": "Approval rejected", "p": "Dedupe bypass not approved. Check the details and raise it again.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "amber"}, {"t": "Dedupe bypass rejected · re-raise it", "s": "red"}, {"t": "Case filed", "s": "todo"}, {"t": "Doc Checker review", "s": "todo"}, {"t": "Loan disbursed", "s": "todo"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "todo"}, {"t": "Seller details added", "s": "todo"}, {"t": "TU created", "s": "todo"}, {"t": "TU and affidavit e-signed", "s": "todo"}]}, {"h": "Payments", "r": [{"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "todo"}, {"t": "RTO check complete", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Fix details", false], ["Take Action", false]]}}, "s5": {"n": "Rajat Jain", "m": "Used Car Loan · #2093", "rl": "RTO Coordinator", "rn": "Neha K.", "t": "g", "h": "TU signing complete", "p": "Buyer, seller and dealer have e-signed the TU and affidavits. Next: raise payment.", "s": [{"h": "Disbursal", "r": [{"t": "Case details complete", "s": "done"}, {"t": "Case filed", "s": "done"}, {"t": "Doc Checker review", "s": "done"}, {"t": "Loan disbursed", "s": "done"}]}, {"h": "TU", "r": [{"t": "Valuation complete", "s": "done"}, {"t": "Seller details added", "s": "done"}, {"t": "TU created", "s": "done"}, {"t": "TU and affidavit e-signed", "s": "done"}]}, {"h": "Payments · Tranche 1 of 2", "r": [{"t": "Close the pendency or request a deferral", "s": "amber"}, {"t": "Payment raised", "s": "todo"}, {"t": "Maker review", "s": "todo"}, {"t": "Checker review", "s": "todo"}, {"t": "Bank payout", "s": "todo"}, {"t": "Payment complete", "s": "todo"}]}, {"h": "RTO", "r": [{"t": "RTO check", "s": "done"}, {"t": "RTO check complete", "s": "done"}, {"t": "Services selected", "s": "done"}, {"t": "Original documents pending", "s": "amber"}, {"t": "RC transfer", "s": "todo"}, {"t": "PDD submitted", "s": "todo"}, {"t": "PDD verified by RTO HQ", "s": "todo"}]}], "b": [["Raise payment", false], ["Take Action", false]]}};</script>
+<script>(function () {
+var D = window.__D;
+function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function $(id) { return document.getElementById(id); }
+
+/* ---------- cards ---------- */
+function nc(c) {
+  var st = c.s.map(function (s) {
+    var segs = s.r.map(function (r) { return '<i class="' + (r.s === 'todo' ? '' : r.s) + '"></i>'; }).join('');
+    var name = s.h.split(' · ')[0];
+    return '<button type="button" class="nd-stg" data-st="' + esc(JSON.stringify(s)) + '" aria-label="' + esc(name) + ': open checklist" aria-expanded="false"><span>' + esc(name) + '</span><span class="sg" style="grid-template-columns:repeat(' + s.r.length + ',1fr)">' + segs + '</span></button>';
+  }).join('');
+  var b = c.b, left = b.length > 1 ? b[0] : null;
+  var lb = left ? (left[1] ? '<span class="nd-btn off" aria-disabled="true">' + esc(left[0]) + '</span>' : '<span class="nd-btn' + (left[0] !== 'Resume' ? ' lead' : '') + '">' + esc(left[0]) + '</span>') : '<span class="nd-btn off" aria-disabled="true">Resume</span>';
+  return '<article class="nd-mc"><div class="nd-mc-b"><div class="nd-mc-top"><div class="nd-who"><span class="nd-n">' + esc(c.n) + '</span><span class="nd-m">' + esc(c.m) + '</span></div><div class="nd-r"><span class="nd-rl">' + esc(c.rl) + '</span><span class="nd-rn">' + esc(c.rn) + '</span></div></div>' +
+    '<div class="nd-step t-' + c.t + '"><span class="nd-step-h">' + esc(c.h) + '</span><p>' + esc(c.p) + '</p></div><div class="nd-stages">' + st + '</div>' +
+    '<div class="nd-foot">' + lb + '<span class="sp"></span><span class="nd-btn">Take Action</span></div></div></article>';
+}
+function oc(o) {
+  return '<article class="oc"><div class="oc-top"><div class="oc-who"><b>Rajat Jain</b><span>Used Car Loan</span></div>' +
+    '<div class="oc-st"><span class="oc-pill ' + (o.pt === 'g' ? 'g' : '') + '">' + esc(o.pill) + '</span><i class="oc-dot ' + o.pt + '"></i><i class="oc-ln"></i>' +
+    '<span class="oc-tag ' + (o.st === 'a' ? 'a' : '') + '">' + esc(o.sub) + '</span><i class="oc-dot ' + o.st + '"></i>' + (o.x ? '<span class="oc-x">' + esc(o.x) + '</span>' : '') + '</div></div>' +
+    '<div class="oc-meta"><span>☎ 98•••••• 10</span><i></i><span>Loan ID: <b>2093</b></span></div>' +
+    '<div class="oc-foot"><span>Resume</span><span>Take Action</span></div></article>';
+}
+function flash(el) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); setTimeout(function () { el.classList.remove('flash'); }, 700); }
+
+/* stage checklist popover (same behaviour as the prototype) */
+var CK = '<svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var XX = '<svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M2 2l6 6M8 2l-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
+var tip = null, on = null;
+function closeTip() { if (tip) { tip.remove(); tip = null; } if (on) { on.classList.remove('on'); on.setAttribute('aria-expanded', 'false'); var f = on; on = null; return f; } }
+document.addEventListener('click', function (e) {
+  var s = e.target.closest && e.target.closest('.nd-stg');
+  if (!s) { if (tip && !e.target.closest('.nd-tip')) closeTip(); return; }
+  if (on === s) { closeTip(); return; }
+  closeTip();
+  var d = JSON.parse(s.getAttribute('data-st')), card = s.closest('.nd-mc'), cr = card.getBoundingClientRect(), br = s.getBoundingClientRect();
+  tip = document.createElement('div'); tip.className = 'nd-tip'; tip.setAttribute('role', 'dialog'); tip.setAttribute('aria-label', d.h + ' checklist');
+  tip.innerHTML = '<p class="nd-tip-h">' + esc(d.h) + '</p>' + d.r.map(function (r) {
+    var c = { done: 'done', amber: 'cur', red: 'bad', todo: 'todo' }[r.s], col = { done: '#0f172a', amber: '#92400e', red: '#991b1b', todo: '#94a3b8' }[r.s];
+    var word = { done: 'done', amber: 'in progress', red: 'stuck', todo: 'not started' }[r.s];
+    return '<div class="nd-tip-r"><div class="nd-dot ' + c + '">' + (r.s === 'done' ? CK : r.s === 'red' ? XX : '') + '</div><span style="font-weight:' + (r.s === 'todo' ? 400 : 500) + ';color:' + col + '">' + esc(r.t) + '<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">, ' + word + '</span></span></div>';
+  }).join('');
+  card.appendChild(tip);
+  var w = tip.offsetWidth;
+  tip.style.top = (br.bottom - cr.top + 6) + 'px';
+  tip.style.left = Math.max(0, Math.min(br.left - cr.left, cr.width - w)) + 'px';
+  on = s; s.classList.add('on'); s.setAttribute('aria-expanded', 'true');
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && tip) { var f = closeTip(); if (f) f.focus(); } });
+
+/* ---------- hero ---------- */
+$('heroOld').innerHTML = oc(D.hero.o);
+$('heroNew').innerHTML = nc(D.hero.c);
+
+/* ---------- 01 pins ---------- */
+var PINS = [
+  { x: 74, y: 35.2, t: 'Status and sub-status, in the system’s words', d: '“Open · Open” covers a draft, six kinds of wait and five kinds of rejection. The card can’t tell them apart.' },
+  { x: 26.5, y: 45.6, t: 'The same two buttons on every card', d: 'Resume and Take Action show whether or not there is anything to do, so a BM taps Resume on a case that is waiting on someone else.' },
+  { x: 57.5, y: 19.6, t: 'Filters that count the wrong things', d: 'PDD Overdue isn’t a status anywhere in the system. None of the three tiles answers “which cases need me?”' },
+  { x: 66.5, y: 58.6, t: 'The one line that talks in time', d: '“2/45 Days Left” tells the BM how long they have. Worth keeping.', good: true },
+  { x: 67.5, y: 74.2, t: 'A tag, with no cause', d: '“Discrepancy” doesn’t say which fields, who raised it, or where to fix them.' }
+];
+var shot = $('shot'), notes = $('notes');
+PINS.forEach(function (p, i) {
+  var b = document.createElement('button'); b.type = 'button'; b.className = 'pin' + (p.good ? ' good' : ''); b.textContent = i + 1;
+  b.style.left = p.x + '%'; b.style.top = p.y + '%'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Note ' + (i + 1) + ': ' + p.t);
+  b.addEventListener('click', function () { pick(i); }); shot.appendChild(b);
+  var li = document.createElement('li'); if (p.good) li.className = 'good';
+  li.innerHTML = '<i>' + (i + 1) + '</i><div><b>' + esc(p.t) + '</b>' + esc(p.d) + '</div>';
+  li.addEventListener('click', function () { pick(i); }); notes.appendChild(li);
+});
+function pick(i) {
+  shot.querySelectorAll('.pin').forEach(function (b, k) { b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+  notes.querySelectorAll('li').forEach(function (l, k) { l.classList.toggle('on', k === i); });
+}
+pick(0);
+
+/* ---------- 01 ticket bars ---------- */
+var BARS = [
+  { n: 118, t: 'Case stuck for disbursal', m: 'median 2 messages · 2,174 case-hours', d: '96 came through the app’s own “Case Stuck for Disbursal” form, which records the loan ID and not the cause. The card just said “Under Disbursement”.' },
+  { n: 63, t: 'Case status, and why it hasn’t disbursed', m: 'median 4 messages · 1,723 case-hours', d: 'Was it paid out? Where is it? Why was it cancelled? What does this discrepancy mean?' },
+  { n: 16, t: 'Where did the button go?', m: 'from “Case not visible”, 84 tickets', d: 'Raise payment, the TU link, the RC upload: the action wasn’t open yet, and nothing said so.' }
+];
+var bh = BARS.map(function (b) {
+  return '<div class="bar"><div class="t"><span style="font:inherit;color:inherit">' + esc(b.t) + '</span><span class="num">' + b.n + ' tickets</span></div><div class="track"><div class="fill" style="width:' + (b.n / 197 * 100).toFixed(1) + '%"></div></div><small>' + esc(b.d) + ' <span class="src">' + esc(b.m) + '</span></small></div>';
+}).join('');
+bh += '<div class="bar sum"><div class="t"><span style="font:inherit;color:inherit">Answered by the new card</span><span class="num" style="color:var(--green)">197 of 265 · 74%</span></div><div class="track"><div class="fill" style="width:74.3%"></div></div><small>Of all 265 tickets about case visibility, 197 ask something the new card shows on its face: about 98 a month, across every loan type. On New Car it is about one in four of all tickets.</small></div>';
+$('bars').innerHTML = bh;
+
+/* ---------- 02 twelve situations ---------- */
+var chips = $('chips'), groups = [['Waiting', 'w'], ['Rejected', 'r']];
+var cur = 0, prevNew = null;
+chips.innerHTML = groups.map(function (g) {
+  return '<div class="row"><span>' + g[0] + '</span>' + D.sit.map(function (s, i) {
+    return s.g === g[0] ? '<button type="button" class="chip ' + g[1] + '" data-i="' + i + '" aria-pressed="false">' + esc(s.l) + '</button>' : '';
+  }).join('') + '</div>';
+}).join('');
+$('sitOld').innerHTML = oc({ pill: 'Open', pt: 'b', sub: 'Open', st: 'b' });
+function showSit(i) {
+  var s = D.sit[i];
+  chips.querySelectorAll('.chip').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-i') === i)); });
+  $('sitNew').innerHTML = nc(s.c);
+  var first = prevNew === null;
+  $('oldChanged').textContent = first ? 'Open · Open' : 'Changed: nothing';
+  $('oldChanged').className = 'changed' + (first ? '' : ' same');
+  $('newChanged').textContent = first ? s.c.h : 'Now: ' + s.c.h;
+  if (!first) { flash($('sitNew')); }
+  prevNew = i;
+}
+chips.addEventListener('click', function (e) { var b = e.target.closest('.chip'); if (b) showSit(+b.getAttribute('data-i')); });
+showSit(0);
+
+/* ---------- 03 anatomy ---------- */
+var anat = $('anat');
+anat.innerHTML = nc(D.mom[9].c);
+function placeCal() {
+  anat.querySelectorAll('.cal').forEach(function (c) { c.remove(); });
+  var pr = anat.getBoundingClientRect();
+  var targets = ['.nd-n', '.nd-step-h', '.nd-step p', '.nd-stages', '.nd-foot .nd-btn'];
+  targets.forEach(function (sel, i) {
+    var el = anat.querySelector(sel); if (!el) return;
+    var rg = document.createRange(); rg.selectNodeContents(el);
+    var r = i === 1 ? rg.getBoundingClientRect() : el.getBoundingClientRect(), c = document.createElement('span');
+    c.className = 'cal'; c.textContent = i + 1; c.setAttribute('aria-hidden', 'true');
+    var x = i === 1 ? r.right - pr.left + 8 : -11;
+    c.style.left = x + 'px';
+    c.style.top = (r.top - pr.top + r.height / 2 - 11) + 'px';
+    anat.appendChild(c);
+  });
+}
+placeCal(); window.addEventListener('resize', placeCal);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeCal);
+
+/* ---------- 03 scrubber ---------- */
+var V = [
+  ['ok', 'Open · Open. Fine here: it is a draft.', 'ok', 'Your step · Draft in progress.'],
+  ['bad', 'Still Open · Open, with Resume live. Reads as a draft.', 'ok', 'Pending approval. Resume is greyed out.'],
+  ['bad', 'Still Open · Open. The rejection is invisible.', 'ok', 'Approval rejected, the remark, and Fix details.'],
+  ['bad', 'Filed · Open. Filed, but with whom?', 'ok', 'In progress: Doc Checker review pending.'],
+  ['bad', 'A Discrepancy tag. Which fields? Resume or Take Action?', 'ok', 'Two fields named, and Fix discrepancy.'],
+  ['', 'Filed · Doc checker pending. Clear if the BM knows the term.', 'ok', 'Back with Doc Checker for a re-check.'],
+  ['bad', 'RTO Check Pending. Nothing says seller details can go in now.', 'ok', 'In progress, and the button is Add seller details.'],
+  ['bad', 'Additional doc required. Who asked, and where to upload?', 'ok', 'Pendency raised, Resolve pendency, RTO stage red.'],
+  ['bad', 'Original Pending. Can a payment be raised? It doesn’t say.', 'ok', 'TU signing complete. Next: raise payment.'],
+  ['bad', 'PDD Pending. The payment problem isn’t on the card at all.', 'ok', 'Payment discrepancy leads, RTO stays amber.'],
+  ['bad', 'PDD Pending again. Nothing moved, as far as the BM can tell.', 'ok', 'Payout in progress at the bank.'],
+  ['ok', 'PDD Updated.', 'ok', 'Payment released. Every stage green.']
+];
+var steps = $('steps'), mi = 0, seen = {};
+steps.innerHTML = D.mom.map(function (m, i) { return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === 0) + '" aria-label="Moment ' + (i + 1) + ': ' + esc(m.t) + '">' + (i + 1) + '</button>'; }).join('');
+function sameOld(a, b) { return a.pill === b.pill && a.sub === b.sub; }
+function showMo(i, anim) {
+  mi = Math.max(0, Math.min(D.mom.length - 1, i)); seen[mi] = 1;
+  var m = D.mom[mi];
+  steps.querySelectorAll('button').forEach(function (b, k) { b.setAttribute('aria-pressed', String(k === mi)); b.classList.toggle('seen', !!seen[k]); });
+  $('moN').textContent = 'Moment ' + (mi + 1) + ' of ' + D.mom.length;
+  $('moT').textContent = m.t; $('moD').textContent = m.d;
+  $('moOld').innerHTML = oc(m.o); $('moNew').innerHTML = nc(m.c);
+  var v = V[mi];
+  $('moOV').className = 'verdict ' + v[0]; $('moOV').textContent = v[1];
+  $('moNV').className = 'verdict ' + v[2]; $('moNV').textContent = v[3];
+  $('prev').disabled = mi === 0; $('next').disabled = mi === D.mom.length - 1;
+  var same = mi > 0 && sameOld(D.mom[mi - 1].o, m.o);
+  $('oldSame').textContent = same ? 'The old card didn’t change from the last moment.' : '';
+  if (anim) flash($('moNew'));
+}
+steps.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) showMo(+b.getAttribute('data-i'), true); });
+steps.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); showMo(mi + (e.key === 'ArrowRight' ? 1 : -1), true); steps.querySelectorAll('button')[mi].focus(); }
+});
+$('prev').addEventListener('click', function () { showMo(mi - 1, true); });
+$('next').addEventListener('click', function () { showMo(mi + 1, true); });
+showMo(0, false);
+
+/* ---------- 06 results ---------- */
+var R = [
+  ['Knew what to do next', '32%', '93%', 'Q2, partly right counts as half'],
+  ['Knew who has the case', '43%', '94%', 'Q1'],
+  ['Seconds to answer', '12.4', '4.8', 'average, counted by hand'],
+  ['Would call or raise a ticket', '57%', '10%', 'the link to the ticket bet'],
+  ['Both answers fully right', '3 of 42', '34 of 42', '7% → 81%'],
+  ['Preferred the new card', '', '6 of 6', 'asked at the end of each session']
+];
+$('res').innerHTML = R.map(function (r) {
+  return '<div class="rt"><span class="k">' + esc(r[0]) + '</span><div class="ab">' + (r[1] ? '<s>' + esc(r[1]) + '</s><em>→</em>' : '') + '<b>' + esc(r[2]) + '</b></div><small>' + esc(r[3]) + '</small></div>';
+}).join('');
+
+var S = [
+  ['Bypass waiting', 0, 1], ['Bypass rejected', 0, 1], ['Doc Checker reviewing', .75, .92], ['Doc Checker discrepancy', .5, .92],
+  ['RTO pendency', .75, 1], ['Parallel: payment flagged', 0, .75], ['TU signed', .25, .92]
+];
+(function chart() {
+  var W = 760, L = 200, RW = W - L - 60, rh = 46, top = 30, H = top + S.length * rh + 6;
+  var g = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Knew what to do next, by situation. ' + S.map(function (s) { return s[0] + ': old ' + Math.round(s[1] * 100) + '%, new ' + Math.round(s[2] * 100) + '%'; }).join('; ') + '">';
+  [0, .25, .5, .75, 1].forEach(function (t) {
+    var x = L + t * RW;
+    g += '<line x1="' + x + '" x2="' + x + '" y1="' + (top - 6) + '" y2="' + (H - 4) + '" stroke="#E4E6E1" stroke-width="1"/>';
+    g += '<text x="' + x + '" y="' + (top - 12) + '" text-anchor="middle" font-size="12" fill="#5E6470" font-weight="500">' + (t * 100) + '%</text>';
+  });
+  S.forEach(function (s, i) {
+    var y = top + i * rh;
+    g += '<text x="' + (L - 14) + '" y="' + (y + 22) + '" text-anchor="end" font-size="14.5" fill="#15171C" font-weight="600">' + esc(s[0]) + '</text>';
+    var wo = Math.max(2, s[1] * RW), wn = s[2] * RW;
+    g += '<rect x="' + L + '" y="' + (y + 5) + '" width="' + wo + '" height="14" rx="3" fill="#9AA1AC"/>';
+    g += '<text x="' + (L + wo + 6) + '" y="' + (y + 16.5) + '" font-size="12" fill="#5E6470" font-weight="600">' + Math.round(s[1] * 100) + '%</text>';
+    g += '<rect x="' + L + '" y="' + (y + 22) + '" width="' + wn + '" height="14" rx="3" fill="#00845A"/>';
+    g += '<text x="' + (L + wn + 6) + '" y="' + (y + 33.5) + '" font-size="12" fill="#15171C" font-weight="700">' + Math.round(s[2] * 100) + '%</text>';
+  });
+  $('chart').innerHTML = g + '</svg>';
+})();
+
+var Q = [
+  ['Open Open dikha raha hai… reject hua kya? Pata nahi, RM ko call karke puchna padega.', 'It says Open, Open… was it rejected? No idea. I’ll have to call the RM and ask.', 'BM5', 'Bypass rejected', 'Old'],
+  ['PDD pending hai bas, payment toh ho gaya hoga. Sab theek hai.', 'Just PDD pending, so the payment must be done. All fine. (It wasn’t: Payment Box had flagged it.)', 'BM2', 'Parallel', 'Old'],
+  ['Filed hai but kiske paas hai nahi pata. Main WhatsApp pe puch leta hoon usually.', 'It’s filed, but I don’t know who has it. I usually ask on WhatsApp.', 'BM3', 'Doc Checker reviewing', 'Old'],
+  ['Approval mein hai, mujhe kuch nahi karna. Clear likha hai sir.', 'It’s in approval, nothing for me to do. It says so clearly.', 'BM4', 'Bypass waiting', 'New'],
+  ['TU sign ho gaya toh payment raise karo, button bhi wahi hai. Easy.', 'TU is signed, so raise the payment, and the button says exactly that. Easy.', 'BM6', 'TU signed', 'New'],
+  ['Payment wala fix karna hai samjha, but RTO wala bhi mujhe karna hai kya? Thoda confuse hua.', 'I get that I fix the payment, but do I have to do the RTO one too? I got a bit confused.', 'BM1', 'Parallel', 'New'],
+  ['Progress bar accha hai, ek nazar mein samajh aata hai case kahan atka hai.', 'The progress bar is good. One look and you know where the case is stuck.', 'BM2', 'Preference', 'New'],
+  ['Mujhe har baar call karna padta tha, isme likha hota hai kiske paas hai.', 'I had to call every time. This one says who has it.', 'BM3', 'Preference', 'New']
+];
+$('quotes').innerHTML = Q.map(function (q) {
+  return '<figure class="qt"><blockquote style="margin:0" class="o" lang="hi-Latn">“' + esc(q[0]) + '”</blockquote><p class="e">' + esc(q[1]) + '</p><figcaption class="w">' + esc(q[2]) + ' · ' + esc(q[3]) + ' <i class="' + (q[4] === 'New' ? 'n' : '') + '">' + q[4] + ' card</i></figcaption></figure>';
+}).join('');
+/* ---------- reading mode ---------- */
+var TS = [
+  ['S1', 'Bypass waiting', 1, 0, 1], ['S2', 'Bypass rejected', 2, 0, 1], ['S3', 'Filed, with Doc Checker', 3, .75, .92],
+  ['S4', 'Doc Checker discrepancy', 4, .5, .92], ['S5', 'RTO pendency', 7, .75, 1], ['S6', 'Payment flagged, RTO running', 9, 0, .75], ['S7', 'TU signed', 8, .25, .92]
+];
+var tlc = $('tlChips'), tli = 1;
+tlc.innerHTML = TS.map(function (t, i) { return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === tli) + '"><b>' + t[0] + '</b>' + esc(t[1]) + '</button>'; }).join('');
+function pct(x) { return Math.round(x * 100) + '%'; }
+function showTl(i, anim) {
+  tli = (i + TS.length) % TS.length;
+  var t = TS[tli], m = D.mom[t[2]], v = V[t[2]];
+  tlc.querySelectorAll('button').forEach(function (b, k) { b.setAttribute('aria-pressed', String(k === tli)); });
+  if (tip) closeTip();
+  $('tlOld').innerHTML = oc(m.o); $('tlNew').innerHTML = nc(m.c);
+  $('tlOV').className = 'verdict ' + v[0]; $('tlOV').textContent = v[1];
+  $('tlNV').textContent = v[3];
+  var sc = $('tlScore');
+  if (!sc.firstChild) sc.innerHTML = '<span class="cap" id="tlCap"></span><span>Old card</span><span class="tr"><i id="tlBo" style="background:var(--old);width:0"></i></span><span class="v" id="tlVo"></span><span>New card</span><span class="tr"><i id="tlBn" style="background:var(--green);width:0"></i></span><span class="v" id="tlVn" style="color:var(--green)"></span>';
+  $('tlCap').textContent = t[0] + ' · ' + t[1] + ' · knew what to do next (6 BMs each)';
+  $('tlBo').style.width = Math.max(1.5, t[3] * 100) + '%'; $('tlBn').style.width = (t[4] * 100) + '%';
+  $('tlVo').textContent = pct(t[3]); $('tlVn').textContent = pct(t[4]);
+  if (anim) flash($('tlNew'));
+}
+tlc.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) showTl(+b.getAttribute('data-i'), true); });
+tlc.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); showTl(tli + (e.key === 'ArrowRight' ? 1 : -1), true); tlc.querySelectorAll('button')[tli].focus(); }
+});
+showTl(tli, false);
+function setMode(m, scroll) {
+  var t = m === 'tldr';
+  $('tldr').hidden = !t; $('full').hidden = t;
+  document.querySelectorAll('.modebar [data-mode]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === m)); });
+  if (tip) closeTip();
+  if (t) { if (location.hash !== '#tldr') history.replaceState(null, '', '#tldr'); }
+  else if (location.hash === '#tldr') history.replaceState(null, '', location.pathname + location.search);
+  if (!t) { placeCal(); }
+  if (scroll) window.scrollTo(0, 0);
+}
+document.querySelector('.modebar .seg').addEventListener('click', function (e) { var b = e.target.closest('[data-mode]'); if (b) setMode(b.getAttribute('data-mode'), true); });
+$('toFull').addEventListener('click', function () { setMode('full', true); });
+window.addEventListener('hashchange', function () { setMode(location.hash === '#tldr' ? 'tldr' : 'full', false); });
+setMode(location.hash === '#tldr' ? 'tldr' : 'full', false);
+})();
+</script>
+</body>
+</html>

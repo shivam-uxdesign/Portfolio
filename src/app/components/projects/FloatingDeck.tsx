@@ -15,8 +15,8 @@ const BLOCKED = ['wheel', 'touchstart', 'touchmove', 'touchend', 'gesturestart',
 const FOCUSABLE = 'a[href],button:not([disabled])';
 // Resting pose of each card. Fun: a little tilt and sideways offset so they read
 // as floating, not listed. Work: straight and aligned.
-const PLAYFUL = [{ r: -2.4, x: 0 }, { r: 1.8, x: 14 }, { r: -1.2, x: 4 }];
-const STRAIGHT = [{ r: 0, x: 0 }, { r: 0, x: 0 }, { r: 0, x: 0 }];
+const PLAYFUL = [{ r: -2.4, x: 0 }, { r: 1.8, x: 14 }, { r: -1.2, x: 4 }, { r: 1.4, x: 10 }];
+const STRAIGHT = [{ r: 0, x: 0 }, { r: 0, x: 0 }, { r: 0, x: 0 }, { r: 0, x: 0 }];
 // Where each card sits in the deck (matches .ps-card-0/1/2), for the fly-out.
 const DECK_TILT = [0, 4, -6];
 
@@ -136,8 +136,8 @@ export function FloatingDeck({ group, trigger, anchor, onClose }: { group: Proje
       <button ref={closeRef} type="button" className="fd-close" style={{ top: head.top + (head.bottom - head.top) / 2 - 19 }} onClick={requestClose} aria-label="Close">
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
         </button>
-      <ul className="fd-cards">
-        {group.items.slice(0, 3).map((item, i) => {
+      <ul className={`fd-cards${group.items.length > 3 ? ' fd-four' : ''}`}>
+        {group.items.slice(0, 4).map((item, i) => {
           const body = (
             <span className="fd-bob" style={{ animationDelay: `${-i * 1.1}s`, animationDuration: `${3.2 + i * 0.45}s` }}>
               <span className="fd-lift">

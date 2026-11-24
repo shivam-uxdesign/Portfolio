@@ -1,0 +1,54 @@
+/* The Rupyy design system overview: the portfolio's reading page. */
+.rs { max-width: 760px; margin: 0 auto; padding: 84px 20px 72px; color: var(--foreground); }
+.rs-label { margin: 0 0 10px; font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted-foreground); }
+.rs-title { margin: 0; font-size: clamp(28px, 7.4vw, 46px); line-height: 1.12; font-weight: 400; letter-spacing: -0.025em; }
+.rs-lede { margin: 16px 0 0; font-size: 15px; line-height: 1.6; color: var(--muted-foreground); max-width: 620px; }
+.rs-h2 { margin: 0; font-size: clamp(22px, 5.6vw, 30px); line-height: 1.2; font-weight: 400; letter-spacing: -0.02em; }
+.rs-p { margin: 12px 0 0; font-size: 14px; line-height: 1.6; color: var(--muted-foreground); }
+.rs-sec { margin-top: 56px; }
+
+.rs-facts { margin: 22px 0 0; }
+.rs-facts > div { display: grid; grid-template-columns: 96px 1fr; gap: 12px; padding: 11px 0; border-top: 1px solid var(--border); }
+.rs-facts dt { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-foreground); padding-top: 2px; }
+.rs-facts dd { margin: 0; font-size: 14px; line-height: 1.5; }
+.rs-facts dd b { font-weight: 600; }
+
+.rs-stats { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+.rs-stats > div { padding: 14px 16px; border-radius: 16px; background: color-mix(in oklab, var(--primary) 7%, var(--background)); display: flex; flex-direction: column; gap: 4px; }
+.rs-stats b { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.rs-stats span { font-size: 13px; line-height: 1.45; color: var(--muted-foreground); }
+
+.rs-tools { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+.rs-tool {
+  display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 18px; text-decoration: none; color: var(--foreground);
+  background: color-mix(in oklab, var(--c) 8%, var(--background)); transition: background .2s, color .2s, transform .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.rs-tool-name { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; }
+.rs-tool-name i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.rs-tool-line { font-size: 13px; line-height: 1.5; color: var(--muted-foreground); }
+.rs-tool-stat { font-size: 13px; color: var(--muted-foreground); }
+.rs-tool-stat b { color: var(--foreground); font-weight: 600; }
+.rs-tool-go { margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--c); }
+@media (hover: hover) {
+  .rs-tool:hover { background: var(--c); color: #fff; }
+  .rs-tool:hover .rs-tool-line, .rs-tool:hover .rs-tool-stat, .rs-tool:hover .rs-tool-stat b, .rs-tool:hover .rs-tool-go { color: #fff; }
+  .rs-tool:hover .rs-tool-name i { background: #fff; }
+}
+.rs-tool:active { transform: scale(.985); }
+.rs-tool:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+.rs-moments { list-style: none; margin: 20px 0 0; padding: 0; }
+.rs-moments li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 14px 0; border-top: 1px solid var(--border); }
+.rs-n { font-size: 12px; color: var(--muted-foreground); padding-top: 2px; }
+.rs-moments b { display: block; font-size: 15px; font-weight: 600; }
+.rs-path { display: block; margin-top: 2px; font-size: 12px; color: var(--primary); }
+.rs-moments p { margin: 6px 0 0; font-size: 14px; line-height: 1.55; color: var(--muted-foreground); }
+
+@media (min-width: 768px) {
+  .rs { padding: 128px 48px 96px; }
+  .rs-sec { margin-top: 72px; }
+  .rs-stats { grid-template-columns: repeat(3, 1fr); }
+  .rs-tools { grid-template-columns: repeat(3, 1fr); }
+  .rs-facts > div { grid-template-columns: 140px 1fr; }
+}

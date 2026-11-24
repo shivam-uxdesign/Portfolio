@@ -55,3 +55,6 @@
 }
 /* Work: one clean, aligned column. */
 .fd-straight .fd-cards { padding: 0 6px; }
+/* Four projects: tighter rows; the one-line description goes when rows get short. */
+.fd-cards.fd-four { grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-height: 800px) { .fd-four .fd-desc { display: none; } }

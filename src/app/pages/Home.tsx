@@ -169,24 +169,30 @@ function MobileAppThumbnail() {
 
 const MotionLink = motion.create(Link);
 
+// Work: the Sales Case Card on its own, then the Rupyy design system as one
+// story told in three case studies (each also opens on its own).
+const thumb = (slug: string) => <img src={`/case-studies/thumbs/${slug}.jpg`} alt="" loading="lazy" draggable={false} className="w-full h-full object-contain" />;
 export const PROJECTS = [
   {
-    title: 'Redesigned BM Dashboard, reducing avg TAT from 32m to 5m',
-    descriptor: 'Redesigned an internal operations dashboard from the ground up — cut average task completion time from 32 minutes to 5.',
-    number: '01', bg: '#0F1923', link: '/case-study/bm-dashboard', external: false,
-    thumbnail: <DashboardThumbnail />,
+    title: 'Sales Case Card',
+    descriptor: 'A case card that tells a business manager whose move it is. 6 of 6 BMs preferred it.',
+    number: '01', tag: 'Case study · Rupyy', bg: '#FBFBF8', link: '/case-study/sales-case-card', external: false,
+    thumbnail: thumb('sales-case-card'),
   },
   {
-    title: 'Built design system adopted by 3 product teams',
-    descriptor: 'Built and rolled out a component design system now adopted across 3 product teams at Rupyy.',
-    number: '02', bg: '#B8A898', link: '/case-study/design-system', external: false,
-    thumbnail: <DesignSystemThumbnail />,
+    title: 'Journey Studio', descriptor: 'Any journey, proven before it’s built.',
+    number: '02', tag: 'Design system · 1 of 3', system: true, bg: '#FBFBF8', link: '/case-study/journey-studio', external: false,
+    thumbnail: thumb('journey-studio'),
   },
   {
-    title: 'Mobile app redesign increasing user retention by 40%',
-    descriptor: 'Rethought onboarding and navigation for a mobile app, lifting user retention by 40%.',
-    number: '03', bg: '#8BACC0', link: '/case-study/mobile-app', external: false,
-    thumbnail: <MobileAppThumbnail />,
+    title: 'Design Kit', descriptor: 'One design system, released like software.',
+    number: '03', tag: 'Design system · 2 of 3', system: true, bg: '#FBFBF8', link: '/case-study/design-kit', external: false,
+    thumbnail: thumb('design-kit'),
+  },
+  {
+    title: 'Illustration Studio', descriptor: 'State illustrations, self-serve.',
+    number: '04', tag: 'Design system · 3 of 3', system: true, bg: '#FBFBF8', link: '/case-study/illustration-studio', external: false,
+    thumbnail: thumb('illustration-studio'),
   },
 ];
 

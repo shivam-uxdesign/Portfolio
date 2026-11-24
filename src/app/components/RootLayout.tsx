@@ -251,7 +251,7 @@ export function RootLayout() {
 
   if (isHome) return <><Outlet />{overlays}</>;
 
-  const showTldr = !!meta?.tldr && tldr;
+  const showTldr = !!meta?.tldr && !meta.tldr.embedded && tldr;
   return (
     <>
       <div className="pc-root">

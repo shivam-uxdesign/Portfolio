@@ -58,3 +58,12 @@
   .wpd-feature, .wpd-small, .wpd-thumb > * { transition: none; }
   .wpd-feature:hover, .wpd-small:hover { transform: none; }
 }
+
+/* The design system: a heading link (the overview) over its three tools. */
+.wpd-system { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+.wpd-sys-head { display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--foreground); border-radius: 12px; }
+.wpd-sys-head:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.wpd-sys-head .wpd-cta { margin-top: 2px; }
+@media (hover: hover) { .wpd-sys-head:hover .wpd-cta span { transform: translateX(3px); } }
+.wpd-sys-tools { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.wpd-sys-tool .wpd-title { font-size: 13.5px; }

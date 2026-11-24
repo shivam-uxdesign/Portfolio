@@ -10,7 +10,7 @@ import type { ProjectGroup, ProjectGroupId } from './projects/types';
 // with AI). Phones: two stacks that fly open. md+: two columns, each with a
 // featured project and two smaller ones.
 
-export interface WorkItem { title: string; descriptor: string; number: string; bg: string; link: string; external?: boolean; thumbnail: ReactNode }
+export interface WorkItem { title: string; descriptor: string; number: string; bg: string; link: string; external?: boolean; thumbnail: ReactNode; tag?: string; system?: boolean }
 export interface PlayItem { title: string; description: string; tag: string; color: string; image: string; link: string }
 
 // Phones: two decks — tap one and its projects fly out and float over the sheet.
@@ -19,7 +19,7 @@ function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
     {
       id: 'work', label: 'Shipped at work', count: `${work.length} case studies`,
       heading: 'Shipped at work', sub: 'Product design at Rupyy and before.',
-      items: work.map(p => ({ title: p.title, descriptor: p.descriptor, link: p.link, external: p.external, bg: p.bg, thumbnail: p.thumbnail, tag: `Case study ${p.number}` })),
+      items: work.map(p => ({ title: p.title, descriptor: p.descriptor, link: p.link, external: p.external, bg: p.bg, thumbnail: p.thumbnail, tag: p.tag ?? `Case study ${p.number}` })),
     },
     {
       id: 'fun', label: 'Built for fun, with AI', count: `${play.length} apps`,
@@ -59,7 +59,7 @@ function EntryLink({ e, className, children }: { e: Entry; className: string; ch
     : <Link to={e.to} className={className} onClick={onClick} draggable={false}>{children}</Link>;
 }
 
-function Column({ id, heading, entries, playful }: { id: string; heading: ReactNode; entries: Entry[]; playful?: boolean }) {
+function Column({ id, heading, entries, playful, after }: { id: string; heading: ReactNode; entries: Entry[]; playful?: boolean; after?: ReactNode }) {
   const [main, ...rest] = entries;
   return (
     <section className={`wpd-col${playful ? ' playful' : ''}`} aria-labelledby={id}>
@@ -73,7 +73,7 @@ function Column({ id, heading, entries, playful }: { id: string; heading: ReactN
           <span className="wpd-cta">{main.cta} <span aria-hidden="true">→</span></span>
         </span>
       </EntryLink>
-      <div className="wpd-pair">
+      {after ?? <div className="wpd-pair">
         {rest.map(e => (
           <EntryLink key={e.to} e={e} className="wpd-small">
             <span className="wpd-thumb">{e.thumb}</span>
@@ -81,15 +81,38 @@ function Column({ id, heading, entries, playful }: { id: string; heading: ReactN
             <span className="wpd-title">{e.title}</span>
           </EntryLink>
         ))}
-      </div>
+      </div>}
     </section>
+  );
+}
+
+// The design system: one story (opens the overview), three tools (each opens its own case study).
+function SystemCard({ items }: { items: WorkItem[] }) {
+  const track = (to: string) => () => trackEvent('project_open', { side: 'work', link: to });
+  return (
+    <div className="wpd-system">
+      <Link to="/case-study/rupyy-design-system" className="wpd-sys-head" onClick={track('/case-study/rupyy-design-system')} draggable={false}>
+        <span className="wpd-eyebrow">Case study · Rupyy · 3 tools</span>
+        <span className="wpd-title">The Rupyy design system</span>
+        <span className="wpd-cta">See how they fit <span aria-hidden="true">→</span></span>
+      </Link>
+      <div className="wpd-sys-tools">
+        {items.map(p => (
+          <Link key={p.link} to={p.link} className="wpd-small wpd-sys-tool" onClick={track(p.link)} draggable={false}>
+            <span className="wpd-thumb"><span className="absolute inset-0" style={{ background: p.bg }}>{p.thumbnail}</span></span>
+            <span className="wpd-title">{p.title}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
 
 export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
   const SERIF = "'Playfair Display', Georgia, serif";
-  const workEntries: Entry[] = work.map(p => ({
-    to: p.link, external: p.external, side: 'work', eyebrow: `Case study ${p.number}`, title: p.title, desc: p.descriptor, cta: 'Read case study',
+  const system = work.filter(p => p.system);
+  const workEntries: Entry[] = work.filter(p => !p.system).map(p => ({
+    to: p.link, external: p.external, side: 'work', eyebrow: p.tag ?? `Case study ${p.number}`, title: p.title, desc: p.descriptor, cta: 'Read case study',
     thumb: <span className="absolute inset-0" style={{ background: p.bg }}><span className="wp-thumb">{p.thumbnail}</span></span>,
   }));
   const playEntries: Entry[] = play.map(f => ({
@@ -107,7 +130,7 @@ export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[]
           </h2>
         </header>
         <div className="wpd-cols">
-          <Column id="wp-work" heading="Shipped at work" entries={workEntries} />
+          <Column id="wp-work" heading="Shipped at work" entries={workEntries} after={system.length ? <SystemCard items={system} /> : undefined} />
           <Column id="wp-play" heading="Built for fun, with AI" entries={playEntries} playful />
         </div>
       </div>
