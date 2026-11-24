@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { motion } from 'motion/react';
 import { trackEvent } from '../../lib/analytics';
 import { HatsHero } from '../components/hats/HatsHero';
@@ -9,6 +9,14 @@ import type { HatsEngine } from '../components/hats/hatsEngine';
 import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
 import { PROJECTS, AboutCell, ContactCell, ResumeCell, InterestsCell } from './Home';
 import { StackPanel } from '../components/cells/StackPanel';
+import { HatShelf, flyHat, type ShelfItem } from '../components/nav/HatShelf';
+import { HandleMap } from '../components/nav/HandleMap';
+
+// Navigation prototypes, switchable with ?nav=rack | handle | both | compass.
+type NavMode = 'rack' | 'handle' | 'both' | 'compass';
+function readNavMode(): NavMode {
+  try { const m = new URLSearchParams(window.location.search).get('nav'); return m === 'rack' || m === 'handle' || m === 'compass' ? m : 'both'; } catch { return 'both'; }
+}
 import { WorkAndPlay } from '../components/WorkAndPlay';
 import { FUN_PROJECTS } from '../components/FunProjects';
 import './sheet.css';
@@ -505,6 +513,12 @@ export function SheetHome() {
   const navRef = useRef(navigateTo);
   useEffect(() => { navRef.current = navigateTo; }, [navigateTo]);
 
+  const [navMode] = useState(readNavMode);
+  const rackOn = navMode === 'rack' || navMode === 'both';
+  const handleOn = navMode === 'handle' || navMode === 'both';
+  const [hatHold, setHatHold] = useState<WearableId | null>(null);
+  const [hatAway, setHatAway] = useState<string | null>(null);
+
   const pickCell = useCallback((p: Pos) => {
     if (ovRef.current > 0) {
       if (ovRef.current < 1 || lockedRef.current) return;
@@ -521,6 +535,27 @@ export function SheetHome() {
   const goUp = () => { const p = posRef.current; if (p.row === 0) closeRef.current(); else navRef.current(p.row - 1, p.col); };
   const goDown = () => { const p = posRef.current; navRef.current(p.row + 1, p.col); };
   const goSide = (d: number) => { const p = posRef.current; navRef.current(p.row, p.col + d); };
+
+  // Rack: the tapped hat flies up to where his head is going, then he wears it.
+  const shelfRows = useMemo<ShelfItem[][]>(() => GRID.map((row, r) => row.map((cell, c) => ({ row: r, col: c, label: cell.label, hat: CONTEXT_HAT[cell.id] as HatId }))), []);
+  const rackPick = (item: ShelfItem, from: DOMRect, svg: string) => {
+    if (lockedRef.current || sRef.current < 1 || ovRef.current > 0) return;
+    const cur = posRef.current;
+    setHatHold(CONTEXT_HAT[GRID[cur.row][mod(cur.col, 3)].id]);
+    setHatAway(`${item.row}-${item.col}`);
+    pickCell({ row: item.row, col: item.col });
+    const vw = window.innerWidth, half = geo.w / 2;
+    const x = [half + 18, vw / 2, vw - half - 18][item.col] ?? vw / 2;
+    const to = { x, y: window.innerHeight * 0.2 - geo.headH * 0.78, w: geo.w * 0.5 };
+    flyHat(svg, from, to, reduce).then(() => { setHatHold(null); setHatAway(null); });
+  };
+  // Handle: tap to zoom out to every page, tap again to come back.
+  const toggleOverview = () => {
+    if (lockedRef.current || sRef.current < 1) return;
+    if (ovRef.current > 0 && ovRef.current < 1) return;
+    setLock(true);
+    animateOv(ovRef.current > 0 ? 0 : 1, () => setLock(false));
+  };
 
   // ── Keyboard ──
   useEffect(() => {
@@ -724,7 +759,9 @@ export function SheetHome() {
   const sheetVisible = s > 0;
   // Hands start once the head is nearly at the edge (as in the prototype).
   const peekProgress = peekOverride ?? s;
-  const peekHat: WearableId = chosenHat !== 'me' ? chosenHat : CONTEXT_HAT[cellId];
+  // With the hat rack, the page's hat is the one he wears (the rack is the map);
+  // while a hat is flying up, he keeps the old one on until it lands.
+  const peekHat: WearableId = hatHold ?? (rackOn || chosenHat === 'me' ? CONTEXT_HAT[cellId] : chosenHat);
   const chromeOn = isOpen && ov === 0;
 
   const draggingSheet = !!drag.current && drag.current.mode === 'sheet';
@@ -784,7 +821,7 @@ export function SheetHome() {
         </div>
 
         {/* The sheet */}
-        <div className={`sh-sheet${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)` }}>
+        <div className={`sh-sheet nav-${navMode}${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)` }}>
           <SheetPeek
             handsOnly
             width={geo.w}
@@ -854,9 +891,11 @@ export function SheetHome() {
               )}
             </>
           )}
+          {rackOn && chromeOn && <HatShelf rows={shelfRows} current={actual} away={hatAway} onPick={rackPick} />}
+          {handleOn && isOpen && <HandleMap current={actual} open={ov > 0} onToggle={toggleOverview} />}
         </div>
 
-        {chromeOn && <SheetCompass pos={actual} onPick={pickCell} />}
+        {chromeOn && navMode === 'compass' && <SheetCompass pos={actual} onPick={pickCell} />}
 
         {introHint && (
           <div className="sh-hint" aria-hidden="true">

@@ -1,0 +1,59 @@
+/* ── Hat rack ──────────────────────────────────────────────────────────── */
+.nav-shelf {
+  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); z-index: 6;
+  display: flex; align-items: flex-end; gap: 18px; padding: 0 14px;
+}
+/* The rail the hats sit on. */
+.nav-shelf::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 6px; height: 2px; border-radius: 2px;
+  background: color-mix(in oklab, var(--foreground) 12%, transparent);
+}
+.nav-group { display: flex; gap: 2px; }
+.nav-hat {
+  position: relative; width: 44px; height: 46px; padding: 0 0 8px; border: 0; background: none; cursor: pointer;
+  display: flex; align-items: flex-end; justify-content: center; -webkit-tap-highlight-color: transparent; border-radius: 10px;
+}
+.nav-hat svg { width: 34px; height: 30px; overflow: visible; transition: transform .25s cubic-bezier(.3,1.5,.5,1), opacity .25s; filter: drop-shadow(0 3px 3px rgba(20,20,18,.14)); }
+.nav-hat:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+@media (hover: hover) { .nav-hat:not(.here):hover svg { transform: translateY(-4px) rotate(-6deg); } }
+.nav-hat:active svg { transform: translateY(-2px) scale(.94); }
+/* Empty peg where the hat he's wearing usually sits. */
+.nav-peg { position: absolute; bottom: 5px; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 99px; background: var(--primary); opacity: 0; transform: scale(.4); transition: opacity .25s, transform .25s; }
+.nav-hat.here svg, .nav-hat.away svg { opacity: 0; transform: translateY(-10px) scale(.8); }
+.nav-hat.here .nav-peg { opacity: 1; transform: none; }
+/* Label on hover/focus (pointer devices) */
+.nav-hat::before {
+  content: attr(data-label); position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translate(-50%, 4px);
+  white-space: nowrap; font-size: 10px; font-weight: 500; letter-spacing: .04em; padding: 3px 8px; border-radius: 6px;
+  background: var(--foreground); color: var(--background); opacity: 0; pointer-events: none; transition: opacity .15s, transform .15s;
+}
+@media (hover: hover) { .nav-hat:hover::before { opacity: 1; transform: translate(-50%, 0); } }
+.nav-hat:focus-visible::before { opacity: 1; transform: translate(-50%, 0); }
+.nav-fly { position: fixed; z-index: 70; pointer-events: none; transform-origin: 50% 100%; }
+.nav-fly svg { width: 100%; height: 100%; overflow: visible; }
+
+/* ── Handle map ────────────────────────────────────────────────────────── */
+.nav-handle {
+  position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 7;
+  padding: 8px 12px; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: 999px;
+}
+.nav-handle:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+.nav-handle-grid {
+  display: grid; grid-template-columns: repeat(3, 6px); gap: 4px 5px; padding: 5px 8px; border-radius: 999px;
+  background: color-mix(in oklab, var(--foreground) 6%, transparent); transition: background .2s, transform .2s;
+}
+.nav-handle-grid span { width: 6px; height: 6px; border-radius: 99px; background: color-mix(in oklab, var(--foreground) 22%, transparent); transition: background .25s, transform .25s; }
+.nav-handle-grid span.on { background: var(--primary); transform: scale(1.25); }
+@media (hover: hover) { .nav-handle:hover .nav-handle-grid { background: color-mix(in oklab, var(--foreground) 10%, transparent); } }
+.nav-handle:active .nav-handle-grid { transform: scale(.94); }
+.nav-handle.open .nav-handle-grid { background: var(--foreground); }
+.nav-handle.open .nav-handle-grid span { background: color-mix(in oklab, var(--background) 45%, transparent); }
+.nav-handle.open .nav-handle-grid span.on { background: var(--primary); }
+
+/* ── Modes: how much room pages keep at the bottom ─────────────────────── */
+.sh-sheet { --nav-reserve: 80px; }
+.sh-sheet.nav-rack, .sh-sheet.nav-both, .sh-sheet.nav-handle { --nav-reserve: 6px; }
+.sh-sheet.nav-rack .sh-edge-down, .sh-sheet.nav-both .sh-edge-down { display: none; }
+body.fd-open .nav-shelf { opacity: 0; pointer-events: none; }
+.nav-shelf { transition: opacity .25s; }
+@media (prefers-reduced-motion: reduce) { .nav-hat svg, .nav-peg, .nav-handle-grid span { transition: none; } }
