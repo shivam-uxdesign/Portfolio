@@ -5,7 +5,9 @@
   background: color-mix(in oklab, var(--background) 42%, transparent);
   animation: fd-fade .25s ease-out both;
 }
-.fd-closing .fd-scrim { animation: fd-fade-out .3s ease-in .15s both; }
+.fd-closing .fd-scrim { animation: fd-fade-out .28s ease-out both; }
+.fd-closing .fd-bob { animation-play-state: paused; }
+.fd-closing { pointer-events: none; }
 .fd-in-sheet { position: absolute; top: 0; bottom: 0; z-index: 6; }
 /* Sits exactly where the page's own heading was. */
 .fd-head { position: absolute; z-index: 1; pointer-events: none; animation: fd-fade .25s .1s ease-out both; }

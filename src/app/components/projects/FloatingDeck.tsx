@@ -45,16 +45,19 @@ export function FloatingDeck({ group, trigger, anchor, onClose }: { group: Proje
       const dx = deck.left + deck.width / 2 - (r.left + r.width / 2), dy = deck.top + deck.height / 2 - (r.top + r.height / 2);
       const s = Math.min(1, deck.width / r.width);
       const inDeck = `translate(${dx}px, ${dy}px) scale(${s}) rotate(${DECK_TILT[i]}deg) rotateX(55deg)`;
+      // Back home it lands flat, exactly like the deck's own card, so the hand-off doesn't pop.
+      const home = `translate(${dx}px, ${dy}px) scale(${s}) rotate(${DECK_TILT[i]}deg)`;
       const pose = `rotate(${POSE[i].r}deg)`;
       // Out: lift off the deck, unfurl flat (rotateX → 0), overshoot a touch past the pose, settle.
       // Work overshoots straight up; fun swings past its tilt.
       const frames: Keyframe[] = out
         ? [{ transform: inDeck, opacity: 0.6 }, { transform: `translateY(-10px) rotate(${POSE[i].r * 1.8}deg)`, opacity: 1, offset: 0.7 }, { transform: pose, opacity: 1 }]
-        : [{ transform: pose, opacity: 1 }, { transform: `translateY(-8px) rotate(${POSE[i].r * 1.6}deg)`, opacity: 1, offset: 0.25 }, { transform: inDeck, opacity: 0.5 }];
+        // Back: starts moving on the first frame (no wind-up, no wait), fast-out ease.
+        : [{ transform: pose, opacity: 1 }, { transform: home, opacity: 1 }];
       return card.animate(frames, {
-        duration: out ? 640 : 420,
-        delay: out ? i * 95 : (cards.length - 1 - i) * 70,
-        easing: out ? 'cubic-bezier(.2,.9,.25,1)' : 'cubic-bezier(.5,0,.75,.4)',
+        duration: out ? 640 : 340,
+        delay: out ? i * 95 : (cards.length - 1 - i) * 35,
+        easing: out ? 'cubic-bezier(.2,.9,.25,1)' : 'cubic-bezier(.3,.6,.2,1)',
         fill: 'both',
       });
     });
@@ -64,8 +67,10 @@ export function FloatingDeck({ group, trigger, anchor, onClose }: { group: Proje
   const requestClose = useCallback(() => {
     if (closing.current) return;
     closing.current = true;
-    setSettled(false);
+    // Synchronous class only: no re-render before the cards move. The bob pauses
+    // where it is (removing it would snap every card first — the old "lag").
     rootRef.current?.classList.add('fd-closing');
+    if (anchor) anchor.style.opacity = '1'; // page heading fades back in alongside
     const done = () => { deckCards().forEach(c => { c.style.visibility = ''; }); onClose(); };
     if (reduced()) { done(); return; }
     fly(false).then(done);
