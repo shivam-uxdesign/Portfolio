@@ -129,7 +129,7 @@ function CellContent({ id }: { id: SheetCellId }) {
     case 'work': return <ScrollCell><WorkAndPlay work={PROJECTS} play={FUN_PROJECTS} /></ScrollCell>;
     // About, with Process & Practice as a reel beside it.
     case 'about': return (
-      <ScrollCell><section className="sh-page"><AboutCell /></section></ScrollCell>
+      <ScrollCell><section className="sh-page sh-page-fixed"><AboutCell /></section></ScrollCell>
     );
     case 'interests': return <ScrollCell><section className="sh-page sh-min-interests"><InterestsCell /></section></ScrollCell>;
     case 'stack': return <ScrollCell><section className="sh-page sh-page-fixed"><StackPanel /></section></ScrollCell>;

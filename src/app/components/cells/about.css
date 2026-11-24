@@ -1,0 +1,44 @@
+/* About: phones stack text → prints (prints take what's left); lg: side by side. */
+.ab { display: flex; flex-direction: column; gap: 18px; padding: 4px 4px 2px; }
+.ab-title { font-size: clamp(22px, 6.4cqw, 26px); line-height: 1.22; font-weight: 400; letter-spacing: -0.02em; margin: 0; }
+.ab-facts { margin: 16px 0 0; }
+.ab-fact { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); }
+.ab-fact dt { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-foreground); padding-top: 2px; }
+.ab-fact dd { margin: 0; font-size: 13px; line-height: 1.45; color: var(--foreground); }
+.ab-media { flex: 1 1 0; min-height: 118px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; container-type: size; }
+.ab-hint { flex: none; margin: 0; font-size: 11px; color: var(--muted-foreground); }
+
+/* The stack: prints sized by whatever room the media area has. */
+.ab-stack {
+  --pw: min(62cqw, calc((100cqh - 46px) / 1.24), 300px);
+  position: relative; flex: none; width: 100%; height: calc(var(--pw) * 1.24 + 18px); border: 0; padding: 0; background: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ab-stack:focus-visible { outline: none; }
+.ab-stack:focus-visible .ab-print:first-child { box-shadow: 0 0 0 2px var(--ring); }
+.ab-print {
+  position: absolute; left: 50%; top: 50%; width: var(--pw); margin: calc(var(--pw) * -.62) 0 0 calc(var(--pw) / -2);
+  padding: 7px 7px 0; background: #fff; border-radius: 4px; transform-origin: 50% 60%;
+  box-shadow: 0 1px 2px rgba(20, 20, 18, .08), 0 10px 24px -12px rgba(20, 20, 18, .3);
+  transition: transform .32s cubic-bezier(.2, .8, .3, 1), opacity .2s;
+}
+.ab-photo { display: block; aspect-ratio: 1 / 1; background: color-mix(in oklab, var(--foreground) 8%, #fff); overflow: hidden; border-radius: 2px; }
+.ab-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ab-print figcaption { font-style: italic; font-size: 13px; color: #3a3a36; text-align: center; padding: 6px 4px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (hover: hover) { .ab-stack:hover .ab-print:first-child { transform: translate(0, -4px) rotate(-1deg) !important; } }
+
+/* Short phones: tighter rhythm. */
+@container (max-height: 470px) { .ab { gap: 12px; } .ab-facts { margin-top: 10px; } .ab-fact { padding: 7px 0; } }
+@media (min-width: 768px) {
+  .ab { padding: 8px 24px; gap: 28px; }
+  .ab-title { font-size: 30px; }
+  .ab-fact { grid-template-columns: 120px 1fr; }
+  .ab-fact dd { font-size: 14px; }
+}
+@media (min-width: 1024px) {
+  .ab { flex-direction: row; align-items: center; gap: 56px; padding: 8px 40px; }
+  .ab-text { flex: 1.1 1 0; max-width: 560px; }
+  .ab-title { font-size: clamp(30px, 2.8vw, 40px); }
+  .ab-media { flex: .9 1 0; height: min(100%, 520px); align-self: center; }
+}
+@media (prefers-reduced-motion: reduce) { .ab-print { transition: none; } }
