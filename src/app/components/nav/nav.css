@@ -72,6 +72,6 @@
 .sh-sheet { --nav-reserve: 80px; }
 .sh-sheet.navmode-rack, .sh-sheet.navmode-both, .sh-sheet.navmode-handle { --nav-reserve: 6px; }
 .sh-sheet.navmode-rack .sh-edge-down, .sh-sheet.navmode-both .sh-edge-down { display: none; }
-body.fd-open .nav-shelf { opacity: 0; pointer-events: none; }
+body.fd-open .nav-shelf, body.fd-open .nav-handle { opacity: 0; pointer-events: none; }
 .nav-shelf { transition: opacity .25s; }
 @media (prefers-reduced-motion: reduce) { .nav-hat svg, .nav-peg, .nav-handle-grid span { transition: none; } }
