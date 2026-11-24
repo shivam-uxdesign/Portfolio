@@ -356,18 +356,6 @@ export function SheetHome() {
     sheetAnim.current = requestAnimationFrame(step);
   }, [reduce]);
 
-  // ── First open: the map opens by itself for a moment, so the handle explains itself ──
-  const introRef = useRef<{ skip: () => void } | null>(null);
-  const runSheetIntro = useCallback(() => {
-    try { if (localStorage.getItem('hasSeenSheetIntro') || reduce) return; localStorage.setItem('hasSeenSheetIntro', '1'); } catch { return; }
-    let done = false;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    const finish = () => { if (done) return; done = true; timers.forEach(clearTimeout); setMapOpen(false); introRef.current = null; };
-    introRef.current = { skip: finish };
-    timers.push(setTimeout(() => setMapOpen(true), 350));
-    timers.push(setTimeout(finish, 2900));
-  }, [reduce]);
-
   // ── Open / close ──
   const openSheet = useCallback(() => {
     if (lockedRef.current && sRef.current < 1) { /* allow re-open during settle */ }
@@ -376,12 +364,10 @@ export function SheetHome() {
     animateSheet(1, () => {
       setLock(false);
       if (!window.location.hash) { history.pushState({ sheet: 1 }, '', '#' + GRID[posRef.current.row][mod(posRef.current.col, 3)].id); pushedRef.current = true; }
-      runSheetIntro();
     });
-  }, [animateSheet, runSheetIntro]);
+  }, [animateSheet]);
 
   const closeSheet = useCallback((fromHistory = false) => {
-    introRef.current?.skip();
     setMapOpen(false);
     setPeekOverride(null); setHomeTip(false);
     setLock(true);
@@ -487,7 +473,6 @@ export function SheetHome() {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-      introRef.current?.skip();
       if (sRef.current === 0) {
         if (['ArrowDown', 'PageDown'].includes(e.key) || (e.key === ' ' && t === document.body)) { e.preventDefault(); openRef.current(); }
         return;
@@ -518,7 +503,6 @@ export function SheetHome() {
     let reset: ReturnType<typeof setTimeout> | null = null;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault(); // also swallows trackpad pinch (ctrl+wheel): no page zoom here
-      introRef.current?.skip();
       if (e.ctrlKey || lockedRef.current || mapOpenRef.current) return;
       // Vertical wheel over a cell that can still scroll that way: let it scroll,
       // and hold off grid moves briefly so trackpad momentum doesn't spill over.
@@ -590,7 +574,6 @@ export function SheetHome() {
   const onPointerDown = (e: React.PointerEvent) => {
     suppressClick.current = false;
     if (!e.isPrimary) return;
-    introRef.current?.skip();
     drag.current = { x: e.clientX, y: e.clientY, t: performance.now(), s0: sRef.current, mode: null, lastY: e.clientY, lastT: performance.now(), vy: 0 };
   };
   const onPointerMove = (e: React.PointerEvent) => {
@@ -605,7 +588,7 @@ export function SheetHome() {
       else if (sRef.current < 1) d.mode = vertical && !lockedRef.current ? 'sheet' : 'none';
       else if (vertical && canScroll(e.target, dy < 0 ? 1 : -1)) d.mode = 'none';
       else d.mode = vertical && dy > 0 && posRef.current.row === 0 && !lockedRef.current ? 'sheet' : 'grid';
-      if (d.mode === 'sheet') { cancelAnimationFrame(sheetAnim.current); introRef.current?.skip(); }
+      if (d.mode === 'sheet') { cancelAnimationFrame(sheetAnim.current); }
     }
     if (d.mode === 'sheet') {
       const v = clamp01(d.s0 - dy / (window.innerHeight * 0.6));
@@ -744,7 +727,7 @@ export function SheetHome() {
               current={actual}
               cells={MAP_CELLS}
               open={mapOpen}
-              onToggle={open => { introRef.current?.skip(); setMapOpen(open); }}
+              onToggle={setMapOpen}
               onPick={pickCell}
               onHeight={setMapRoom}
             />
