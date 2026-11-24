@@ -33,45 +33,14 @@
 @media (min-width: 768px) { .sh-bar-arrow { top: 28px; right: 32px; } }
 @media (prefers-reduced-motion: no-preference) { .sh-bar-arrow { animation: sh-nudge 2.4s ease-in-out infinite; } }
 
-/* Overview overlay cells */
-.sh-ov-cell { position: absolute; width: 20%; height: 50%; border: 3px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.sh-ov-cell:focus-visible { outline: 6px solid var(--ring); outline-offset: -6px; }
-.sh-ov-dot { position: absolute; top: 21px; right: 21px; width: 18px; height: 18px; border-radius: 999px; background: var(--primary); opacity: 0; transition: opacity .28s; }
-.sh-ov-dot.on { opacity: 1; }
-.sh-ov-label {
-  font-size: 27px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #fff;
-  background: rgba(20, 20, 18, .55); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: opacity .28s;
+/* A chosen hat's glow behind his head (theme vars come from .sh-root). */
+.sh-glow {
+  position: absolute; left: 50%; top: 0; width: min(520px, 120vw); height: 40%; transform: translateX(-50%); pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--sh-halo, transparent) 55%, transparent), transparent);
+  opacity: 0; transition: opacity .5s;
 }
-.sh-ov-label.on { opacity: 1; }
-
-/* Edge labels inside the sheet */
-.sh-edge {
-  position: absolute; z-index: 5; display: flex; align-items: center; gap: 8px; padding: 6px; border: 0; background: none; cursor: pointer;
-  font-size: 9px; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; color: color-mix(in oklab, var(--foreground) 65%, transparent);
-}
-.sh-edge:hover { color: var(--foreground); }
-.sh-edge:focus-visible { outline: 2px solid var(--ring); border-radius: 6px; }
-.sh-edge-left { left: 10px; top: 50%; transform: translateY(-50%); flex-direction: column; }
-.sh-edge-right { right: 10px; top: 50%; transform: translateY(-50%); flex-direction: column-reverse; }
-.sh-edge-down { bottom: 10px; left: 50%; transform: translateX(-50%); flex-direction: column; }
-.sh-edge-up { top: 10px; flex-direction: column; }
-.sh-edge-up.at-right { right: 64px; }
-.sh-edge-up.at-left { left: 64px; }
-.sh-tri { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid currentColor; }
-
-.sh-compass {
-  position: fixed; bottom: 24px; right: 24px; z-index: 50; border-radius: 16px; padding: 6px;
-  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
-  background: rgba(255, 255, 255, .85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 12px 28px -14px rgba(20, 20, 18, .25);
-}
-
-.sh-hint {
-  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 60; pointer-events: none;
-  padding: 7px 14px; border-radius: 999px; font-size: 11px; letter-spacing: .04em; color: var(--muted-foreground);
-  background: rgba(255, 255, 255, .88); backdrop-filter: blur(14px); border: 1px solid var(--border); white-space: nowrap;
-}
+.sh-glow.on { opacity: 1; }
+.sh-root, .sh-clip { transition: background-color .45s; }
 
 /* The head on the sheet's top edge */
 .work-peek.sheet-peek {
@@ -126,5 +95,3 @@
 .sh-sheet .work-peek.sheet-peek { z-index: 8; }
 body.fd-open .work-peek.sheet-peek { pointer-events: none; }
 body.fd-open .work-peek.sheet-peek * { pointer-events: none !important; }
-.sh-compass { transition: opacity .25s; }
-body.fd-open .sh-compass { opacity: 0; pointer-events: none; }

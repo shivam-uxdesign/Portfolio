@@ -1,77 +1,77 @@
-/* ── Hat rack ──────────────────────────────────────────────────────────── */
-.nav-shelf {
-  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); z-index: 6;
-  display: flex; align-items: flex-end; gap: 18px; padding: 0 14px;
-}
-/* The rail the hats sit on. */
-.nav-shelf::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 6px; height: 2px; border-radius: 2px;
-  background: color-mix(in oklab, var(--foreground) 12%, transparent);
-}
-.nav-group { display: flex; gap: 2px; }
-.nav-hat {
-  position: relative; width: 44px; height: 46px; padding: 0 0 8px; border: 0; background: none; cursor: pointer;
-  display: flex; align-items: flex-end; justify-content: center; -webkit-tap-highlight-color: transparent; border-radius: 10px;
-}
-.nav-hat svg { width: 34px; height: 30px; overflow: visible; transition: transform .25s cubic-bezier(.3,1.5,.5,1), opacity .25s; filter: drop-shadow(0 3px 3px rgba(20,20,18,.14)); }
-.nav-hat:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
-@media (hover: hover) { .nav-hat:not(.here):hover svg { transform: translateY(-4px) rotate(-6deg); } }
-.nav-hat:active svg { transform: translateY(-2px) scale(.94); }
-/* Empty peg where the hat he's wearing usually sits. */
-.nav-peg { position: absolute; bottom: 5px; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 99px; background: var(--primary); opacity: 0; transform: scale(.4); transition: opacity .25s, transform .25s; }
-.nav-hat.here svg, .nav-hat.away svg { opacity: 0; transform: translateY(-10px) scale(.8); }
-.nav-hat.here .nav-peg { opacity: 1; transform: none; }
-/* Label on hover/focus (pointer devices) */
-.nav-hat::before {
-  content: attr(data-label); position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translate(-50%, 4px);
-  white-space: nowrap; font-size: 10px; font-weight: 500; letter-spacing: .04em; padding: 3px 8px; border-radius: 6px;
-  background: var(--foreground); color: var(--background); opacity: 0; pointer-events: none; transition: opacity .15s, transform .15s;
-}
-@media (hover: hover) { .nav-hat:hover::before { opacity: 1; transform: translate(-50%, 0); } }
-.nav-hat:focus-visible::before { opacity: 1; transform: translate(-50%, 0); }
-.nav-fly { position: fixed; z-index: 70; pointer-events: none; transform-origin: 50% 100%; }
-.nav-fly svg { width: 100%; height: 100%; overflow: visible; }
+/* ── Page map: the handle under his chin, and the map it opens into ─────── */
+.pm { position: absolute; top: 0; left: 0; right: 0; z-index: 7; pointer-events: none; }
+.pm > * { pointer-events: auto; }
 
-/* ── Handle map ────────────────────────────────────────────────────────── */
-/* Sits under his chin, between his hands, and glides with his head. */
-.nav-handle {
-  position: absolute; top: 4px; z-index: 7; transform: translateX(-50%);
+.pm-handle {
+  position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
   padding: 8px 10px 10px; border: 0; background: none; cursor: pointer; touch-action: none;
   -webkit-tap-highlight-color: transparent; border-radius: 999px;
-  transition: left .46s cubic-bezier(.45, 0, .2, 1);
 }
-.nav-handle:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
-.nav-handle-pill {
-  display: flex; align-items: center; padding: 5px 8px; border-radius: 999px;
+.pm-handle:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+.pm-pill {
+  position: relative; display: block; padding: 5px 8px; border-radius: 999px;
   background: color-mix(in oklab, var(--foreground) 6%, transparent);
   transition: background .2s, transform .2s, box-shadow .2s;
 }
-.nav-handle-grid { display: grid; grid-template-columns: repeat(3, 6px); gap: 4px 5px; }
-.nav-handle-grid span { width: 6px; height: 6px; border-radius: 99px; background: color-mix(in oklab, var(--foreground) 22%, transparent); transition: background .2s, transform .2s; }
-.nav-handle-grid span.on { background: var(--primary); transform: scale(1.3); }
-/* The page name drops out under the pill for a moment (his hands are either side). */
-.nav-handle-name {
+.pm-dots { display: grid; grid-template-columns: repeat(3, 6px); gap: 4px 5px; }
+.pm-dots span { width: 6px; height: 6px; border-radius: 99px; background: color-mix(in oklab, var(--foreground) 22%, transparent); }
+/* The lit dot is its own element so it can travel between spots. */
+.pm-lit { position: absolute; top: 5px; left: 8px; width: 6px; height: 6px; border-radius: 99px; background: var(--primary); transform-origin: 3px 3px; }
+.pm-pill .pm-lit { box-shadow: 0 0 0 1.5px color-mix(in oklab, var(--primary) 30%, transparent); }
+@media (hover: hover) { .pm-handle:hover .pm-pill { background: color-mix(in oklab, var(--foreground) 10%, transparent); } }
+.pm-handle:active .pm-pill { transform: scale(.95); }
+.pm-handle.scrubbing .pm-pill { transform: scale(1.08); background: var(--background); box-shadow: 0 6px 18px -8px rgba(20, 20, 18, .28), 0 0 0 1px color-mix(in oklab, var(--border) 70%, transparent); }
+.pm.open .pm-pill { background: var(--foreground); }
+.pm.open .pm-dots span { background: color-mix(in oklab, var(--background) 40%, transparent); }
+
+/* The page's name drops out under the pill for a moment. */
+.pm-name {
   position: absolute; top: calc(100% - 4px); left: 50%; transform: translate(-50%, -6px) scale(.9); pointer-events: none;
   white-space: nowrap; font-size: 11px; font-weight: 500; letter-spacing: .02em; color: var(--background);
   background: var(--foreground); padding: 4px 9px; border-radius: 999px; opacity: 0;
   transition: opacity .2s, transform .25s cubic-bezier(.3, 1.4, .5, 1);
 }
-.nav-handle.named .nav-handle-name { opacity: 1; transform: translate(-50%, 0) scale(1); }
-.nav-handle.named .nav-handle-pill, .nav-handle.scrubbing .nav-handle-pill {
-  background: var(--background); box-shadow: 0 6px 18px -8px rgba(20, 20, 18, .28), 0 0 0 1px color-mix(in oklab, var(--border) 70%, transparent);
-}
-.nav-handle.scrubbing .nav-handle-pill { transform: scale(1.08); }
-@media (hover: hover) { .nav-handle:hover .nav-handle-pill { background: color-mix(in oklab, var(--foreground) 10%, transparent); } }
-.nav-handle:active .nav-handle-pill { transform: scale(.95); }
-.nav-handle.open .nav-handle-pill { background: var(--foreground); }
-.nav-handle.open .nav-handle-grid span { background: color-mix(in oklab, var(--background) 45%, transparent); }
-.nav-handle.open .nav-handle-grid span.on { background: var(--primary); }
-@media (prefers-reduced-motion: reduce) { .nav-handle, .nav-handle-name, .nav-handle-pill { transition: none; } }
+.pm-handle.named .pm-name { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.pm.open .pm-name { opacity: 0; }
 
-/* ── Modes: how much room pages keep at the bottom ─────────────────────── */
-.sh-sheet { --nav-reserve: 80px; }
-.sh-sheet.navmode-rack, .sh-sheet.navmode-both, .sh-sheet.navmode-handle { --nav-reserve: 6px; }
-.sh-sheet.navmode-rack .sh-edge-down, .sh-sheet.navmode-both .sh-edge-down { display: none; }
-body.fd-open .nav-shelf, body.fd-open .nav-handle { opacity: 0; pointer-events: none; }
-.nav-shelf { transition: opacity .25s; }
-@media (prefers-reduced-motion: reduce) { .nav-hat svg, .nav-peg, .nav-handle-grid span { transition: none; } }
+/* The map: grows out of the pill. */
+.pm-card {
+  position: absolute; top: 46px; left: 50%; width: min(calc(100% - 32px), 380px);
+  transform: translateX(-50%) scale(.35, .2); transform-origin: 50% 0; opacity: 0; visibility: hidden;
+  padding: 12px; border-radius: 22px; background: var(--background);
+  box-shadow: 0 24px 50px -24px rgba(20, 20, 18, .35), 0 0 0 1px color-mix(in oklab, var(--border) 80%, transparent);
+  transition: transform .38s cubic-bezier(.3, 1.25, .4, 1), opacity .2s, visibility 0s linear .38s;
+}
+.pm.open .pm-card { transform: translateX(-50%); opacity: 1; visibility: visible; transition: transform .42s cubic-bezier(.3, 1.25, .4, 1), opacity .18s, visibility 0s; }
+.pm-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.pm-chip {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px 9px; border-radius: 14px; cursor: pointer;
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent); background: color-mix(in oklab, var(--foreground) 3%, var(--background));
+  color: var(--foreground); transition: background .15s, transform .15s;
+}
+.pm-chip:active { transform: scale(.96); }
+@media (hover: hover) { .pm-chip:hover { background: color-mix(in oklab, var(--foreground) 6%, var(--background)); } }
+.pm-chip:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.pm-chip.here { border-color: color-mix(in oklab, var(--primary) 70%, transparent); background: color-mix(in oklab, var(--primary) 12%, var(--background)); }
+.pm-chip-hat { display: grid; place-items: end center; height: 24px; }
+.pm-chip-hat svg { width: 30px; height: 24px; overflow: visible; }
+.pm-chip-label { font-size: 12px; font-weight: 500; line-height: 1.15; text-align: center; }
+.pm-foot { margin: 10px 0 0; text-align: center; font-size: 10.5px; color: var(--muted-foreground); }
+/* Staggered chips as it opens. */
+.pm.open .pm-grid li { animation: pm-in .32s cubic-bezier(.3, 1.2, .4, 1) both; }
+.pm.open .pm-grid li:nth-child(2) { animation-delay: .03s; } .pm.open .pm-grid li:nth-child(3) { animation-delay: .06s; }
+.pm.open .pm-grid li:nth-child(4) { animation-delay: .05s; } .pm.open .pm-grid li:nth-child(5) { animation-delay: .08s; } .pm.open .pm-grid li:nth-child(6) { animation-delay: .11s; }
+@keyframes pm-in { from { opacity: 0; transform: translateY(-6px) scale(.94); } to { opacity: 1; transform: none; } }
+
+/* The page underneath makes room while the map is open. */
+.sh-page-stage { transition: transform .42s cubic-bezier(.3, 1.1, .4, 1), border-radius .42s, box-shadow .42s; }
+.sh-page-stage.making-room { overflow: hidden; border-radius: 24px; box-shadow: 0 0 0 1px color-mix(in oklab, var(--border) 80%, transparent); }
+.sh-map-scrim { position: absolute; inset: 0; z-index: 4; border: 0; padding: 0; background: color-mix(in oklab, var(--background) 45%, transparent); opacity: 0; pointer-events: none; transition: opacity .3s; cursor: pointer; }
+.sh-map-scrim.on { opacity: 1; pointer-events: auto; }
+
+body.fd-open .pm, body.fd-open .pm > * { opacity: 0; pointer-events: none; }
+.pm { transition: opacity .25s; }
+@media (prefers-reduced-motion: reduce) {
+  .pm-card, .pm.open .pm-card, .pm-name, .pm-pill, .sh-page-stage, .sh-map-scrim { transition: none; }
+  .pm.open .pm-grid li { animation: none; }
+}

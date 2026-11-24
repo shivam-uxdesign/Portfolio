@@ -378,7 +378,7 @@ export function AboutCell() {
   const [openBio, setOpenBio] = useState(0);
 
   return (
-    <div className="w-full min-h-full flex items-stretch md:items-center bg-background px-1 md:px-16 lg:px-20 pt-2 pb-[var(--nav-reserve,80px)] md:py-4">
+    <div className="w-full min-h-full flex items-stretch md:items-center bg-background px-1 md:px-16 lg:px-20 pt-2 pb-1 md:py-4">
       <div className="w-full max-w-6xl mx-auto flex flex-col md:grid md:grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6 md:gap-10 lg:gap-16 md:items-center">
         {/* Left — hook + bio rail (+ the filmstrip below lg, taking whatever height is left on phones) */}
         <div className="flex flex-1 min-h-0 flex-col md:block">
@@ -490,7 +490,7 @@ export function ContactCell() {
 
   return (
     // Phones: the ask at the top, the compose card fills the rest down to the navigator.
-    <div className="w-full min-h-full flex items-stretch md:items-center bg-background px-1 md:px-16 lg:px-20 pt-1 pb-[var(--nav-reserve,80px)] md:py-6">
+    <div className="w-full min-h-full flex items-stretch md:items-center bg-background px-1 md:px-16 lg:px-20 pt-1 pb-1 md:py-6">
       <div className="w-full max-w-5xl mx-auto flex flex-col md:grid md:grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-5 md:gap-4 lg:gap-14 md:items-center">
         {/* Left — greeting, status, signature */}
         <div className="flex flex-col gap-3 md:gap-5 max-w-[420px]">
@@ -552,7 +552,7 @@ export function InterestsCell() {
 
 export function ResumeCell() {
   return (
-    <div className="w-full h-full bg-background flex flex-col md:justify-center px-1 md:px-10 lg:px-14 pt-1 md:pt-4 pb-[var(--nav-reserve,80px)] md:pb-5">
+    <div className="w-full h-full bg-background flex flex-col md:justify-center px-1 md:px-10 lg:px-14 pt-1 md:pt-4 pb-1 md:pb-5">
       <div className="rs-head flex-none pb-3 flex items-center justify-between gap-3">
         <p className="text-[11px] tracking-[0.1em] text-muted-foreground uppercase">Resume</p>
         <a

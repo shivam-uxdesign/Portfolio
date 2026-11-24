@@ -34,7 +34,11 @@ export interface HatsEngine {
   /** Settled in the peek: blink, follow the pointer, small idle bits. */
   setPeekLive(on: boolean): void;
   /** Show a hat without wearing it (no palette/tagline change). null = the worn hat. */
-  displayHat(id: WearableId | null): void;
+  displayHat(id: WearableId | null, dir?: { x: number; y: number }): void;
+  /** Page change while wearing your own hat: lift it a touch and settle it back. */
+  tipHat(): void;
+  /** Toss the worn hat off (dragged away in the sheet): back to no hat. */
+  takeOff(dx: number, dy: number): void;
   /** Quick look left (-1) or right (1), e.g. before shuffling along the edge. */
   glance(dir: number): void;
   destroy(): void;
@@ -505,11 +509,35 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
       scheduleIdle();
     }, 20000 + Math.random() * 10000);
   }
-  function showProps(id: WearableId, drop: boolean) {
+  function setProps(id: WearableId) {
     props.innerHTML = id === 'me' ? '' : PROPS[id].svg(false);
     me.dataset.hat = id;
     bladesEl = props.querySelector('.blades');
+  }
+  function showProps(id: WearableId, drop: boolean) {
+    setProps(id);
     if (drop && !reduce && id !== 'me') props.animate([{ transform: 'translateY(-90px)', opacity: 0 }, { transform: 'translateY(6px)', opacity: 1, offset: 0.65 }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.3,.7,.4,1)' });
+  }
+  // Page change: the old hat leaves with the outgoing page, the new one comes in
+  // with the incoming page (sideways), or drops in from above (row change).
+  let swapAnim: Animation | null = null;
+  function swapProps(id: WearableId, dir: { x: number; y: number }) {
+    swapAnim?.cancel();
+    if (reduce) { setProps(id); return; }
+    const sx = Math.sign(dir.x);
+    const out = sx
+      ? { transform: `translate(${-sx * 260}px, -70px) rotate(${-sx * 28}deg)`, opacity: 0 }
+      : { transform: `translateY(${dir.y > 0 ? -200 : -140}px) rotate(-10deg)`, opacity: 0 };
+    const a = props.animate([{ transform: 'none', opacity: 1 }, out], { duration: 190, easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' });
+    swapAnim = a;
+    a.onfinish = () => {
+      if (swapAnim !== a) return;
+      setProps(id);
+      const from = sx ? `translate(${sx * 260}px, -90px) rotate(${sx * 24}deg)` : 'translateY(-110px)';
+      swapAnim = props.animate([{ transform: from, opacity: 0 }, { transform: 'translateY(5px) rotate(0deg)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }],
+        { duration: 340, easing: 'cubic-bezier(.25,.8,.35,1)' });
+      a.cancel();
+    };
   }
 
   // ── Public API ────────────────────────────────────────────────────────────
@@ -569,13 +597,28 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
       if (on) { lookDown(); scheduleIdle(); }
       else { if (idleT) clearTimeout(idleT); if (lookDownT) clearTimeout(lookDownT); }
     },
-    displayHat(id: WearableId | null) {
+    displayHat(id: WearableId | null, dir?: { x: number; y: number }) {
       if (destroyed) return;
       const next = id ?? current;
       if (next === (shownHat ?? current)) { shownHat = id; return; }
+      if (dir) { shownHat = id; swapProps(next, dir); return; }
       const drop = id !== null || shownHat !== null;
       shownHat = id;
       showProps(next, drop);
+    },
+    tipHat() {
+      if (destroyed || reduce || current === 'me') return;
+      props.animate([{ transform: 'none' }, { transform: 'translate(-6px, -34px) rotate(-9deg)', offset: 0.4 }, { transform: 'translate(-2px, -30px) rotate(-7deg)', offset: 0.6 }, { transform: 'none' }],
+        { duration: 520, easing: 'cubic-bezier(.35,.1,.3,1)' });
+    },
+    takeOff(dx: number, dy: number) {
+      if (destroyed || current === 'me') return;
+      const done = () => { putBack(); relayout(); apply('me', false); shownHat = null; };
+      if (reduce) { done(); return; }
+      const d = Math.hypot(dx, dy) || 1;
+      const ux = dx / d, uy = dy / d;
+      props.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${ux * 520}px, ${uy * 520 - 160}px) rotate(${ux >= 0 ? 70 : -70}deg)`, opacity: 0 }],
+        { duration: 420, easing: 'cubic-bezier(.3,.2,.6,1)', fill: 'forwards' }).onfinish = function (this: Animation) { done(); this.cancel(); };
     },
     glance(dir: number) {
       if (destroyed || reduce) return;

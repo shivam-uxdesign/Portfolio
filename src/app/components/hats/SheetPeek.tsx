@@ -36,9 +36,13 @@ export interface SheetPeekProps {
   handsOnly?: boolean;
   /** Width of the visible head in px (the portrait's width) when handsOnly. */
   width?: number;
+  /** Wearing their own hat: drag it off his head (up or sideways) to take it off. */
+  onHatFling?: (dx: number, dy: number) => void;
 }
 
-export function SheetPeek({ progress, col, hat, active, showTip, onHome, handsOnly = false, width }: SheetPeekProps) {
+export function SheetPeek({ progress, col, hat, active, showTip, onHome, handsOnly = false, width, onHatFling }: SheetPeekProps) {
+  // Hat fling: a press on the head that travels up or sideways (down stays a sheet drag).
+  const fling = useRef<{ x: number; y: number; done: boolean } | null>(null);
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const pre = `sp${uid}-`;
   const portraitHtml = useMemo(() => ({ __html: prefixedPortrait(pre) }), [pre]);
@@ -207,7 +211,17 @@ export function SheetPeek({ progress, col, hat, active, showTip, onHome, handsOn
           tabIndex={visible ? 0 : -1}
           aria-hidden={!visible}
           aria-label="Home"
-          onClick={onHome}
+          onClick={() => { if (fling.current?.done) { fling.current = null; return; } onHome(); }}
+          onPointerDown={e => { fling.current = onHatFling && e.isPrimary ? { x: e.clientX, y: e.clientY, done: false } : null; }}
+          onPointerMove={e => {
+            const f = fling.current;
+            if (!f || f.done || !onHatFling) return;
+            const dx = e.clientX - f.x, dy = e.clientY - f.y;
+            if (Math.hypot(dx, dy) < 22 || (dy > 0 && dy > Math.abs(dx))) return;
+            f.done = true;
+            onHatFling(dx, dy);
+          }}
+          onPointerUp={() => { if (fling.current && !fling.current.done) fling.current = null; }}
           onPointerEnter={() => setHover(true)}
           onPointerLeave={() => setHover(false)}
           onFocus={() => setHover(true)}

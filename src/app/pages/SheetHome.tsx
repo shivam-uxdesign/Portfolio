@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { memo, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { motion } from 'motion/react';
 import { trackEvent } from '../../lib/analytics';
 import { HatsHero } from '../components/hats/HatsHero';
@@ -9,14 +9,7 @@ import type { HatsEngine } from '../components/hats/hatsEngine';
 import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
 import { PROJECTS, AboutCell, ContactCell, ResumeCell, InterestsCell } from './Home';
 import { StackPanel } from '../components/cells/StackPanel';
-import { HatShelf, flyHat, type ShelfItem } from '../components/nav/HatShelf';
-import { HandleMap } from '../components/nav/HandleMap';
-
-// Navigation: the handle map by default; ?nav=rack | both | compass for the other prototypes.
-type NavMode = 'rack' | 'handle' | 'both' | 'compass';
-function readNavMode(): NavMode {
-  try { const m = new URLSearchParams(window.location.search).get('nav'); return m === 'rack' || m === 'both' || m === 'compass' ? m : 'handle'; } catch { return 'handle'; }
-}
+import { PageMap, type MapCell } from '../components/nav/PageMap';
 import { WorkAndPlay } from '../components/WorkAndPlay';
 import { FUN_PROJECTS } from '../components/FunProjects';
 import './sheet.css';
@@ -24,7 +17,8 @@ import './sheet.css';
 // ─── Layout ───────────────────────────────────────────────────────────────────
 // The hero is a fixed backdrop (not a grid cell). A sheet rests as a 20% bar at
 // the bottom; slide it up and it takes 80% of the screen, with Shivam hanging
-// on its top edge. Inside the sheet: a 3×2 grid, wrapping left/right only.
+// on its top edge (always centred). Inside the sheet: a 3×2 grid, wrapping
+// left/right only. The handle under his chin is the map.
 
 type SheetCellId = 'about' | 'work' | 'interests' | 'stack' | 'resume' | 'contact';
 type Pos = { row: number; col: number };
@@ -35,7 +29,8 @@ const GRID: { id: SheetCellId; label: string }[][] = [
 ];
 const START: Pos = { row: 0, col: 1 }; // opening the sheet lands on Work
 
-// Hat he wears on each cell, unless the visitor already picked one on the hero.
+// Hat he wears on each cell, unless the visitor already picked one on the hero
+// (then he keeps theirs, and the sheet takes on its colours).
 const CONTEXT_HAT: Record<SheetCellId, HatId> = {
   about: 'cat', work: 'notes', interests: 'beret', stack: 'propeller', resume: 'helmet', contact: 'party',
 };
@@ -50,7 +45,6 @@ const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 const seg = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 const easeOutBackLocal = (x: number) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
 const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
@@ -111,11 +105,22 @@ function ScrollCell({ children, more }: { children: React.ReactNode; more?: { la
 const barScale = (W: number) => Math.max(0.9, 1 - 64 / Math.max(1, W));
 
 // World = 5 columns (3 real + a clone each side for wraparound) × 2 rows.
-// Interpolates the visible world rect (cell → whole 3×2) so the zoom stays centred.
-function worldTransform(col: number, row: number, ov: number, W: number, H: number) {
-  const x = lerp((col + 1) * W, W, ov), y = lerp(row * H, -H / 2, ov), w = lerp(W, 3 * W, ov);
-  const k = W / w;
-  return `translate(${(-k * x).toFixed(2)}px, ${(-k * y).toFixed(2)}px) scale(${k.toFixed(5)})`;
+const worldTransform = (col: number, row: number, W: number, H: number) =>
+  `translate(${(-(col + 1) * W).toFixed(2)}px, ${(-row * H).toFixed(2)}px)`;
+
+const MAP_CELLS: MapCell[][] = GRID.map(row => row.map(c => ({ label: c.label, hat: CONTEXT_HAT[c.id] })));
+
+// A hat the visitor chose themes the sheet, lightly: accent colour and a faint
+// wash of the hat's card colour. Nothing else moves.
+function themeVars(hat: WearableId): React.CSSProperties | undefined {
+  if (hat === 'me') return undefined;
+  const p = PAL[hat];
+  return {
+    '--primary': p.accent,
+    '--accent': p.accent,
+    '--background': `color-mix(in oklab, ${p.card} 4%, #fff)`,
+    '--sh-halo': p.halo,
+  } as React.CSSProperties;
 }
 
 // ─── Cells ────────────────────────────────────────────────────────────────────
@@ -146,9 +151,8 @@ const SheetWorld = memo(function SheetWorld() {
             className="absolute overflow-hidden"
             style={{ left: `${(pc + 1) * 20}%`, top: `${r * 50}%`, width: '20%', height: '50%' }}
           >
-            {/* Safe zone: keeps content clear of the sheet's edge labels and the Compass.
-                Bottom-row cells carry the "↑ up" label at the top, so they start lower on phones. */}
-            <div className={`w-full h-full box-border ${r === 1 ? 'pt-[52px]' : 'pt-9'} pl-9 pr-14 pb-14 md:pt-11 md:pl-11 md:pr-16 md:pb-16`}>
+            {/* Safe zone: the top clears his hands and the handle. */}
+            <div className="w-full h-full box-border pt-[52px] px-5 pb-5 md:pt-14 md:px-12 md:pb-10">
               <CellContent id={cell.id} />
             </div>
           </div>
@@ -222,40 +226,6 @@ const BarButton = memo(function BarButton({ onOpen }: { onOpen: () => void }) {
   );
 });
 
-// ─── Compass (3×2) ────────────────────────────────────────────────────────────
-function SheetCompass({ pos, onPick }: { pos: Pos; onPick: (p: Pos) => void }) {
-  const [hovered, setHovered] = useState<string | null>(null);
-  return (
-    <div className="sh-compass" role="navigation" aria-label="Sections">
-      <div className="grid grid-cols-3 gap-0.5">
-        {[0, 1].flatMap(r => [0, 1, 2].map(c => {
-          const key = `${r}-${c}`, active = pos.row === r && pos.col === c;
-          return (
-            <div key={key} className="relative flex items-center justify-center">
-              {hovered === key && (
-                <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none z-10 text-[10px] font-medium tracking-[0.04em] px-2 py-1 rounded-md bg-foreground text-background shadow-lg">
-                  {GRID[r][c].label}
-                </span>
-              )}
-              <button
-                type="button"
-                onClick={() => onPick({ row: r, col: c })}
-                onMouseEnter={() => setHovered(key)} onMouseLeave={() => setHovered(null)}
-                onFocus={() => setHovered(key)} onBlur={() => setHovered(null)}
-                aria-label={`Go to ${GRID[r][c].label}`}
-                aria-current={active ? 'true' : undefined}
-                className="group relative rounded-full w-5 h-5 pointer-coarse:w-11 pointer-coarse:h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <span className={`rounded-full w-[7px] h-[7px] transition-all duration-200 ${active ? 'bg-primary scale-125' : 'bg-foreground/22 group-hover:bg-primary/55'}`} />
-              </button>
-            </div>
-          );
-        }))}
-      </div>
-    </div>
-  );
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 function initialPos(): Pos | null {
   try { const h = window.location.hash.replace('#', ''); return h ? findCell(h) : null; } catch { return null; }
@@ -277,19 +247,17 @@ export function SheetHome() {
   const [locked, setLocked] = useState(false);
   const lockedRef = useRef(false);
   const [noTransition, setNoTransition] = useState(false);
-  // Overview zoom inside the sheet.
-  const [ov, setOv] = useState(0);
-  const ovRef = useRef(0);
-  const ovAnim = useRef(0);
-  const gestureRef = useRef(false);
-  const [hoverCell, setHoverCell] = useState<string | null>(null);
+  // The page map (opened from the handle).
+  const [mapOpen, setMapOpen] = useState(false);
+  const mapOpenRef = useRef(false);
+  const [mapRoom, setMapRoom] = useState(0);
+  useEffect(() => { mapOpenRef.current = mapOpen; }, [mapOpen]);
   // Sheet size for the world transform.
   const clipRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ W: typeof window !== 'undefined' ? window.innerWidth : 1, H: typeof window !== 'undefined' ? window.innerHeight * 0.8 : 1 });
   // Deep-link arrival: the head rises on its own timeline, then a "Home" tip.
   const [peekOverride, setPeekOverride] = useState<number | null>(deepLink ? 0 : null);
   const [homeTip, setHomeTip] = useState(false);
-  const [introHint, setIntroHint] = useState(false);
   const pushedRef = useRef(false);
 
   useEffect(() => { sRef.current = s; }, [s]);
@@ -297,7 +265,7 @@ export function SheetHome() {
   // ── The portrait is the peek ──
   // Like the prototype: the hero stage slides so the glasses' lower edge
   // (y≈494 of the 1000-unit portrait) lands on the open sheet's top edge, and
-  // sideways to follow the column. The engine fades the card and runs the face.
+  // The engine fades the card and runs the face.
   const heroRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<HatsEngine | null>(null);
   const [engineReady, setEngineReady] = useState(0);
@@ -388,33 +356,17 @@ export function SheetHome() {
     sheetAnim.current = requestAnimationFrame(step);
   }, [reduce]);
 
-  // ── Overview animation ──
-  const animateOv = useCallback((to: 0 | 1, done?: () => void, ms = 620) => {
-    cancelAnimationFrame(ovAnim.current);
-    const from = ovRef.current;
-    if (reduce) { ovRef.current = to; setOv(to); done?.(); return; }
-    const t0 = performance.now();
-    const step = (now: number) => {
-      const t = clamp01((now - t0) / ms), v = from + (to - from) * easeOutExpo(t);
-      ovRef.current = v; setOv(v);
-      if (t < 1) ovAnim.current = requestAnimationFrame(step);
-      else done?.();
-    };
-    ovAnim.current = requestAnimationFrame(step);
-  }, [reduce]);
-
-  // ── First open: zoom out to show the 3×2, then land on Work ──
+  // ── First open: the map opens by itself for a moment, so the handle explains itself ──
   const introRef = useRef<{ skip: () => void } | null>(null);
   const runSheetIntro = useCallback(() => {
     try { if (localStorage.getItem('hasSeenSheetIntro') || reduce) return; localStorage.setItem('hasSeenSheetIntro', '1'); } catch { return; }
-    setLock(true);
     let done = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
-    const finish = () => { if (done) return; done = true; timers.forEach(clearTimeout); setIntroHint(false); animateOv(0, () => setLock(false), 560); introRef.current = null; };
+    const finish = () => { if (done) return; done = true; timers.forEach(clearTimeout); setMapOpen(false); introRef.current = null; };
     introRef.current = { skip: finish };
-    timers.push(setTimeout(() => animateOv(1, () => setIntroHint(true), 620), 250));
-    timers.push(setTimeout(finish, 2500));
-  }, [animateOv]);
+    timers.push(setTimeout(() => setMapOpen(true), 350));
+    timers.push(setTimeout(finish, 2900));
+  }, [reduce]);
 
   // ── Open / close ──
   const openSheet = useCallback(() => {
@@ -429,8 +381,8 @@ export function SheetHome() {
   }, [animateSheet, runSheetIntro]);
 
   const closeSheet = useCallback((fromHistory = false) => {
-    if (ovRef.current > 0) { cancelAnimationFrame(ovAnim.current); ovRef.current = 0; setOv(0); }
     introRef.current?.skip();
+    setMapOpen(false);
     setPeekOverride(null); setHomeTip(false);
     setLock(true);
     animateSheet(0, () => {
@@ -497,9 +449,13 @@ export function SheetHome() {
   }, [deepLink, reduce]);
 
   // ── Grid navigation (sheet open only) ──
+  // Which way the last move went, for his hat swap.
+  const navDir = useRef({ x: 0, y: 0 });
   const navigateTo = useCallback((r: number, c: number) => {
-    if (lockedRef.current || gestureRef.current || ovRef.current > 0 || sRef.current < 1) return;
+    if (lockedRef.current || mapOpenRef.current || sRef.current < 1) return;
     if (r < 0 || r > 1) return; // no vertical wrap
+    const cur = posRef.current;
+    navDir.current = { x: Math.sign(c - cur.col), y: Math.sign(r - cur.row) };
     setLock(true);
     setPos({ row: r, col: c });
     if (c < 0 || c > 2) {
@@ -513,49 +469,18 @@ export function SheetHome() {
   const navRef = useRef(navigateTo);
   useEffect(() => { navRef.current = navigateTo; }, [navigateTo]);
 
-  const [navMode] = useState(readNavMode);
-  const rackOn = navMode === 'rack' || navMode === 'both';
-  const handleOn = navMode === 'handle' || navMode === 'both';
-  const [hatHold, setHatHold] = useState<WearableId | null>(null);
-  const [hatAway, setHatAway] = useState<string | null>(null);
-
   const pickCell = useCallback((p: Pos) => {
-    if (ovRef.current > 0) {
-      if (ovRef.current < 1 || lockedRef.current) return;
-      setLock(true); setHoverCell(null); setPos(p);
-      animateOv(0, () => setLock(false));
-      return;
-    }
     if (lockedRef.current || sRef.current < 1) return;
+    const cur = posRef.current;
+    navDir.current = { x: Math.sign(p.col - mod(cur.col, 3)), y: Math.sign(p.row - cur.row) };
     setLock(true); setPos(p);
     setTimeout(() => setLock(false), NAV_MS);
-  }, [animateOv]);
+  }, []);
 
   // Up from the top row = close the sheet.
   const goUp = () => { const p = posRef.current; if (p.row === 0) closeRef.current(); else navRef.current(p.row - 1, p.col); };
   const goDown = () => { const p = posRef.current; navRef.current(p.row + 1, p.col); };
   const goSide = (d: number) => { const p = posRef.current; navRef.current(p.row, p.col + d); };
-
-  // Rack: the tapped hat flies up to where his head is going, then he wears it.
-  const shelfRows = useMemo<ShelfItem[][]>(() => GRID.map((row, r) => row.map((cell, c) => ({ row: r, col: c, label: cell.label, hat: CONTEXT_HAT[cell.id] as HatId }))), []);
-  const rackPick = (item: ShelfItem, from: DOMRect, svg: string) => {
-    if (lockedRef.current || sRef.current < 1 || ovRef.current > 0) return;
-    const cur = posRef.current;
-    setHatHold(CONTEXT_HAT[GRID[cur.row][mod(cur.col, 3)].id]);
-    setHatAway(`${item.row}-${item.col}`);
-    pickCell({ row: item.row, col: item.col });
-    const vw = window.innerWidth, half = geo.w / 2;
-    const x = [half + 18, vw / 2, vw - half - 18][item.col] ?? vw / 2;
-    const to = { x, y: window.innerHeight * 0.2 - geo.headH * 0.78, w: geo.w * 0.5 };
-    flyHat(svg, from, to, reduce).then(() => { setHatHold(null); setHatAway(null); });
-  };
-  // Handle: tap to zoom out to every page, tap again to come back.
-  const toggleOverview = () => {
-    if (lockedRef.current || sRef.current < 1) return;
-    if (ovRef.current > 0 && ovRef.current < 1) return;
-    setLock(true);
-    animateOv(ovRef.current > 0 ? 0 : 1, () => setLock(false));
-  };
 
   // ── Keyboard ──
   useEffect(() => {
@@ -569,9 +494,10 @@ export function SheetHome() {
       }
       if (e.key === 'Escape') {
         e.preventDefault();
-        if (ovRef.current > 0) { setLock(true); animateOv(0, () => setLock(false)); } else closeRef.current();
+        if (mapOpenRef.current) setMapOpen(false); else closeRef.current();
         return;
       }
+      if (mapOpenRef.current) return;
       if (e.key === 'Home') { e.preventDefault(); closeRef.current(); return; }
       if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) || sRef.current < 1) return;
       e.preventDefault();
@@ -583,27 +509,17 @@ export function SheetHome() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animateOv]);
+  }, []);
 
   // ── Wheel / trackpad ──
   useEffect(() => {
     const acc = { x: 0, y: 0 };
     let innerScrollAt = 0;
-    let reset: ReturnType<typeof setTimeout> | null = null, pinchEnd: ReturnType<typeof setTimeout> | null = null;
+    let reset: ReturnType<typeof setTimeout> | null = null;
     const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
+      e.preventDefault(); // also swallows trackpad pinch (ctrl+wheel): no page zoom here
       introRef.current?.skip();
-      if (e.ctrlKey) {
-        if (sRef.current < 1 || lockedRef.current) return;
-        gestureRef.current = true;
-        cancelAnimationFrame(ovAnim.current);
-        const v = clamp01(ovRef.current + e.deltaY / 190);
-        ovRef.current = v; setOv(v);
-        if (pinchEnd) clearTimeout(pinchEnd);
-        pinchEnd = setTimeout(() => { gestureRef.current = false; setLock(true); animateOv(ovRef.current > 0.5 ? 1 : 0, () => setLock(false)); }, 220);
-        return;
-      }
-      if (lockedRef.current || gestureRef.current || ovRef.current > 0) return;
+      if (e.ctrlKey || lockedRef.current || mapOpenRef.current) return;
       // Vertical wheel over a cell that can still scroll that way: let it scroll,
       // and hold off grid moves briefly so trackpad momentum doesn't spill over.
       if (sRef.current >= 1 && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
@@ -627,9 +543,9 @@ export function SheetHome() {
       else if (ay > ax && ay > 90) { const d = acc.y; acc.x = acc.y = 0; if (d > 0) goDown(); else goUp(); }
     };
     window.addEventListener('wheel', onWheel, { passive: false });
-    return () => { window.removeEventListener('wheel', onWheel); if (reset) clearTimeout(reset); if (pinchEnd) clearTimeout(pinchEnd); };
+    return () => { window.removeEventListener('wheel', onWheel); if (reset) clearTimeout(reset); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animateOv]);
+  }, []);
 
   // ── Touch inside a scrollable cell: native scroll until its edge, then the grid ──
   useEffect(() => {
@@ -660,35 +576,6 @@ export function SheetHome() {
     return () => { window.removeEventListener('touchstart', onStart, { capture: true }); window.removeEventListener('touchmove', onMove, { capture: true }); };
   }, []);
 
-  // ── Touch pinch → overview (sheet open) ──
-  useEffect(() => {
-    const pinch = { active: false, d0: 0, p0: 0 };
-    const dist = (t: TouchList) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-    const onStart = (e: TouchEvent) => {
-      if (e.touches.length >= 2 && sRef.current >= 1 && !lockedRef.current) {
-        gestureRef.current = true; cancelAnimationFrame(ovAnim.current);
-        Object.assign(pinch, { active: true, d0: dist(e.touches), p0: ovRef.current });
-        drag.current = null;
-      }
-    };
-    const onMove = (e: TouchEvent) => {
-      if (!pinch.active || e.touches.length < 2) return;
-      e.preventDefault();
-      const v = clamp01(pinch.p0 + (1 - dist(e.touches) / pinch.d0) * 3.4);
-      ovRef.current = v; setOv(v);
-    };
-    const onEnd = (e: TouchEvent) => {
-      if (!pinch.active || e.touches.length >= 2) return;
-      pinch.active = false; gestureRef.current = false;
-      setLock(true); animateOv(ovRef.current > 0.5 ? 1 : 0, () => setLock(false));
-    };
-    window.addEventListener('touchstart', onStart, { passive: true });
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend', onEnd, { passive: true });
-    return () => { window.removeEventListener('touchstart', onStart); window.removeEventListener('touchmove', onMove); window.removeEventListener('touchend', onEnd); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animateOv]);
-
   // ── Pointer: drag the sheet, or swipe the grid ──
   // Closed: a vertical drag anywhere (hats stop their own events) scrubs the
   // sheet up. Open: on the top row, dragging down scrubs it closed; every other
@@ -702,19 +589,19 @@ export function SheetHome() {
   };
   const onPointerDown = (e: React.PointerEvent) => {
     suppressClick.current = false;
-    if (!e.isPrimary || gestureRef.current) return;
+    if (!e.isPrimary) return;
     introRef.current?.skip();
     drag.current = { x: e.clientX, y: e.clientY, t: performance.now(), s0: sRef.current, mode: null, lastY: e.clientY, lastT: performance.now(), vy: 0 };
   };
   const onPointerMove = (e: React.PointerEvent) => {
     const d = drag.current;
-    if (!d || !e.isPrimary || gestureRef.current) return;
+    if (!d || !e.isPrimary) return;
     const dx = e.clientX - d.x, dy = e.clientY - d.y;
     const now = performance.now();
     d.vy = (e.clientY - d.lastY) / Math.max(1, now - d.lastT); d.lastY = e.clientY; d.lastT = now;
     if (d.mode === null && Math.hypot(dx, dy) > 8) {
       const vertical = Math.abs(dy) > Math.abs(dx);
-      if (ovRef.current > 0) d.mode = 'none';
+      if (mapOpenRef.current) d.mode = 'none';
       else if (sRef.current < 1) d.mode = vertical && !lockedRef.current ? 'sheet' : 'none';
       else if (vertical && canScroll(e.target, dy < 0 ? 1 : -1)) d.mode = 'none';
       else d.mode = vertical && dy > 0 && posRef.current.row === 0 && !lockedRef.current ? 'sheet' : 'grid';
@@ -739,16 +626,6 @@ export function SheetHome() {
       else animateSheet(0);
       return;
     }
-    if (d.mode === null) {
-      // A tap in the settled overview picks a cell.
-      if (ovRef.current === 1 && !lockedRef.current && clipRef.current) {
-        const r = clipRef.current.getBoundingClientRect();
-        const c = Math.floor((e.clientX - r.left) / (r.width / 3));
-        const row = Math.floor((e.clientY - r.top - r.height / 6) / (r.height / 3));
-        if (c >= 0 && c <= 2 && row >= 0 && row <= 1) pickCell({ row, col: c });
-      }
-      return;
-    }
     if (d.mode !== 'grid' || Math.max(Math.abs(dx), Math.abs(dy)) < DRAG_THRESHOLD) return;
     if (Math.abs(dx) > Math.abs(dy)) goSide(dx > 0 ? -1 : 1);
     else if (dy < 0) goDown();
@@ -759,48 +636,52 @@ export function SheetHome() {
   const sheetVisible = s > 0;
   // Hands start once the head is nearly at the edge (as in the prototype).
   const peekProgress = peekOverride ?? s;
-  // With the hat rack, the page's hat is the one he wears (the rack is the map);
-  // while a hat is flying up, he keeps the old one on until it lands.
-  const peekHat: WearableId = hatHold ?? (rackOn || chosenHat === 'me' ? CONTEXT_HAT[cellId] : chosenHat);
-  const chromeOn = isOpen && ov === 0;
+  const ownHat = chosenHat !== 'me';
+  const peekHat: WearableId = ownHat ? chosenHat : CONTEXT_HAT[cellId];
 
-  const draggingSheet = !!drag.current && drag.current.mode === 'sheet';
+  // Page change: no hat of your own → the page hats swap, leaving and arriving
+  // with the pages; your own hat → a glance the way you're going and a hat tip.
+  // (Declared before the frame effect below so the swap gets to the engine first.)
+  const prevCell = useRef(cellId);
+  useEffect(() => {
+    if (prevCell.current === cellId) return;
+    prevCell.current = cellId;
+    const engine = engineRef.current;
+    if (!engine || sRef.current < 1) return;
+    const dir = navDir.current;
+    if (dir.x) engine.glance(dir.x);
+    if (ownHat) engine.tipHat();
+    else engine.displayHat(CONTEXT_HAT[cellId], dir);
+  }, [cellId, ownHat]);
+
   useEffect(() => {
     const stage = heroRef.current?.querySelector<HTMLElement>('.hats-hero');
     const text = heroRef.current?.querySelector<HTMLElement>('.hh-text');
     const engine = engineRef.current;
     if (!stage) return;
-    const vw = window.innerWidth, half = geo.w / 2;
-    const colX = [half + 18, vw / 2, vw - half - 18][actual.col] ?? vw / 2;
+    const colX = window.innerWidth / 2; // he stays centred
     // Deep-link arrival: rise from behind the sheet on its own timeline.
     const rise = peekOverride !== null ? (1 - easeOutBackLocal(clamp01(peekOverride / 0.55))) * geo.headH : 0;
     const p = Math.min(1.05, s);
     const x = (colX - geo.cx) * Math.min(1, s), y = geo.dy * p + rise;
     curOffset.current = { x, y };
     stage.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
-    // Column moves glide; drags and the sheet tween are already frame-by-frame.
-    stage.style.transition = s >= 1 && !draggingSheet && peekOverride === null && !reduce ? 'transform .46s cubic-bezier(.45, 0, .2, 1)' : 'none';
+    stage.style.transition = 'none'; // driven frame-by-frame by the sheet
     if (text) text.style.opacity = String(clamp01(1 - s * 1.8));
     if (engine) {
       engine.setPeek(s);
       engine.setOverview(s > 0 ? 0.5 : 0);
-      engine.setPeekLive(isOpen && ov === 0 && peekOverride === null);
+      engine.setPeekLive(isOpen && peekOverride === null);
       engine.displayHat(s >= 1 ? peekHat : null);
     }
   });
-  const prevColRef = useRef(actual.col);
-  useEffect(() => {
-    if (isOpen && prevColRef.current !== actual.col) engineRef.current?.glance(actual.col - prevColRef.current);
-    prevColRef.current = actual.col;
-  }, [actual.col, isOpen]);
-  const transition = noTransition || gestureRef.current || ov > 0 ? 'none' : `transform ${NAV_MS}ms ${NAV_EASE}`;
-  const heroK = s;
+  const transition = noTransition ? 'none' : `transform ${NAV_MS}ms ${NAV_EASE}`;
 
   return (
     <HeroBridgeContext.Provider value={bridge}>
       <div
-        className="fixed inset-0 overflow-hidden bg-background select-none"
-        style={{ touchAction: 'none' }}
+        className="sh-root fixed inset-0 overflow-hidden bg-background select-none"
+        style={{ touchAction: 'none', ...themeVars(chosenHat) }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -816,105 +697,60 @@ export function SheetHome() {
       >
         {/* Hero backdrop. As the sheet rises, the portrait slides behind it until
             only his head shows above the edge (see the peek effect above). */}
+        {/* A chosen hat's soft glow behind his head. */}
+        <div className={`sh-glow${ownHat && s > 0 ? ' on' : ''}`} aria-hidden="true" />
         <div ref={heroRef} className={`sh-hero${s > 0 ? ' peeking' : ''}`} aria-hidden={s > 0.5} style={{ pointerEvents: s > 0 ? 'none' : undefined }}>
           <HeroPane onEngine={onEngine} />
         </div>
 
         {/* The sheet */}
-        <div className={`sh-sheet navmode-${navMode}${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)` }}>
+        <div className={`sh-sheet${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)` }}>
           <SheetPeek
             handsOnly
             width={geo.w}
             progress={peekProgress}
-            col={actual.col}
+            col={1}
             hat={peekHat}
-            active={isOpen && ov === 0}
+            active={isOpen}
             showTip={homeTip}
             onHome={() => closeRef.current()}
+            onHatFling={ownHat ? (dx, dy) => { drag.current = null; engineRef.current?.takeOff(dx, dy); } : undefined}
           />
           <div ref={clipRef} className="sh-clip" aria-hidden={!sheetVisible}>
             {/* Zoomed out a touch at rest, growing to full size as the sheet rises:
                 the bar and the open sheet are the same surface. */}
-            <div className="absolute inset-0" style={{ transformOrigin: '50% 0', transform: s < 1 ? `scale(${lerp(barScale(size.W), 1, s).toFixed(4)})` : undefined }}>
+            {/* While the map is open the page steps down and back to make room. */}
+            <div
+              className={`sh-page-stage absolute inset-0${mapRoom ? ' making-room' : ''}`}
+              style={{ transformOrigin: '50% 0', transform: s < 1 ? `scale(${lerp(barScale(size.W), 1, s).toFixed(4)})` : mapRoom ? `translateY(${mapRoom}px) scale(.94)` : undefined }}
+            >
             <div
               ref={el => { if (el) el.inert = !isOpen; }}
               className="absolute"
-              style={{ width: '500%', height: '200%', transformOrigin: '0 0', transform: worldTransform(pos.col, pos.row, ov, size.W, size.H), transition, willChange: 'transform' }}
+              style={{ width: '500%', height: '200%', transform: worldTransform(pos.col, pos.row, size.W, size.H), transition, willChange: 'transform' }}
             >
               <SheetWorld />
-              {ov > 0 && [0, 1].flatMap(r => [0, 1, 2].map(c => {
-                const key = `${r}-${c}`, hovered = hoverCell === key, active = actual.row === r && actual.col === c;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    tabIndex={ov === 1 ? 0 : -1}
-                    aria-label={`Go to ${GRID[r][c].label}`}
-                    className="sh-ov-cell"
-                    style={{ left: `${(c + 1) * 20}%`, top: `${r * 50}%`, opacity: ov, pointerEvents: ov === 1 ? 'auto' : 'none' }}
-                    onMouseEnter={() => setHoverCell(key)} onMouseLeave={() => setHoverCell(null)}
-                    onClick={() => pickCell({ row: r, col: c })}
-                  >
-                    <span className={`sh-ov-dot${active ? ' on' : ''}`} />
-                    <span className={`sh-ov-label${hovered ? ' on' : ''}`}>{GRID[r][c].label}</span>
-                  </button>
-                );
-              }))}
             </div>
             </div>
+            <button type="button" className={`sh-map-scrim${mapOpen ? ' on' : ''}`} tabIndex={-1} aria-hidden="true" onClick={() => setMapOpen(false)} />
             {/* Tap target + handle; the handle fades as his head arrives. */}
             <div className="sh-bar-wrap" style={{ opacity: 1 - seg(s, 0, 0.35), pointerEvents: s > 0.05 ? 'none' : undefined, visibility: s >= 0.35 ? 'hidden' : undefined }}>
               <BarButton onOpen={() => openRef.current()} />
             </div>
           </div>
 
-          {/* Edge labels inside the sheet */}
-          {chromeOn && (
-            <>
-              {(['left', 'right'] as const).map(side => {
-                const c = mod(actual.col + (side === 'left' ? -1 : 1), 3);
-                return (
-                  <button key={side} type="button" className={`sh-edge sh-edge-${side}`} onClick={() => goSide(side === 'left' ? -1 : 1)} aria-label={`Go to ${GRID[actual.row][c].label}`}>
-                    <span className="sh-tri" style={{ transform: `rotate(${side === 'left' ? -90 : 90}deg)` }} />
-                    <span style={{ writingMode: 'vertical-rl' }}>{GRID[actual.row][c].label}</span>
-                  </button>
-                );
-              })}
-              {actual.row === 0 ? (
-                <button type="button" className="sh-edge sh-edge-down" onClick={goDown} aria-label={`Go to ${GRID[1][actual.col].label}`}>
-                  <span>{GRID[1][actual.col].label}</span><span className="sh-tri" style={{ transform: 'rotate(180deg)' }} />
-                </button>
-              ) : (
-                <button type="button" className={`sh-edge sh-edge-up ${actual.col === 2 ? 'at-left' : 'at-right'}`} onClick={goUp} aria-label={`Go to ${GRID[0][actual.col].label}`}>
-                  <span className="sh-tri" /><span>{GRID[0][actual.col].label}</span>
-                </button>
-              )}
-            </>
-          )}
-          {rackOn && chromeOn && <HatShelf rows={shelfRows} current={actual} away={hatAway} onPick={rackPick} />}
-          {handleOn && isOpen && (
-            <HandleMap
+          {isOpen && (
+            <PageMap
               current={actual}
-              labels={GRID.map(row => row.map(c => c.label))}
-              x={[geo.w / 2 + 18, size.W / 2, size.W - geo.w / 2 - 18][actual.col] ?? size.W / 2}
-              open={ov > 0}
-              onToggle={toggleOverview}
+              cells={MAP_CELLS}
+              open={mapOpen}
+              onToggle={open => { introRef.current?.skip(); setMapOpen(open); }}
               onPick={pickCell}
+              onHeight={setMapRoom}
             />
           )}
         </div>
 
-        {chromeOn && navMode === 'compass' && <SheetCompass pos={actual} onPick={pickCell} />}
-
-        {introHint && (
-          <div className="sh-hint" aria-hidden="true">
-            <span className="md:hidden">swipe to explore · tap me to go home</span>
-            <span className="hidden md:inline">scroll · drag · arrow keys · click my head to go home</span>
-          </div>
-        )}
-        {ov > 0 && !introHint && (
-          <div className="sh-hint" style={{ opacity: seg(ov, 0.6, 1) }} aria-hidden="true">pinch out · esc · tap to go</div>
-        )}
       </div>
     </HeroBridgeContext.Provider>
   );

@@ -21,7 +21,7 @@ function Learning({ className = '' }: { className?: string }) {
 
 export function StackPanel() {
   return (
-    <div className="stk w-full h-full flex flex-col bg-background px-1 md:px-10 lg:px-14 pt-1 md:pt-4 pb-[var(--nav-reserve,80px)] md:pb-6">
+    <div className="stk w-full h-full flex flex-col bg-background px-1 md:px-10 lg:px-14 pt-1 md:pt-4 pb-1 md:pb-6">
       <header className="flex-none flex items-end justify-between gap-6">
         <div className="min-w-0">
           <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase mb-2">Tools &amp; Stack</p>
