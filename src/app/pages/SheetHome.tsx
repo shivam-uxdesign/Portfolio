@@ -501,9 +501,17 @@ export function SheetHome() {
     const acc = { x: 0, y: 0 };
     let innerScrollAt = 0;
     let reset: ReturnType<typeof setTimeout> | null = null;
+    // One swipe = one move. A trackpad keeps firing fading "momentum" events for a
+    // second or two after the fingers lift; once a swipe has moved the page, the
+    // rest of that stream is ignored until it goes quiet (a pause) or picks up
+    // speed again (a genuinely new swipe).
+    let spent = false, lastT = 0, lastMag = 0;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault(); // also swallows trackpad pinch (ctrl+wheel): no page zoom here
-      if (e.ctrlKey || lockedRef.current || mapOpenRef.current) return;
+      const now = performance.now(), mag = Math.max(Math.abs(e.deltaX), Math.abs(e.deltaY));
+      if (spent && (now - lastT > 220 || (mag > lastMag * 1.6 && mag > 14))) spent = false;
+      lastT = now; lastMag = mag;
+      if (spent || e.ctrlKey || lockedRef.current || mapOpenRef.current) return;
       // Vertical wheel over a cell that can still scroll that way: let it scroll,
       // and hold off grid moves briefly so trackpad momentum doesn't spill over.
       if (sRef.current >= 1 && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
@@ -519,12 +527,12 @@ export function SheetHome() {
       reset = setTimeout(() => { acc.x = 0; acc.y = 0; }, 350);
       const ax = Math.abs(acc.x), ay = Math.abs(acc.y);
       if (sRef.current === 0) {
-        if (ay > ax && acc.y > 90) { acc.x = acc.y = 0; openRef.current(); }
+        if (ay > ax && acc.y > 90) { acc.x = acc.y = 0; spent = true; openRef.current(); }
         return;
       }
       if (sRef.current < 1) return;
-      if (ax > ay && ax > 90) { const d = acc.x > 0 ? 1 : -1; acc.x = acc.y = 0; goSide(d); }
-      else if (ay > ax && ay > 90) { const d = acc.y; acc.x = acc.y = 0; if (d > 0) goDown(); else goUp(); }
+      if (ax > ay && ax > 90) { const d = acc.x > 0 ? 1 : -1; acc.x = acc.y = 0; spent = true; goSide(d); }
+      else if (ay > ax && ay > 90) { const d = acc.y; acc.x = acc.y = 0; spent = true; if (d > 0) goDown(); else goUp(); }
     };
     window.addEventListener('wheel', onWheel, { passive: false });
     return () => { window.removeEventListener('wheel', onWheel); if (reset) clearTimeout(reset); };
