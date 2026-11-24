@@ -8,24 +8,24 @@ import './hats.css';
 // Hero: the portrait cropped just under the glasses, wearing the current hat,
 // two hands gripping the edge. Tapping the head goes back to Hero.
 
-const VIEWBOX = '0 -24 800 518'; // everything above the glasses' lower edge (y≈494), plus headroom for tall hats
-const VB_RATIO = 518 / 800;
-const TIMELINE_MS = 700;
+export const VIEWBOX = '0 -24 800 518'; // everything above the glasses' lower edge (y≈494), plus headroom for tall hats
+export const VB_RATIO = 518 / 800;
+export const TIMELINE_MS = 700;
 const HEAD_START = { transform: 'translateY(100%)' };
 
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const cl = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-const seg = (p: number, a: number, b: number) => cl((p - a) / (b - a));
-const easeOutBack = (x: number) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * (x - 1) ** 3 + c1 * (x - 1) ** 2; };
+export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+export const cl = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+export const seg = (p: number, a: number, b: number) => cl((p - a) / (b - a));
+export const easeOutBack = (x: number) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * (x - 1) ** 3 + c1 * (x - 1) ** 2; };
 
-function handSvg(clipId: string, mirrored: boolean) {
+export function handSvg(clipId: string, mirrored: boolean) {
   const finger = (x: number) => `<g class="fg" data-x="${x + 8}"><rect x="${x}" y="10" width="16" height="48" rx="8" fill="#F2B48C"/><path d="M${x + 2} 38 h12" stroke="#E3A07B" stroke-width="2" stroke-linecap="round"/><ellipse cx="${x + 8}" cy="18" rx="5" ry="4.5" fill="#F8D3BB"/></g>`;
   return `<svg class="wp-hand" viewBox="0 0 90 120" aria-hidden="true"${mirrored ? ' style="transform:scaleX(-1)"' : ''}><defs><clipPath id="${clipId}"><rect x="-40" y="-80" width="170" height="160"/></clipPath></defs>`
     + `<g clip-path="url(#${clipId})"><g class="hg"><rect x="8" y="48" width="74" height="68" rx="22" fill="#F2B48C"/><ellipse cx="44" cy="80" rx="24" ry="18" fill="#F7C9A8"/><rect x="72" y="60" width="16" height="36" rx="8" fill="#E9A985" transform="rotate(24 80 78)"/></g></g>`
     + `<g class="hg">${[10, 28, 46, 64].map(finger).join('')}</g></svg>`;
 }
 
-const prefersReducedMotion = () =>
+export const prefersReducedMotion = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 export function WorkPeek({ onBackToHero }: { onBackToHero: () => void }) {

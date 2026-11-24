@@ -1,0 +1,101 @@
+/* Sheet home: hero backdrop + 20/80 sheet with a 3×2 grid. */
+
+.sh-hero {
+  position: absolute; left: 0; right: 0; top: 0; height: 80%;
+  padding: 28px 24px 8px; box-sizing: border-box;
+  transform-origin: 50% 0; will-change: transform, opacity;
+}
+@media (min-width: 768px) { .sh-hero { padding: 36px 48px 12px; } }
+
+.sh-sheet {
+  position: absolute; left: 0; right: 0; top: 20%; height: 80%; z-index: 20;
+  will-change: transform;
+}
+.sh-clip {
+  position: absolute; inset: 0; overflow: hidden;
+  background: var(--background);
+  border-top: 1px solid var(--border); border-radius: 28px 28px 0 0;
+  box-shadow: 0 -24px 48px -28px rgba(20, 20, 18, .35);
+}
+
+/* Resting bar (the top 25% of the sheet = 20% of the screen) */
+.sh-teaser-wrap { position: absolute; left: 0; right: 0; top: 0; height: 25%; background: var(--background); z-index: 2; }
+.sh-teaser {
+  position: absolute; inset: 0; width: 100%; display: flex; flex-direction: column; align-items: stretch;
+  padding: 10px 24px 0; border: 0; background: none; cursor: grab; text-align: left; color: inherit;
+  -webkit-tap-highlight-color: transparent; overflow: hidden;
+}
+.sh-teaser:focus-visible { outline: 2px solid var(--ring); outline-offset: -4px; border-radius: 28px 28px 0 0; }
+.sh-handle { align-self: center; width: 40px; height: 4px; border-radius: 4px; background: var(--border); margin-bottom: 10px; flex: none; }
+.sh-teaser-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: none; max-width: 980px; width: 100%; margin: 0 auto; }
+.sh-teaser-text { display: flex; flex-direction: column; }
+.sh-teaser-title { font-size: 17px; font-weight: 600; letter-spacing: -.02em; color: var(--foreground); }
+.sh-teaser-sub { font-size: 11px; color: var(--muted-foreground); }
+.sh-teaser-arrow {
+  width: 32px; height: 32px; border-radius: 999px; border: 1px solid var(--border); display: grid; place-items: center;
+  font-size: 14px; color: var(--foreground);
+}
+@media (prefers-reduced-motion: no-preference) { .sh-teaser-arrow { animation: sh-nudge 2.4s ease-in-out infinite; } }
+.sh-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px auto 0; width: 100%; max-width: 980px; flex: 1 1 auto; min-height: 40px; }
+.sh-thumb { position: relative; border-radius: 12px 12px 0 0; overflow: hidden; outline: 1px solid rgba(0,0,0,.06); outline-offset: -1px; height: 200px; }
+.sh-thumb-inner { position: absolute; left: 0; top: 0; width: 200%; height: 200%; transform: scale(.5); transform-origin: 0 0; }
+
+/* Overview overlay cells */
+.sh-ov-cell { position: absolute; width: 20%; height: 50%; border: 3px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.sh-ov-cell:focus-visible { outline: 6px solid var(--ring); outline-offset: -6px; }
+.sh-ov-dot { position: absolute; top: 21px; right: 21px; width: 18px; height: 18px; border-radius: 999px; background: var(--primary); opacity: 0; transition: opacity .28s; }
+.sh-ov-dot.on { opacity: 1; }
+.sh-ov-label {
+  font-size: 27px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #fff;
+  background: rgba(20, 20, 18, .55); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .28s;
+}
+.sh-ov-label.on { opacity: 1; }
+
+/* Edge labels inside the sheet */
+.sh-edge {
+  position: absolute; z-index: 5; display: flex; align-items: center; gap: 8px; padding: 6px; border: 0; background: none; cursor: pointer;
+  font-size: 9px; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; color: color-mix(in oklab, var(--foreground) 65%, transparent);
+}
+.sh-edge:hover { color: var(--foreground); }
+.sh-edge:focus-visible { outline: 2px solid var(--ring); border-radius: 6px; }
+.sh-edge-left { left: 10px; top: 50%; transform: translateY(-50%); flex-direction: column; }
+.sh-edge-right { right: 10px; top: 50%; transform: translateY(-50%); flex-direction: column-reverse; }
+.sh-edge-down { bottom: 10px; left: 50%; transform: translateX(-50%); flex-direction: column; }
+.sh-edge-up { top: 10px; flex-direction: column; }
+.sh-edge-up.at-right { right: 64px; }
+.sh-edge-up.at-left { left: 64px; }
+.sh-tri { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid currentColor; }
+
+.sh-compass {
+  position: fixed; bottom: 24px; right: 24px; z-index: 50; border-radius: 16px; padding: 6px;
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  background: rgba(255, 255, 255, .85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 12px 28px -14px rgba(20, 20, 18, .25);
+}
+
+.sh-hint {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 60; pointer-events: none;
+  padding: 7px 14px; border-radius: 999px; font-size: 11px; letter-spacing: .04em; color: var(--muted-foreground);
+  background: rgba(255, 255, 255, .88); backdrop-filter: blur(14px); border: 1px solid var(--border); white-space: nowrap;
+}
+
+/* The head on the sheet's top edge */
+.work-peek.sheet-peek {
+  bottom: 100%; top: auto; left: 50%; z-index: 4;
+  --pw: clamp(108px, 14vw, 176px);
+  width: var(--pw);
+  transition: left .46s cubic-bezier(.45, 0, .2, 1), opacity .2s;
+}
+.sp-tip {
+  position: absolute; bottom: 38%; white-space: nowrap; pointer-events: none;
+  font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 999px; background: var(--foreground); color: var(--background);
+  opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s;
+}
+.sp-tip-right { left: 100%; margin-left: 4px; }
+.sp-tip-left { right: 100%; margin-right: 4px; }
+.sp-tip.on { opacity: 1; transform: none; }
+
+@keyframes sh-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .work-peek.sheet-peek { transition: none; } }

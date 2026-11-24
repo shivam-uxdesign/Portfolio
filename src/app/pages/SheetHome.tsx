@@ -1,0 +1,664 @@
+import { memo, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { motion } from 'motion/react';
+import { trackEvent } from '../../lib/analytics';
+import { HatsHero } from '../components/hats/HatsHero';
+import { SheetPeek } from '../components/hats/SheetPeek';
+import { HATS, PAL, type WearableId } from '../components/hats/hatsData';
+import type { HatId } from '../components/hats/props';
+import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
+import { PROJECTS, WorkCell, AboutCell, GalleryCell, ContactCell, ResumeCell, StackCell } from './Home';
+import './sheet.css';
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+// The hero is a fixed backdrop (not a grid cell). A sheet rests as a 20% bar at
+// the bottom; slide it up and it takes 80% of the screen, with Shivam hanging
+// on its top edge. Inside the sheet: a 3×2 grid, wrapping left/right only.
+
+type SheetCellId = 'about' | 'work' | 'resume' | 'gallery' | 'contact' | 'stack';
+type Pos = { row: number; col: number };
+
+const GRID: { id: SheetCellId; label: string }[][] = [
+  [{ id: 'about', label: 'About' }, { id: 'work', label: 'Work' }, { id: 'resume', label: 'Resume' }],
+  [{ id: 'gallery', label: 'Off the clock' }, { id: 'contact', label: 'Contact' }, { id: 'stack', label: 'Stack' }],
+];
+const START: Pos = { row: 0, col: 1 }; // opening the sheet lands on Work
+
+// Hat he wears on each cell, unless the visitor already picked one on the hero.
+const CONTEXT_HAT: Record<SheetCellId, HatId> = {
+  work: 'notes', about: 'cat', resume: 'helmet', gallery: 'beret', contact: 'party', stack: 'propeller',
+};
+
+const NAV_MS = 600;
+const NAV_EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
+const DRAG_THRESHOLD = 55;
+const SHEET_MS = 520;
+
+const mod = (n: number, m: number) => ((n % m) + m) % m;
+const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
+const seg = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
+const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+function findCell(id: string): Pos | null {
+  for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) if (GRID[r][c].id === id) return { row: r, col: c };
+  return null;
+}
+
+// World = 5 columns (3 real + a clone each side for wraparound) × 2 rows.
+// Interpolates the visible world rect (cell → whole 3×2) so the zoom stays centred.
+function worldTransform(col: number, row: number, ov: number, W: number, H: number) {
+  const x = lerp((col + 1) * W, W, ov), y = lerp(row * H, -H / 2, ov), w = lerp(W, 3 * W, ov);
+  const k = W / w;
+  return `translate(${(-k * x).toFixed(2)}px, ${(-k * y).toFixed(2)}px) scale(${k.toFixed(5)})`;
+}
+
+// ─── Cells ────────────────────────────────────────────────────────────────────
+function CellContent({ id }: { id: SheetCellId }) {
+  switch (id) {
+    case 'work': return <WorkCell />;
+    case 'about': return <AboutCell />;
+    case 'resume': return <ResumeCell />;
+    case 'gallery': return <GalleryCell />;
+    case 'contact': return <ContactCell />;
+    case 'stack': return <StackCell />;
+  }
+}
+
+const SheetWorld = memo(function SheetWorld() {
+  return (
+    <>
+      {[0, 1].flatMap(r => [-1, 0, 1, 2, 3].map(pc => {
+        const cell = GRID[r][mod(pc, 3)];
+        const isReal = pc >= 0 && pc <= 2;
+        return (
+          <div
+            key={`${r}:${pc}`}
+            ref={el => { if (el) el.inert = !isReal; }}
+            className="absolute overflow-hidden"
+            style={{ left: `${(pc + 1) * 20}%`, top: `${r * 50}%`, width: '20%', height: '50%' }}
+          >
+            {/* Safe zone: keeps content clear of the sheet's edge labels and the Compass. */}
+            <div className="w-full h-full box-border pt-9 pl-9 pr-14 pb-14 md:pt-11 md:pl-11 md:pr-16 md:pb-16">
+              <CellContent id={cell.id} />
+            </div>
+          </div>
+        );
+      }))}
+    </>
+  );
+});
+
+// ─── Hero (backdrop) ──────────────────────────────────────────────────────────
+const HeroPane = memo(function HeroPane() {
+  const [isNameHovered, setIsNameHovered] = useState(false);
+  const bridge = useHeroBridgeStore();
+  const heroActive = useHeroBridge(s => s.heroActive);
+  const hat = useHeroBridge(s => s.hat);
+  const [shownHat, setShownHat] = useState<WearableId>(hat);
+  const [swapping, setSwapping] = useState(false);
+  useEffect(() => {
+    if (hat === shownHat) return;
+    if (reducedMotion()) { setShownHat(hat); return; }
+    setSwapping(true);
+    const t = setTimeout(() => { setShownHat(hat); setSwapping(false); }, 200);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hat]);
+  const info = HATS.find(h => h.id === shownHat);
+  const onHatChange = useCallback((h: WearableId) => bridge.set({ hat: h }), [bridge]);
+  const onWear = useCallback((h: string) => trackEvent('hat_worn', { hat: h }), []);
+
+  return (
+    <div className="hh-cell w-full h-full flex flex-col items-center justify-center gap-3 md:gap-4 select-text overflow-hidden">
+      <div className="hh-text order-1 md:order-2 flex-shrink-0 flex flex-col items-center text-center w-full" style={{ '--hh-accent': PAL[hat].accent } as React.CSSProperties}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
+          className="text-[11px] font-medium tracking-[0.09em] text-muted-foreground uppercase mb-1">
+          Hey, I am
+        </motion.div>
+        <div className="overflow-hidden">
+          <motion.h1
+            initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            className="font-medium leading-[0.92] cursor-default relative"
+            style={{ fontSize: 'clamp(2.4rem, 7vw, 4rem)', color: 'var(--foreground)', letterSpacing: isNameHovered ? '0.01em' : '-0.04em', transition: 'letter-spacing 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
+            onMouseEnter={() => setIsNameHovered(true)} onMouseLeave={() => setIsNameHovered(false)}
+          >
+            Shivam
+          </motion.h1>
+        </div>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}
+          aria-live="polite"
+          className={`hh-tagline text-[13px] md:text-[14px] leading-snug text-muted-foreground mt-2 max-w-[34em] min-h-[2.9em]${swapping ? ' swap' : ''}`}
+        >
+          {info ? <><em>{info.name}.</em> {info.line}</> : <>A product designer who works from <em>strategy</em> to pixel. I wear a lot of hats.</>}
+        </motion.p>
+      </div>
+      <div className="hh-stage-wrap order-2 md:order-1 w-full">
+        <HatsHero isActive={heroActive} overviewProgress={0} onHatChange={onHatChange} onWear={onWear} />
+      </div>
+    </div>
+  );
+});
+
+// ─── Resting bar ──────────────────────────────────────────────────────────────
+const Teaser = memo(function Teaser({ onOpen }: { onOpen: () => void }) {
+  return (
+    <button type="button" className="sh-teaser" onClick={onOpen} aria-label={`Open my work: ${PROJECTS.length} case studies`}>
+      <span className="sh-handle" aria-hidden="true" />
+      <span className="sh-teaser-row">
+        <span className="sh-teaser-text">
+          <span className="sh-teaser-title">Work</span>
+          <span className="sh-teaser-sub">{PROJECTS.length} case studies · swipe up</span>
+        </span>
+        <span className="sh-teaser-arrow" aria-hidden="true">↑</span>
+      </span>
+      <span className="sh-thumbs" aria-hidden="true">
+        {PROJECTS.map(p => (
+          <span key={p.number} className="sh-thumb" style={{ background: p.bg }}>
+            <span className="sh-thumb-inner">{p.thumbnail}</span>
+          </span>
+        ))}
+      </span>
+    </button>
+  );
+});
+
+// ─── Compass (3×2) ────────────────────────────────────────────────────────────
+function SheetCompass({ pos, onPick }: { pos: Pos; onPick: (p: Pos) => void }) {
+  const [hovered, setHovered] = useState<string | null>(null);
+  return (
+    <div className="sh-compass" role="navigation" aria-label="Sections">
+      <div className="grid grid-cols-3 gap-0.5">
+        {[0, 1].flatMap(r => [0, 1, 2].map(c => {
+          const key = `${r}-${c}`, active = pos.row === r && pos.col === c;
+          return (
+            <div key={key} className="relative flex items-center justify-center">
+              {hovered === key && (
+                <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none z-10 text-[10px] font-medium tracking-[0.04em] px-2 py-1 rounded-md bg-foreground text-background shadow-lg">
+                  {GRID[r][c].label}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => onPick({ row: r, col: c })}
+                onMouseEnter={() => setHovered(key)} onMouseLeave={() => setHovered(null)}
+                onFocus={() => setHovered(key)} onBlur={() => setHovered(null)}
+                aria-label={`Go to ${GRID[r][c].label}`}
+                aria-current={active ? 'true' : undefined}
+                className="group relative rounded-full w-5 h-5 pointer-coarse:w-11 pointer-coarse:h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className={`rounded-full w-[7px] h-[7px] transition-all duration-200 ${active ? 'bg-primary scale-125' : 'bg-foreground/22 group-hover:bg-primary/55'}`} />
+              </button>
+            </div>
+          );
+        }))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+function initialPos(): Pos | null {
+  try { const h = window.location.hash.replace('#', ''); return h ? findCell(h) : null; } catch { return null; }
+}
+
+export function SheetHome() {
+  const [deepLink] = useState(initialPos);
+  const reduce = useRef(reducedMotion()).current;
+
+  // Sheet: 0 = resting bar, 1 = open.
+  const [s, setS] = useState(deepLink ? 1 : 0);
+  const sRef = useRef(s);
+  const sheetAnim = useRef(0);
+  // Grid position. col runs -1..3 (clones) during a wrap, rebased after.
+  const [pos, setPos] = useState<Pos>(deepLink ?? START);
+  const posRef = useRef(pos);
+  const [locked, setLocked] = useState(false);
+  const lockedRef = useRef(false);
+  const [noTransition, setNoTransition] = useState(false);
+  // Overview zoom inside the sheet.
+  const [ov, setOv] = useState(0);
+  const ovRef = useRef(0);
+  const ovAnim = useRef(0);
+  const gestureRef = useRef(false);
+  const [hoverCell, setHoverCell] = useState<string | null>(null);
+  // Sheet size for the world transform.
+  const clipRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ W: typeof window !== 'undefined' ? window.innerWidth : 1, H: typeof window !== 'undefined' ? window.innerHeight * 0.8 : 1 });
+  // Deep-link arrival: the head rises on its own timeline, then a "Home" tip.
+  const [peekOverride, setPeekOverride] = useState<number | null>(deepLink ? 0 : null);
+  const [homeTip, setHomeTip] = useState(false);
+  const [introHint, setIntroHint] = useState(false);
+  const pushedRef = useRef(false);
+
+  useEffect(() => { sRef.current = s; }, [s]);
+  useEffect(() => { posRef.current = pos; }, [pos]);
+  useEffect(() => { lockedRef.current = locked; }, [locked]);
+  const setLock = (v: boolean) => { lockedRef.current = v; setLocked(v); };
+
+  useEffect(() => {
+    const el = clipRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setSize({ W: el.offsetWidth || 1, H: el.offsetHeight || 1 }));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const actual: Pos = { row: pos.row, col: mod(pos.col, 3) };
+  const cellId = GRID[actual.row][actual.col].id;
+  const isOpen = s >= 1;
+
+  // ── Bridge for the hats ──
+  const [bridge] = useState(() => createHeroBridge({ settled: true, heroActive: !deepLink }));
+  // This component provides the bridge, so it reads the store directly.
+  const chosenHat = useSyncExternalStore(bridge.subscribe, () => bridge.get().hat, () => bridge.get().hat);
+  useEffect(() => { bridge.set({ heroActive: s === 0 && !lockedRef.current }); }, [bridge, s]);
+
+  // ── Sheet animation ──
+  const animateSheet = useCallback((to: 0 | 1, done?: () => void) => {
+    cancelAnimationFrame(sheetAnim.current);
+    const from = sRef.current;
+    if (reduce || from === to) { sRef.current = to; setS(to); done?.(); return; }
+    const t0 = performance.now(), dur = SHEET_MS * Math.max(0.35, Math.abs(to - from));
+    const step = (now: number) => {
+      const t = clamp01((now - t0) / dur), v = from + (to - from) * easeOutCubic(t);
+      sRef.current = v; setS(v);
+      if (t < 1) sheetAnim.current = requestAnimationFrame(step);
+      else done?.();
+    };
+    sheetAnim.current = requestAnimationFrame(step);
+  }, [reduce]);
+
+  // ── Overview animation ──
+  const animateOv = useCallback((to: 0 | 1, done?: () => void, ms = 620) => {
+    cancelAnimationFrame(ovAnim.current);
+    const from = ovRef.current;
+    if (reduce) { ovRef.current = to; setOv(to); done?.(); return; }
+    const t0 = performance.now();
+    const step = (now: number) => {
+      const t = clamp01((now - t0) / ms), v = from + (to - from) * easeOutExpo(t);
+      ovRef.current = v; setOv(v);
+      if (t < 1) ovAnim.current = requestAnimationFrame(step);
+      else done?.();
+    };
+    ovAnim.current = requestAnimationFrame(step);
+  }, [reduce]);
+
+  // ── First open: zoom out to show the 3×2, then land on Work ──
+  const introRef = useRef<{ skip: () => void } | null>(null);
+  const runSheetIntro = useCallback(() => {
+    try { if (localStorage.getItem('hasSeenSheetIntro') || reduce) return; localStorage.setItem('hasSeenSheetIntro', '1'); } catch { return; }
+    setLock(true);
+    let done = false;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const finish = () => { if (done) return; done = true; timers.forEach(clearTimeout); setIntroHint(false); animateOv(0, () => setLock(false), 560); introRef.current = null; };
+    introRef.current = { skip: finish };
+    timers.push(setTimeout(() => animateOv(1, () => setIntroHint(true), 620), 250));
+    timers.push(setTimeout(finish, 2500));
+  }, [animateOv]);
+
+  // ── Open / close ──
+  const openSheet = useCallback(() => {
+    if (lockedRef.current && sRef.current < 1) { /* allow re-open during settle */ }
+    setLock(true);
+    trackEvent('sheet_open', {});
+    animateSheet(1, () => {
+      setLock(false);
+      if (!window.location.hash) { history.pushState({ sheet: 1 }, '', '#' + GRID[posRef.current.row][mod(posRef.current.col, 3)].id); pushedRef.current = true; }
+      runSheetIntro();
+    });
+  }, [animateSheet, runSheetIntro]);
+
+  const closeSheet = useCallback((fromHistory = false) => {
+    if (ovRef.current > 0) { cancelAnimationFrame(ovAnim.current); ovRef.current = 0; setOv(0); }
+    introRef.current?.skip();
+    setPeekOverride(null); setHomeTip(false);
+    setLock(true);
+    animateSheet(0, () => {
+      setLock(false);
+      // Next open lands on Work again.
+      posRef.current = START; setPos(START);
+      if (!fromHistory) {
+        if (pushedRef.current && history.state?.sheet) { pushedRef.current = false; history.back(); }
+        else history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    });
+  }, [animateSheet]);
+  const openRef = useRef(openSheet), closeRef = useRef(closeSheet);
+  useEffect(() => { openRef.current = openSheet; closeRef.current = closeSheet; }, [openSheet, closeSheet]);
+
+  // Back button closes the sheet; forward reopens it.
+  useEffect(() => {
+    const onPop = () => {
+      const p = initialPos();
+      if (!p && sRef.current > 0) closeRef.current(true);
+      else if (p && sRef.current === 0) { posRef.current = p; setPos(p); pushedRef.current = true; openRef.current(); }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Keep the hash on the current cell while open.
+  useEffect(() => {
+    if (!isOpen) return;
+    const next = '#' + cellId;
+    if (window.location.hash !== next) history.replaceState(history.state, '', window.location.pathname + window.location.search + next);
+    trackEvent('cell_view', { cell: cellId });
+  }, [isOpen, cellId]);
+
+  // Deep-link arrival: he rises once on his own, then the tip says what he's for.
+  useEffect(() => {
+    if (!deepLink) return;
+    if (reduce) { setPeekOverride(null); return; }
+    let raf = 0;
+    const t0 = performance.now() + 450;
+    const step = (now: number) => {
+      const t = clamp01((now - t0) / 700);
+      setPeekOverride(t);
+      if (t < 1) raf = requestAnimationFrame(step);
+      else { setPeekOverride(null); setHomeTip(true); setTimeout(() => setHomeTip(false), 2200); }
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [deepLink, reduce]);
+
+  // ── Grid navigation (sheet open only) ──
+  const navigateTo = useCallback((r: number, c: number) => {
+    if (lockedRef.current || gestureRef.current || ovRef.current > 0 || sRef.current < 1) return;
+    if (r < 0 || r > 1) return; // no vertical wrap
+    setLock(true);
+    setPos({ row: r, col: c });
+    if (c < 0 || c > 2) {
+      setTimeout(() => {
+        setNoTransition(true);
+        setPos({ row: r, col: mod(c, 3) });
+        requestAnimationFrame(() => requestAnimationFrame(() => { setNoTransition(false); setLock(false); }));
+      }, NAV_MS);
+    } else setTimeout(() => setLock(false), NAV_MS);
+  }, []);
+  const navRef = useRef(navigateTo);
+  useEffect(() => { navRef.current = navigateTo; }, [navigateTo]);
+
+  const pickCell = useCallback((p: Pos) => {
+    if (ovRef.current > 0) {
+      if (ovRef.current < 1 || lockedRef.current) return;
+      setLock(true); setHoverCell(null); setPos(p);
+      animateOv(0, () => setLock(false));
+      return;
+    }
+    if (lockedRef.current || sRef.current < 1) return;
+    setLock(true); setPos(p);
+    setTimeout(() => setLock(false), NAV_MS);
+  }, [animateOv]);
+
+  // Up from the top row = close the sheet.
+  const goUp = () => { const p = posRef.current; if (p.row === 0) closeRef.current(); else navRef.current(p.row - 1, p.col); };
+  const goDown = () => { const p = posRef.current; navRef.current(p.row + 1, p.col); };
+  const goSide = (d: number) => { const p = posRef.current; navRef.current(p.row, p.col + d); };
+
+  // ── Keyboard ──
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      introRef.current?.skip();
+      if (sRef.current === 0) {
+        if (['ArrowDown', 'PageDown'].includes(e.key) || (e.key === ' ' && t === document.body)) { e.preventDefault(); openRef.current(); }
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (ovRef.current > 0) { setLock(true); animateOv(0, () => setLock(false)); } else closeRef.current();
+        return;
+      }
+      if (e.key === 'Home') { e.preventDefault(); closeRef.current(); return; }
+      if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) || sRef.current < 1) return;
+      e.preventDefault();
+      if (e.key === 'ArrowUp') goUp();
+      if (e.key === 'ArrowDown') goDown();
+      if (e.key === 'ArrowLeft') goSide(-1);
+      if (e.key === 'ArrowRight') goSide(1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animateOv]);
+
+  // ── Wheel / trackpad ──
+  useEffect(() => {
+    const acc = { x: 0, y: 0 };
+    let reset: ReturnType<typeof setTimeout> | null = null, pinchEnd: ReturnType<typeof setTimeout> | null = null;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      introRef.current?.skip();
+      if (e.ctrlKey) {
+        if (sRef.current < 1 || lockedRef.current) return;
+        gestureRef.current = true;
+        cancelAnimationFrame(ovAnim.current);
+        const v = clamp01(ovRef.current + e.deltaY / 190);
+        ovRef.current = v; setOv(v);
+        if (pinchEnd) clearTimeout(pinchEnd);
+        pinchEnd = setTimeout(() => { gestureRef.current = false; setLock(true); animateOv(ovRef.current > 0.5 ? 1 : 0, () => setLock(false)); }, 220);
+        return;
+      }
+      if (lockedRef.current || gestureRef.current || ovRef.current > 0) return;
+      acc.x += e.deltaX; acc.y += e.deltaY;
+      if (reset) clearTimeout(reset);
+      reset = setTimeout(() => { acc.x = 0; acc.y = 0; }, 350);
+      const ax = Math.abs(acc.x), ay = Math.abs(acc.y);
+      if (sRef.current === 0) {
+        if (ay > ax && acc.y > 90) { acc.x = acc.y = 0; openRef.current(); }
+        return;
+      }
+      if (sRef.current < 1) return;
+      if (ax > ay && ax > 90) { const d = acc.x > 0 ? 1 : -1; acc.x = acc.y = 0; goSide(d); }
+      else if (ay > ax && ay > 90) { const d = acc.y; acc.x = acc.y = 0; if (d > 0) goDown(); else goUp(); }
+    };
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => { window.removeEventListener('wheel', onWheel); if (reset) clearTimeout(reset); if (pinchEnd) clearTimeout(pinchEnd); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animateOv]);
+
+  // ── Touch pinch → overview (sheet open) ──
+  useEffect(() => {
+    const pinch = { active: false, d0: 0, p0: 0 };
+    const dist = (t: TouchList) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    const onStart = (e: TouchEvent) => {
+      if (e.touches.length >= 2 && sRef.current >= 1 && !lockedRef.current) {
+        gestureRef.current = true; cancelAnimationFrame(ovAnim.current);
+        Object.assign(pinch, { active: true, d0: dist(e.touches), p0: ovRef.current });
+        drag.current = null;
+      }
+    };
+    const onMove = (e: TouchEvent) => {
+      if (!pinch.active || e.touches.length < 2) return;
+      e.preventDefault();
+      const v = clamp01(pinch.p0 + (1 - dist(e.touches) / pinch.d0) * 3.4);
+      ovRef.current = v; setOv(v);
+    };
+    const onEnd = (e: TouchEvent) => {
+      if (!pinch.active || e.touches.length >= 2) return;
+      pinch.active = false; gestureRef.current = false;
+      setLock(true); animateOv(ovRef.current > 0.5 ? 1 : 0, () => setLock(false));
+    };
+    window.addEventListener('touchstart', onStart, { passive: true });
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onEnd, { passive: true });
+    return () => { window.removeEventListener('touchstart', onStart); window.removeEventListener('touchmove', onMove); window.removeEventListener('touchend', onEnd); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animateOv]);
+
+  // ── Pointer: drag the sheet, or swipe the grid ──
+  // Closed: a vertical drag anywhere (hats stop their own events) scrubs the
+  // sheet up. Open: on the top row, dragging down scrubs it closed; every other
+  // swipe moves through the grid on release.
+  const drag = useRef<{ x: number; y: number; t: number; s0: number; mode: 'none' | 'sheet' | 'grid' | null; lastY: number; lastT: number; vy: number } | null>(null);
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (!e.isPrimary || gestureRef.current) return;
+    introRef.current?.skip();
+    drag.current = { x: e.clientX, y: e.clientY, t: performance.now(), s0: sRef.current, mode: null, lastY: e.clientY, lastT: performance.now(), vy: 0 };
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || !e.isPrimary || gestureRef.current) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    const now = performance.now();
+    d.vy = (e.clientY - d.lastY) / Math.max(1, now - d.lastT); d.lastY = e.clientY; d.lastT = now;
+    if (d.mode === null && Math.hypot(dx, dy) > 8) {
+      const vertical = Math.abs(dy) > Math.abs(dx);
+      if (ovRef.current > 0) d.mode = 'none';
+      else if (sRef.current < 1) d.mode = vertical && !lockedRef.current ? 'sheet' : 'none';
+      else d.mode = vertical && dy > 0 && posRef.current.row === 0 && !lockedRef.current ? 'sheet' : 'grid';
+      if (d.mode === 'sheet') { cancelAnimationFrame(sheetAnim.current); introRef.current?.skip(); }
+    }
+    if (d.mode === 'sheet') {
+      const v = clamp01(d.s0 - dy / (window.innerHeight * 0.6));
+      sRef.current = v; setS(v);
+    }
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    const d = drag.current;
+    drag.current = null;
+    if (!d || !e.isPrimary) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (d.mode === 'sheet') {
+      const v = sRef.current;
+      const open = d.s0 < 1 ? (v > 0.3 || d.vy < -0.45) && d.vy < 0.45 : !(v < 0.75 || d.vy > 0.45);
+      if (open) { if (d.s0 < 1) openRef.current(); else animateSheet(1); }
+      else if (d.s0 >= 1) closeRef.current();
+      else animateSheet(0);
+      return;
+    }
+    if (d.mode === null) {
+      // A tap in the settled overview picks a cell.
+      if (ovRef.current === 1 && !lockedRef.current && clipRef.current) {
+        const r = clipRef.current.getBoundingClientRect();
+        const c = Math.floor((e.clientX - r.left) / (r.width / 3));
+        const row = Math.floor((e.clientY - r.top - r.height / 6) / (r.height / 3));
+        if (c >= 0 && c <= 2 && row >= 0 && row <= 1) pickCell({ row, col: c });
+      }
+      return;
+    }
+    if (d.mode !== 'grid' || Math.max(Math.abs(dx), Math.abs(dy)) < DRAG_THRESHOLD) return;
+    if (Math.abs(dx) > Math.abs(dy)) goSide(dx > 0 ? -1 : 1);
+    else if (dy < 0) goDown();
+    else goUp();
+  };
+
+  // ── Render ──
+  const sheetVisible = s > 0;
+  const peekProgress = peekOverride ?? seg(s, 0.45, 1);
+  const peekHat: WearableId = chosenHat !== 'me' ? chosenHat : CONTEXT_HAT[cellId];
+  const chromeOn = isOpen && ov === 0;
+  const transition = noTransition || gestureRef.current || ov > 0 ? 'none' : `transform ${NAV_MS}ms ${NAV_EASE}`;
+  const heroK = s;
+
+  return (
+    <HeroBridgeContext.Provider value={bridge}>
+      <div
+        className="fixed inset-0 overflow-hidden bg-background select-none"
+        style={{ touchAction: 'none' }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={() => { drag.current = null; }}
+      >
+        {/* Hero backdrop: lives in the top 80%, lifts and fades as the sheet rises. */}
+        <div
+          className="sh-hero"
+          aria-hidden={s > 0.5}
+          style={{
+            // Portrait lifts away and is gone before his head appears on the sheet edge.
+            transform: `translateY(${(-seg(heroK, 0, 0.6) * 22).toFixed(2)}%) scale(${(1 - seg(heroK, 0, 0.6) * 0.08).toFixed(4)})`,
+            opacity: 1 - seg(s, 0.05, 0.42),
+            pointerEvents: s > 0 ? 'none' : undefined,
+            visibility: s >= 1 ? 'hidden' : undefined,
+          }}
+        >
+          <HeroPane />
+        </div>
+
+        {/* The sheet */}
+        <div className={`sh-sheet${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)` }}>
+          <SheetPeek
+            progress={peekProgress}
+            col={actual.col}
+            hat={peekHat}
+            active={isOpen && ov === 0}
+            showTip={homeTip}
+            onHome={() => closeRef.current()}
+          />
+          <div ref={clipRef} className="sh-clip" aria-hidden={!sheetVisible}>
+            <div
+              ref={el => { if (el) el.inert = !isOpen; }}
+              className="absolute"
+              style={{ width: '500%', height: '200%', transformOrigin: '0 0', transform: worldTransform(pos.col, pos.row, ov, size.W, size.H), transition, willChange: 'transform' }}
+            >
+              <SheetWorld />
+              {ov > 0 && [0, 1].flatMap(r => [0, 1, 2].map(c => {
+                const key = `${r}-${c}`, hovered = hoverCell === key, active = actual.row === r && actual.col === c;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    tabIndex={ov === 1 ? 0 : -1}
+                    aria-label={`Go to ${GRID[r][c].label}`}
+                    className="sh-ov-cell"
+                    style={{ left: `${(c + 1) * 20}%`, top: `${r * 50}%`, opacity: ov, pointerEvents: ov === 1 ? 'auto' : 'none' }}
+                    onMouseEnter={() => setHoverCell(key)} onMouseLeave={() => setHoverCell(null)}
+                    onClick={() => pickCell({ row: r, col: c })}
+                  >
+                    <span className={`sh-ov-dot${active ? ' on' : ''}`} />
+                    <span className={`sh-ov-label${hovered ? ' on' : ''}`}>{GRID[r][c].label}</span>
+                  </button>
+                );
+              }))}
+            </div>
+            {/* Resting bar content — fades as the sheet rises. */}
+            <div className="sh-teaser-wrap" style={{ opacity: 1 - seg(s, 0.02, 0.35), pointerEvents: s > 0.05 ? 'none' : undefined }}>
+              <Teaser onOpen={() => openRef.current()} />
+            </div>
+          </div>
+
+          {/* Edge labels inside the sheet */}
+          {chromeOn && (
+            <>
+              {(['left', 'right'] as const).map(side => {
+                const c = mod(actual.col + (side === 'left' ? -1 : 1), 3);
+                return (
+                  <button key={side} type="button" className={`sh-edge sh-edge-${side}`} onClick={() => goSide(side === 'left' ? -1 : 1)} aria-label={`Go to ${GRID[actual.row][c].label}`}>
+                    <span className="sh-tri" style={{ transform: `rotate(${side === 'left' ? -90 : 90}deg)` }} />
+                    <span style={{ writingMode: 'vertical-rl' }}>{GRID[actual.row][c].label}</span>
+                  </button>
+                );
+              })}
+              {actual.row === 0 ? (
+                <button type="button" className="sh-edge sh-edge-down" onClick={goDown} aria-label={`Go to ${GRID[1][actual.col].label}`}>
+                  <span>{GRID[1][actual.col].label}</span><span className="sh-tri" style={{ transform: 'rotate(180deg)' }} />
+                </button>
+              ) : (
+                <button type="button" className={`sh-edge sh-edge-up ${actual.col === 2 ? 'at-left' : 'at-right'}`} onClick={goUp} aria-label={`Go to ${GRID[0][actual.col].label}`}>
+                  <span className="sh-tri" /><span>{GRID[0][actual.col].label}</span>
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
+        {chromeOn && <SheetCompass pos={actual} onPick={pickCell} />}
+
+        {introHint && (
+          <div className="sh-hint" aria-hidden="true">
+            <span className="md:hidden">swipe to explore · tap me to go home</span>
+            <span className="hidden md:inline">scroll · drag · arrow keys · click my head to go home</span>
+          </div>
+        )}
+        {ov > 0 && !introHint && (
+          <div className="sh-hint" style={{ opacity: seg(ov, 0.6, 1) }} aria-hidden="true">pinch out · esc · tap to go</div>
+        )}
+      </div>
+    </HeroBridgeContext.Provider>
+  );
+}

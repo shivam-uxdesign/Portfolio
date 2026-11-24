@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router';
 import { RootLayout } from './components/RootLayout';
 import { ErrorPage } from './pages/ErrorPage';
-import { Home } from './pages/Home';
+import { SheetHome as Home } from './pages/SheetHome';
 import { GridPanelPage } from './pages/GridPanelPage';
 import { BMDashboardCaseStudy } from './pages/BMDashboardCaseStudy';
 import { DesignSystemCaseStudy } from './pages/DesignSystemCaseStudy';

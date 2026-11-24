@@ -168,7 +168,7 @@ function MobileAppThumbnail() {
 
 const MotionLink = motion.create(Link);
 
-const PROJECTS = [
+export const PROJECTS = [
   {
     title: 'Redesigned BM Dashboard, reducing avg TAT from 32m to 5m',
     descriptor: 'Redesigned an internal operations dashboard from the ground up — cut average task completion time from 32 minutes to 5.',
@@ -297,7 +297,7 @@ function HeroCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
   );
 }
 
-function WorkCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
+export function WorkCell({ onNavigateDir }: { onNavigateDir?: (dir: NavDir) => void }) {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   return (
@@ -348,12 +348,12 @@ function WorkCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
         })}
       </div>
     </div>
-    <WorkPeek onBackToHero={() => onNavigateDir('down')} />
+    {onNavigateDir && <WorkPeek onBackToHero={() => onNavigateDir('down')} />}
     </div>
   );
 }
 
-function AboutCell() {
+export function AboutCell() {
   const bio = [
     {
       n: '01',
@@ -456,7 +456,7 @@ function AboutCell() {
   );
 }
 
-function GalleryCell() {
+export function GalleryCell() {
   return (
     <div className="w-full h-full bg-background flex flex-col overflow-hidden">
       <div className="px-8 md:px-12 pt-12 pb-6 flex-shrink-0 border-b border-border">
@@ -481,7 +481,7 @@ function FunCell() {
   );
 }
 
-function ContactCell() {
+export function ContactCell() {
   const SERIF = "'Playfair Display', Georgia, serif";
 
   return (
@@ -546,7 +546,7 @@ function InterestsCell() {
   );
 }
 
-function ResumeCell() {
+export function ResumeCell() {
   return (
     <div className="w-full h-full bg-background flex flex-col">
       <div className="px-8 md:px-12 pt-8 pb-3">
@@ -559,7 +559,7 @@ function ResumeCell() {
   );
 }
 
-function StackCell() {
+export function StackCell() {
   return <StackContent />;
 }
 
