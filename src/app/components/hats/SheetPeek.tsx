@@ -28,9 +28,17 @@ export interface SheetPeekProps {
   /** Show the "Home" hint bubble (first deep-link arrival). */
   showTip: boolean;
   onHome: () => void;
+  /**
+   * The hero portrait itself is the visible head (it slides behind the sheet).
+   * This component then only draws the gripping hands and an invisible tap
+   * target the size of the portrait.
+   */
+  handsOnly?: boolean;
+  /** Width of the visible head in px (the portrait's width) when handsOnly. */
+  width?: number;
 }
 
-export function SheetPeek({ progress, col, hat, active, showTip, onHome }: SheetPeekProps) {
+export function SheetPeek({ progress, col, hat, active, showTip, onHome, handsOnly = false, width }: SheetPeekProps) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const pre = `sp${uid}-`;
   const portraitHtml = useMemo(() => ({ __html: prefixedPortrait(pre) }), [pre]);
@@ -137,7 +145,7 @@ export function SheetPeek({ progress, col, hat, active, showTip, onHome }: Sheet
 
   // Pupils follow the pointer while active.
   useEffect(() => {
-    if (!active || reduce) return;
+    if (!active || reduce || handsOnly) return;
     let idleBack: ReturnType<typeof setTimeout> | null = null;
     const onMove = (e: PointerEvent) => {
       const head = headRef.current;
@@ -157,20 +165,20 @@ export function SheetPeek({ progress, col, hat, active, showTip, onHome }: Sheet
   // Idle bits every 20–30s, plus finger drumming every ~6s.
   useEffect(() => {
     if (!active || reduce) return;
-    let t: ReturnType<typeof setTimeout>;
+    let t: ReturnType<typeof setTimeout> | undefined;
     const bits = [
       () => q<SVGGElement>('glasses')?.animate([{ transform: 'none' }, { transform: 'translateY(-9px)' }, { transform: 'translateY(-9px)', offset: 0.6 }, { transform: 'none' }], { duration: 700, easing: 'ease-in-out' }),
       () => { lookRef.current = { x: 0, y: 0 }; paintPupils(); setTimeout(() => { lookRef.current = { x: 0, y: 4 }; paintPupils(); }, 1400); },
       () => headRef.current?.querySelectorAll('.eye').forEach(e => e.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(.1)' }, { transform: 'scaleY(1)' }, { transform: 'scaleY(.1)' }, { transform: 'scaleY(1)' }], { duration: 520 })),
     ];
-    const schedule = () => { t = setTimeout(() => { if (progressRef.current >= 1) bits[Math.floor(Math.random() * bits.length)](); schedule(); }, 20000 + Math.random() * 10000); };
+    const schedule = () => { if (handsOnly) return; t = setTimeout(() => { if (progressRef.current >= 1) bits[Math.floor(Math.random() * bits.length)](); schedule(); }, 20000 + Math.random() * 10000); };
     schedule();
     const drum = setInterval(() => {
       if (progressRef.current < 1) return;
       handsRef.current?.querySelectorAll('.wp-hand').forEach((el, i) =>
         el.querySelectorAll('.fg').forEach((f, j) => f.animate([{ opacity: 1 }, { opacity: 0.75 }, { opacity: 1 }], { duration: 200, delay: (3 - j) * 90 + i * 420 })));
     }, 6000);
-    return () => { clearTimeout(t); clearInterval(drum); };
+    return () => { if (t) clearTimeout(t); clearInterval(drum); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
@@ -187,8 +195,9 @@ export function SheetPeek({ progress, col, hat, active, showTip, onHome }: Sheet
   return (
     <div
       ref={rootRef}
-      className={`work-peek sheet-peek${visible ? '' : ' is-hidden'}${active ? '' : ' paused'}`}
+      className={`work-peek sheet-peek${visible ? '' : ' is-hidden'}${active ? '' : ' paused'}${handsOnly ? ' hands-only' : ''}`}
       data-hat={hat}
+      style={handsOnly && width ? ({ '--pw': `${width}px` } as React.CSSProperties) : undefined}
     >
       <div className="wp-clip">
         <button

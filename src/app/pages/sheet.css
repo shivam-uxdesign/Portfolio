@@ -122,3 +122,9 @@
 
 /* Work & Play thumbnails: drawn thumbnails render large and scale down. */
 .wp-thumb { position: absolute; left: 0; top: 0; width: 250%; height: 250%; transform: scale(.4); transform-origin: 0 0; }
+/* Hands-only peek: the hero portrait is the head; keep its tap target invisible. */
+.work-peek.sheet-peek.hands-only .wp-head svg { opacity: 0; }
+.work-peek.sheet-peek.hands-only.is-hidden { visibility: visible; opacity: 1; }
+.work-peek.sheet-peek.hands-only.is-hidden .wp-head { pointer-events: none; }
+/* While peeking the portrait slides outside its own box; don't clip it. */
+.sh-hero.peeking .hh-cell, .sh-hero.peeking .hh-stage-wrap { overflow: visible; }

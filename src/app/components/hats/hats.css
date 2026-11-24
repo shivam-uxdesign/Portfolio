@@ -181,3 +181,12 @@
 @media (prefers-reduced-motion: reduce) {
   .hats-hero *, .work-peek * { animation: none !important; transition: none !important; }
 }
+
+/* Sheet peek: the portrait slides behind the sheet; the card falls away. */
+.hats-hero.peeking .hh-me { overflow: visible; box-shadow: none; cursor: default; }
+.hats-hero.peeking .hat { opacity: 0; pointer-events: none; transition: opacity .2s; }
+/* Settled in the peek: he still blinks even though the hero itself is paused. */
+.hats-hero.paused.peek-live .eye,
+.hats-hero.paused.peek-live .cattail,
+.hats-hero.paused.peek-live .catlid,
+.hats-hero.paused.peek-live .tails { animation-play-state: running !important; }

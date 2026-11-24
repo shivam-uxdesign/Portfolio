@@ -5,6 +5,7 @@ import { HatsHero } from '../components/hats/HatsHero';
 import { SheetPeek } from '../components/hats/SheetPeek';
 import { HATS, PAL, type WearableId } from '../components/hats/hatsData';
 import type { HatId } from '../components/hats/props';
+import type { HatsEngine } from '../components/hats/hatsEngine';
 import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
 import { PROJECTS, AboutCell, GalleryCell, ContactCell, ResumeCell, StackCell, InterestsCell } from './Home';
 import { WorkAndPlay } from '../components/WorkAndPlay';
@@ -41,6 +42,7 @@ const seg = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
+const easeOutBackLocal = (x: number) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
 const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 // Old links to merged sections land on the cell that now holds them, scrolled to the section.
@@ -146,7 +148,7 @@ const SheetWorld = memo(function SheetWorld() {
 });
 
 // ─── Hero (backdrop) ──────────────────────────────────────────────────────────
-const HeroPane = memo(function HeroPane() {
+const HeroPane = memo(function HeroPane({ onEngine }: { onEngine: (e: HatsEngine | null) => void }) {
   const [isNameHovered, setIsNameHovered] = useState(false);
   const bridge = useHeroBridgeStore();
   const heroActive = useHeroBridge(s => s.heroActive);
@@ -191,7 +193,7 @@ const HeroPane = memo(function HeroPane() {
         </motion.p>
       </div>
       <div className="hh-stage-wrap order-2 md:order-1 w-full">
-        <HatsHero isActive={heroActive} overviewProgress={0} onHatChange={onHatChange} onWear={onWear} />
+        <HatsHero isActive={heroActive} overviewProgress={0} onHatChange={onHatChange} onWear={onWear} onEngine={onEngine} />
       </div>
     </div>
   );
@@ -291,6 +293,33 @@ export function SheetHome() {
   const pushedRef = useRef(false);
 
   useEffect(() => { sRef.current = s; }, [s]);
+
+  // ── The portrait is the peek ──
+  // Like the prototype: the hero stage slides so the glasses' lower edge
+  // (y≈494 of the 1000-unit portrait) lands on the open sheet's top edge, and
+  // sideways to follow the column. The engine fades the card and runs the face.
+  const heroRef = useRef<HTMLDivElement>(null);
+  const engineRef = useRef<HatsEngine | null>(null);
+  const [engineReady, setEngineReady] = useState(0);
+  const onEngine = useCallback((e: HatsEngine | null) => { engineRef.current = e; setEngineReady(n => n + 1); }, []);
+  const curOffset = useRef({ x: 0, y: 0 });
+  const [geo, setGeo] = useState({ dy: 0, cx: 0, w: 140, headH: 90 });
+  const measureGeo = useCallback(() => {
+    const me = heroRef.current?.querySelector<SVGSVGElement>('.hh-me');
+    if (!me) return;
+    const r = me.getBoundingClientRect();
+    if (!r.width) return;
+    // Measure the resting position: undo whatever offset is applied right now.
+    const top = r.top - curOffset.current.y, left = r.left - curOffset.current.x;
+    const glassesY = top + r.height * 0.494;
+    setGeo({ dy: window.innerHeight * 0.2 - glassesY, cx: left + r.width / 2, w: r.width, headH: r.height * 0.4 });
+  }, []);
+  useEffect(() => {
+    measureGeo();
+    const t = setTimeout(measureGeo, 400); // after fonts/layout settle
+    window.addEventListener('resize', measureGeo);
+    return () => { clearTimeout(t); window.removeEventListener('resize', measureGeo); };
+  }, [measureGeo, engineReady]);
   useEffect(() => { posRef.current = pos; }, [pos]);
   useEffect(() => { lockedRef.current = locked; }, [locked]);
   const setLock = (v: boolean) => { lockedRef.current = v; setLocked(v); };
@@ -663,9 +692,40 @@ export function SheetHome() {
 
   // ── Render ──
   const sheetVisible = s > 0;
-  const peekProgress = peekOverride ?? seg(s, 0.45, 1);
+  // Hands start once the head is nearly at the edge (as in the prototype).
+  const peekProgress = peekOverride ?? s;
   const peekHat: WearableId = chosenHat !== 'me' ? chosenHat : CONTEXT_HAT[cellId];
   const chromeOn = isOpen && ov === 0;
+
+  const draggingSheet = !!drag.current && drag.current.mode === 'sheet';
+  useEffect(() => {
+    const stage = heroRef.current?.querySelector<HTMLElement>('.hats-hero');
+    const text = heroRef.current?.querySelector<HTMLElement>('.hh-text');
+    const engine = engineRef.current;
+    if (!stage) return;
+    const vw = window.innerWidth, half = geo.w / 2;
+    const colX = [half + 18, vw / 2, vw - half - 18][actual.col] ?? vw / 2;
+    // Deep-link arrival: rise from behind the sheet on its own timeline.
+    const rise = peekOverride !== null ? (1 - easeOutBackLocal(clamp01(peekOverride / 0.55))) * geo.headH : 0;
+    const p = Math.min(1.05, s);
+    const x = (colX - geo.cx) * Math.min(1, s), y = geo.dy * p + rise;
+    curOffset.current = { x, y };
+    stage.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+    // Column moves glide; drags and the sheet tween are already frame-by-frame.
+    stage.style.transition = s >= 1 && !draggingSheet && peekOverride === null && !reduce ? 'transform .46s cubic-bezier(.45, 0, .2, 1)' : 'none';
+    if (text) text.style.opacity = String(clamp01(1 - s * 1.8));
+    if (engine) {
+      engine.setPeek(s);
+      engine.setOverview(s > 0 ? 0.5 : 0);
+      engine.setPeekLive(isOpen && ov === 0 && peekOverride === null);
+      engine.displayHat(s >= 1 ? peekHat : null);
+    }
+  });
+  const prevColRef = useRef(actual.col);
+  useEffect(() => {
+    if (isOpen && prevColRef.current !== actual.col) engineRef.current?.glance(actual.col - prevColRef.current);
+    prevColRef.current = actual.col;
+  }, [actual.col, isOpen]);
   const transition = noTransition || gestureRef.current || ov > 0 ? 'none' : `transform ${NAV_MS}ms ${NAV_EASE}`;
   const heroK = s;
 
@@ -682,24 +742,17 @@ export function SheetHome() {
         // Links and images are natively draggable; that would cancel a swipe that starts on a card.
         onDragStart={e => e.preventDefault()}
       >
-        {/* Hero backdrop: lives in the top 80%, lifts and fades as the sheet rises. */}
-        <div
-          className="sh-hero"
-          aria-hidden={s > 0.5}
-          style={{
-            // Portrait lifts away and is gone before his head appears on the sheet edge.
-            transform: `translateY(${(-seg(heroK, 0, 0.6) * 22).toFixed(2)}%) scale(${(1 - seg(heroK, 0, 0.6) * 0.08).toFixed(4)})`,
-            opacity: 1 - seg(s, 0.05, 0.42),
-            pointerEvents: s > 0 ? 'none' : undefined,
-            visibility: s >= 1 ? 'hidden' : undefined,
-          }}
-        >
-          <HeroPane />
+        {/* Hero backdrop. As the sheet rises, the portrait slides behind it until
+            only his head shows above the edge (see the peek effect above). */}
+        <div ref={heroRef} className={`sh-hero${s > 0 ? ' peeking' : ''}`} aria-hidden={s > 0.5} style={{ pointerEvents: s > 0 ? 'none' : undefined }}>
+          <HeroPane onEngine={onEngine} />
         </div>
 
         {/* The sheet */}
         <div className={`sh-sheet${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)` }}>
           <SheetPeek
+            handsOnly
+            width={geo.w}
             progress={peekProgress}
             col={actual.col}
             hat={peekHat}

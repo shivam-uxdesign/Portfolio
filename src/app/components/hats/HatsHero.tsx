@@ -14,6 +14,8 @@ export interface HatsHeroProps {
   deferEntrance?: boolean;
   onHatChange?: (hat: WearableId) => void;
   onWear?: (hat: HatId) => void;
+  /** Hands the engine to a host that drives extra behaviour (e.g. the sheet peek). */
+  onEngine?: (engine: HatsEngine | null) => void;
 }
 
 const prefersReducedMotion = () =>
@@ -46,12 +48,12 @@ const Stage = memo(function Stage() {
   );
 });
 
-export function HatsHero({ isActive, overviewProgress, deferEntrance = false, onHatChange, onWear }: HatsHeroProps) {
+export function HatsHero({ isActive, overviewProgress, deferEntrance = false, onHatChange, onWear, onEngine }: HatsHeroProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<HatsEngine | null>(null);
   const flownRef = useRef(!deferEntrance);
-  const cbRef = useRef({ onHatChange, onWear });
-  cbRef.current = { onHatChange, onWear };
+  const cbRef = useRef({ onHatChange, onWear, onEngine });
+  cbRef.current = { onHatChange, onWear, onEngine };
 
   useEffect(() => {
     const root = rootRef.current;
@@ -63,7 +65,8 @@ export function HatsHero({ isActive, overviewProgress, deferEntrance = false, on
     });
     const off = engine.onHatChange(hat => cbRef.current.onHatChange?.(hat));
     engineRef.current = engine;
-    return () => { off(); engine.destroy(); engineRef.current = null; };
+    cbRef.current.onEngine?.(engine);
+    return () => { off(); cbRef.current.onEngine?.(null); engine.destroy(); engineRef.current = null; };
     // Created once per mount; later prop changes go through the effects below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

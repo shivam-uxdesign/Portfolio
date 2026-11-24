@@ -25,6 +25,18 @@ export interface HatsEngine {
   onHatChange(cb: (hat: WearableId) => void): () => void;
   /** Hats fly in from off-screen to their orbit slots, staggered 60ms. */
   flyIn(): void;
+  /**
+   * Sheet peek (0 = full hero, 1 = hiding behind the sheet with only the head
+   * showing). The host moves the stage; the engine handles the portrait
+   * itself: card background fades, the face reacts as it goes, pupils drop.
+   */
+  setPeek(p: number): void;
+  /** Settled in the peek: blink, follow the pointer, small idle bits. */
+  setPeekLive(on: boolean): void;
+  /** Show a hat without wearing it (no palette/tagline change). null = the worn hat. */
+  displayHat(id: WearableId | null): void;
+  /** Quick look left (-1) or right (1), e.g. before shuffling along the edge. */
+  glance(dir: number): void;
   destroy(): void;
 }
 
@@ -139,6 +151,7 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
     pupils.forEach(p => p.setAttribute('transform', `translate(${px.toFixed(2)} ${py.toFixed(2)})`));
   }
   const onWindowMove = (e: PointerEvent) => {
+    if (peekLive && !active) { lastPX = e.clientX; lastPY = e.clientY; look(e.clientX, e.clientY); scheduleLookDown(); return; }
     if (!active) return;
     if (current === 'propeller') { const v = Math.hypot(e.clientX - lastPX, e.clientY - lastPY); if (v > 25) spin(Math.min(0.15, v * 0.0012)); }
     lastPX = e.clientX; lastPY = e.clientY;
@@ -471,6 +484,34 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
 
   apply('me', false);
 
+  // ── Sheet peek ────────────────────────────────────────────────────────────
+  let peekP = 0, peekLive = false, peekBucket = -1, shownHat: WearableId | null = null;
+  let lookDownT: ReturnType<typeof setTimeout> | null = null, idleT: ReturnType<typeof setTimeout> | null = null;
+  const pupilsTo = (x: number, y: number) => pupils.forEach(p => p.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)})`));
+  // Resting gaze in the peek: down at the content.
+  const lookDown = () => pupilsTo(0, 5);
+  function scheduleLookDown() { if (lookDownT) clearTimeout(lookDownT); lookDownT = setTimeout(() => { if (peekLive) lookDown(); }, 2500); }
+  function scheduleIdle() {
+    if (idleT) clearTimeout(idleT);
+    if (!peekLive || reduce) return;
+    idleT = setTimeout(() => {
+      if (!peekLive) return;
+      const bits = [
+        () => glasses.animate([{ transform: 'none' }, { transform: 'translateY(-9px)' }, { transform: 'translateY(-9px)', offset: 0.6 }, { transform: 'none' }], { duration: 700, easing: 'ease-in-out' }),
+        () => { pupilsTo(0, 0); setTimeout(() => { if (peekLive) lookDown(); }, 1400); },
+        () => me.querySelectorAll('.eye').forEach(e => e.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(.1)' }, { transform: 'scaleY(1)' }, { transform: 'scaleY(.1)' }, { transform: 'scaleY(1)' }], { duration: 520 })),
+      ];
+      if (gState === 'on') bits[Math.floor(Math.random() * bits.length)]();
+      scheduleIdle();
+    }, 20000 + Math.random() * 10000);
+  }
+  function showProps(id: WearableId, drop: boolean) {
+    props.innerHTML = id === 'me' ? '' : PROPS[id].svg(false);
+    me.dataset.hat = id;
+    bladesEl = props.querySelector('.blades');
+    if (drop && !reduce && id !== 'me') props.animate([{ transform: 'translateY(-90px)', opacity: 0 }, { transform: 'translateY(6px)', opacity: 1, offset: 0.65 }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.3,.7,.4,1)' });
+  }
+
   // ── Public API ────────────────────────────────────────────────────────────
   function cancelDrags() {
     hats.forEach(h => {
@@ -503,6 +544,44 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
       if (p >= 1 && was < 1 && !reduce) setFace({ eyes: 'happy', mouth: 'smile' }, 300);
     },
     currentHat: () => current,
+    setPeek(p: number) {
+      if (destroyed) return;
+      const was = peekP;
+      peekP = p;
+      root.classList.toggle('peeking', p > 0);
+      const bgO = String(Math.max(0, Math.min(1, 1 - p * 1.4)));
+      bgrect.style.opacity = bgO; bghalo.style.opacity = bgO;
+      if (p > 0 && p < 1) {
+        // The face follows the drag, like the prototype.
+        const b = p < 0.12 ? 0 : p < 0.42 ? 1 : p < 0.78 ? 2 : 3;
+        if (b !== peekBucket) {
+          peekBucket = b;
+          setFace(([{}, { eyes: 'open', mouth: 'o', brows: 'up' }, { eyes: 'open', mouth: 'small', brows: 'worried' }, { eyes: 'open', mouth: 'grin', brows: 'none' }] as Face[])[b], 0);
+        }
+        if (p > 0.05) pupilsTo(0, 5 * p);
+      } else if (p >= 1 && was < 1) { peekBucket = -1; setFace({ eyes: 'open', mouth: 'grin' }, 0); lookDown(); }
+      else if (p <= 0 && was > 0) { peekBucket = -1; setFace({ eyes: 'happy', mouth: 'laugh' }, 1000); pupilsTo(0, 0); }
+    },
+    setPeekLive(on: boolean) {
+      if (destroyed || on === peekLive) return;
+      peekLive = on;
+      root.classList.toggle('peek-live', on);
+      if (on) { lookDown(); scheduleIdle(); }
+      else { if (idleT) clearTimeout(idleT); if (lookDownT) clearTimeout(lookDownT); }
+    },
+    displayHat(id: WearableId | null) {
+      if (destroyed) return;
+      const next = id ?? current;
+      if (next === (shownHat ?? current)) { shownHat = id; return; }
+      const drop = id !== null || shownHat !== null;
+      shownHat = id;
+      showProps(next, drop);
+    },
+    glance(dir: number) {
+      if (destroyed || reduce) return;
+      pupilsTo(7 * Math.sign(dir), 1);
+      setTimeout(() => { if (peekLive) lookDown(); }, 480);
+    },
     onHatChange(cb) { listeners.add(cb); return () => { listeners.delete(cb); }; },
     flyIn() {
       if (destroyed) return;
@@ -515,6 +594,8 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
       raf = 0;
       if (faceTimer) clearTimeout(faceTimer);
       timers.forEach(t => clearTimeout(t)); timers.clear();
+      if (idleT) clearTimeout(idleT);
+      if (lookDownT) clearTimeout(lookDownT);
       clearInterval(hintInterval);
       gAnim?.cancel();
       ro.disconnect();
