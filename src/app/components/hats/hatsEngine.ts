@@ -35,8 +35,8 @@ export interface HatsEngine {
   setPeekLive(on: boolean): void;
   /** Show a hat without wearing it (no palette/tagline change). null = the worn hat. */
   displayHat(id: WearableId | null, dir?: { x: number; y: number }): void;
-  /** Page change while wearing your own hat: lift it a touch and settle it back. */
-  tipHat(): void;
+  /** Page change while wearing your own hat: tip it the way the page is moving. */
+  tipHat(dir: { x: number; y: number }): void;
   /** Toss the worn hat off (dragged away in the sheet): back to no hat. */
   takeOff(dx: number, dy: number): void;
   /** Quick look left (-1) or right (1), e.g. before shuffling along the edge. */
@@ -606,9 +606,15 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
       shownHat = id;
       showProps(next, drop);
     },
-    tipHat() {
+    tipHat(dir: { x: number; y: number }) {
       if (destroyed || reduce || current === 'me') return;
-      props.animate([{ transform: 'none' }, { transform: 'translate(-6px, -34px) rotate(-9deg)', offset: 0.4 }, { transform: 'translate(-2px, -30px) rotate(-7deg)', offset: 0.6 }, { transform: 'none' }],
+      const sx = Math.sign(dir.x);
+      // Sideways: lift and tip towards where you're going. Down a row: a straight
+      // lift. Up a row: a little press down, then back.
+      const peak = sx
+        ? [`translate(${sx * 8}px, -34px) rotate(${sx * 10}deg)`, `translate(${sx * 3}px, -30px) rotate(${sx * 7}deg)`]
+        : dir.y > 0 ? ['translateY(-38px)', 'translateY(-32px)'] : ['translateY(10px) scale(1.05, .93)', 'translateY(4px)'];
+      props.animate([{ transform: 'none' }, { transform: peak[0], offset: 0.4 }, { transform: peak[1], offset: 0.6 }, { transform: 'none' }],
         { duration: 520, easing: 'cubic-bezier(.35,.1,.3,1)' });
     },
     takeOff(dx: number, dy: number) {

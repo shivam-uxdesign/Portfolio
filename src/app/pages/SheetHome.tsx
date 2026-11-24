@@ -641,7 +641,7 @@ export function SheetHome() {
     if (!engine || sRef.current < 1) return;
     const dir = navDir.current;
     if (dir.x) engine.glance(dir.x);
-    if (ownHat) engine.tipHat();
+    if (ownHat) engine.tipHat(dir);
     else engine.displayHat(CONTEXT_HAT[cellId], dir);
   }, [cellId, ownHat]);
 
