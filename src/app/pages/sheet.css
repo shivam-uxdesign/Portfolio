@@ -99,3 +99,12 @@ body.fd-open .work-peek.sheet-peek * { pointer-events: none !important; }
 .sh-sheet.arriving .sh-page-stage { animation: sh-arrive .34s ease-out both; }
 @keyframes sh-arrive { from { opacity: 0; transform: translateY(10px); } }
 @media (prefers-reduced-motion: reduce) { .sh-sheet.arriving .sh-page-stage { animation: none; } }
+
+/* Leaving for an inner page: the traveler stands in for his head; the hands duck behind the rising page. */
+.sh-leaving .hh-me { visibility: hidden; }
+.sh-leaving .sheet-peek { translate: 0 40px; transition: translate .2s cubic-bezier(.5, 0, .75, 0); }
+/* Back from an inner page: mount straight into the peek (no hats or card flashing past). */
+.sh-hero.returning .hat { opacity: 0 !important; transition: none !important; }
+.sh-hero.returning .hh-me { box-shadow: none !important; transition: none !important; }
+.sh-hero.returning #bgrect, .sh-hero.returning #bghalo { opacity: 0 !important; }
+.sh-leaving .sp-tip { opacity: 0 !important; transition: opacity .1s; }

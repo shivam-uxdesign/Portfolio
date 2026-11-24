@@ -52,9 +52,16 @@
 @media (hover: hover) { .pc-seg button:not(.on):hover, .pc-pill:not(.on):hover { color: var(--foreground); background: color-mix(in oklab, var(--foreground) 6%, var(--background)); } }
 .pc-pill:focus-visible, .pc-seg button:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 
-/* The head in transit. */
-.pc-trav { position: fixed; z-index: 60; display: none; pointer-events: none; left: 0; top: 0; }
-.pc-trav-in { width: 100%; height: 100%; transform-origin: 50% 100%; }
+/* The trip: a clip box (holds the head that goes under the card), the ghost card, the head on top. */
+.pc-clip { position: fixed; left: 0; top: 0; width: 100%; overflow: hidden; display: none; pointer-events: none; }
+.pc-clip .pc-trav { position: absolute; }
+.pc-ghost {
+  position: fixed; left: 0; right: 0; top: 0; display: none; pointer-events: none; will-change: transform, opacity;
+  background: var(--background); border-top: 1px solid var(--border); border-radius: 28px 28px 0 0;
+  box-shadow: 0 -24px 48px -28px rgba(20, 20, 18, .35);
+}
+.pc-trav { position: fixed; display: none; pointer-events: none; left: 0; top: 0; transform-origin: 0 0; will-change: transform, opacity; }
+.pc-trav-in { width: 100%; height: 100%; transform-origin: 50% 100%; will-change: transform; }
 .pc-trav .mh { display: block; width: 100%; height: 100%; }
 
 /* ── The mini head ── */

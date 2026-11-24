@@ -54,3 +54,8 @@ export const site = {
 export function useSite<T>(sel: (s: SiteState) => T): T {
   return useSyncExternalStore(site.subscribe, () => sel(state), () => sel(state));
 }
+
+/** RootLayout registers the trip runner; the sheet calls it on a link tap,
+ *  before navigating, so the motion is already on the compositor while the
+ *  new page mounts. */
+export const trips: { out: null | ((t: Omit<Travel, 'id' | 'dir'>) => void) } = { out: null };

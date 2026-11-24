@@ -7,7 +7,7 @@ import type { WearableId } from '../hats/hatsData';
 // inner pages' home button and the trip there. Boxes measured with getBBox in
 // the portrait's 800×1000 space.
 const HEAD = [178, 130, 636, 628];
-const PROP_BOX: Record<Exclude<WearableId, 'me'>, number[]> = {
+export const PROP_BOX: Record<Exclude<WearableId, 'me'>, number[]> = {
   notes: [261, 147, 539, 308], party: [333, -22, 545, 223], helmet: [180, 164, 620, 688],
   beret: [214, 83, 583, 350], propeller: [244, 77, 556, 254], ninja: [232, 266, 692, 372], cat: [234, 66, 584, 334],
 };

@@ -1,7 +1,9 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { motion } from 'motion/react';
 import { trackEvent } from '../../lib/analytics';
-import { site } from '../../lib/site';
+import { site, trips } from '../../lib/site';
+import { pageMeta } from '../../lib/pages';
+import { useNavigate } from 'react-router';
 import { themeVars } from '../../lib/theme';
 import { headBox } from '../components/chrome/MiniHead';
 import { HatsHero } from '../components/hats/HatsHero';
@@ -574,9 +576,13 @@ export function SheetHome() {
   const drag = useRef<{ x: number; y: number; t: number; s0: number; mode: 'none' | 'sheet' | 'grid' | null; lastY: number; lastT: number; vy: number } | null>(null);
   const suppressClick = useRef(false);
   const onClickCapture = (e: React.MouseEvent) => {
-    if (!suppressClick.current) return;
-    suppressClick.current = false;
+    if (suppressClick.current) { suppressClick.current = false; e.preventDefault(); e.stopPropagation(); return; }
+    // A link to an inner page: run the trip instead of a plain jump.
+    const a = (e.target as Element).closest?.('a[href]') as HTMLAnchorElement | null;
+    const href = a?.getAttribute('href');
+    if (!a || !href || !pageMeta(href) || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0 || a.target === '_blank') return;
     e.preventDefault(); e.stopPropagation();
+    leaveTo(href);
   };
   const onPointerDown = (e: React.PointerEvent) => {
     suppressClick.current = false;
@@ -645,21 +651,29 @@ export function SheetHome() {
   useEffect(() => { site.set({ hat: chosenHat, bare, worn }); }, [chosenHat, bare, worn]);
   // Your hat comes back with you from an inner page.
   useEffect(() => { const h = site.get().hat; if (h !== 'me') engineRef.current?.restore(h); }, [engineReady]);
-  // Leaving for an inner page: hand his head's screen box to the trip.
+  // Leaving for an inner page: hand his head's screen box to the trip, start
+  // it, and only then navigate (a frame later), so the page's mount happens
+  // under motion that's already running on the compositor.
   const leaveRef = useRef({ worn, cellId, open: isOpen });
   leaveRef.current = { worn, cellId, open: isOpen };
   const sheetRef = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => () => {
-    if (window.location.pathname === '/') return;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const routerNavigate = useNavigate();
+  const leaving = useRef(false);
+  const leaveTo = (to: string) => {
+    if (leaving.current) return;
     const { worn: w, cellId: c, open } = leaveRef.current;
-    site.set({ origin: open ? c : null });
     const me = heroRef.current?.querySelector<SVGSVGElement>('.hh-me');
     const m = me?.getScreenCTM();
     const edge = sheetRef.current?.getBoundingClientRect().top;
-    if (!m || edge == null || !open) return;
+    site.set({ origin: open ? c : null });
+    if (!m || edge == null || !open || !trips.out || reduce) { routerNavigate(to); return; }
+    leaving.current = true;
     const [bx, by, bw, bh] = headBox(w);
-    site.startTravel({ dir: 'out', hat: w, edgeY: edge, from: { x: m.a * bx + m.e, y: m.d * by + m.f, w: m.a * bw, h: m.d * bh } });
-  }, []);
+    trips.out({ hat: w, edgeY: edge, from: { x: m.a * bx + m.e, y: m.d * by + m.f, w: m.a * bw, h: m.d * bh } });
+    rootRef.current?.classList.add('sh-leaving');
+    requestAnimationFrame(() => requestAnimationFrame(() => routerNavigate(to)));
+  };
 
   // Page change: no hat of your own → the page hats swap, leaving and arriving
   // with the pages; your own hat → a glance the way you're going and a hat tip.
@@ -702,7 +716,7 @@ export function SheetHome() {
   return (
     <HeroBridgeContext.Provider value={bridge}>
       <div
-        className="sh-root fixed inset-0 overflow-hidden bg-background select-none"
+        ref={rootRef} className="sh-root fixed inset-0 overflow-hidden bg-background select-none"
         style={{ touchAction: 'none' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -721,7 +735,7 @@ export function SheetHome() {
             only his head shows above the edge (see the peek effect above). */}
         {/* A chosen hat's soft glow behind his head. */}
         <div className={`sh-glow${themeHat !== 'me' && s > 0 ? ' on' : ''}`} style={themeHat !== 'me' ? { '--sh-halo': PAL[themeHat].halo } as React.CSSProperties : undefined} aria-hidden="true" />
-        <div ref={heroRef} className={`sh-hero${s > 0 ? ' peeking' : ''}`} aria-hidden={s > 0.5} style={{ pointerEvents: s > 0 ? 'none' : undefined }}>
+        <div ref={heroRef} className={`sh-hero${s > 0 ? ' peeking' : ''}${returning && s >= 1 ? ' returning' : ''}`} aria-hidden={s > 0.5} style={{ pointerEvents: s > 0 ? 'none' : undefined }}>
           <HeroPane onEngine={onEngine} />
         </div>
 
