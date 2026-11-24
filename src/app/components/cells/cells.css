@@ -1,16 +1,3 @@
-/* ── Resume ─────────────────────────────────────────────────────────────── */
-/* Phones: the quip under the location row goes; short phones also lose the role's sub-line. */
-@media (max-width: 767px) { .rs-quip { display: none; } }
-/* Narrow or short phones: the role's sub-line and the location row go,
-   and the expertise blurb clamps to two lines. */
-@container (max-width: 290px) or (max-height: 470px) {
-  .rs-sub, .rs-foot { display: none; }
-  .rs-head { padding-bottom: 6px; }
-  .rs-cards { gap: 6px; }
-  .rs-card { padding: 11px 12px; }
-  .rs-desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-}
-
 /* ── Contact ────────────────────────────────────────────────────────────── */
 /* Short phones: keep the ask and the form, drop the supporting lines. */
 @container (max-height: 520px) { .ct-extra { display: none; } }

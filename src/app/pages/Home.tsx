@@ -1,12 +1,12 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { Home as HomeIcon, ArrowUp, Download } from 'lucide-react';
+import { Home as HomeIcon, ArrowUp } from 'lucide-react';
 import { Link } from 'react-router';
 import { AboutPanel } from '../components/cells/AboutPanel';
 import { ImageGallery } from '../components/ImageGallery';
 import { OffFigmaPanel } from '../components/cells/OffFigmaPanel';
+import { ResumePanel } from '../components/cells/ResumePanel';
 import { AboutBlock } from '../components/AboutBlock';
-import { ResumeCards } from '../components/ResumeCards';
 import { FunProjects } from '../components/FunProjects';
 import { CTACard } from '../components/CTACard';
 import { StackContent } from './StackPage';
@@ -436,23 +436,7 @@ export function InterestsCell() {
 }
 
 export function ResumeCell() {
-  return (
-    <div className="w-full h-full bg-background flex flex-col md:justify-center px-1 md:px-10 lg:px-14 pt-1 md:pt-4 pb-1 md:pb-5">
-      <div className="rs-head flex-none pb-3 flex items-center justify-between gap-3">
-        <p className="text-[11px] tracking-[0.1em] text-muted-foreground uppercase">Resume</p>
-        <a
-          href="/resume.pdf"
-          download="Shivam_Sehgal_Resume.pdf"
-          onClick={() => trackEvent('resume_download', {})}
-          className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3.5 py-2 text-[12px] font-medium transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          <Download className="w-3.5 h-3.5" strokeWidth={1.75} aria-hidden="true" />
-          Download resume
-        </a>
-      </div>
-      <ResumeCards />
-    </div>
-  );
+  return <ResumePanel />;
 }
 
 export function StackCell() {
