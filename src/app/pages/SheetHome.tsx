@@ -603,7 +603,14 @@ export function SheetHome() {
       t0 = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY, target: e.target, mode: null } : null;
     };
     const onMove = (e: TouchEvent) => {
-      if (!t0 || e.touches.length !== 1 || sRef.current < 1 || !(t0.target as Element | null)?.closest?.(SCROLL_SEL)) return;
+      if (!t0 || e.touches.length !== 1 || !(t0.target as Element | null)?.closest?.(SCROLL_SEL)) return;
+      // Once a touch is ours (grid or sheet drag) keep it ours: dragging the sheet
+      // down drops s below 1 on the first move, and letting the browser pan from
+      // there cancelled the pointer, stranding the sheet half-closed.
+      // (pointermove runs before touchmove, so a sheet drag may already be under way.)
+      if (t0.mode === null && drag.current?.mode === 'sheet') t0.mode = 'grid';
+      if (t0.mode === 'grid') { if (e.cancelable) e.preventDefault(); return; }
+      if (sRef.current < 1) return;
       if (t0.mode === null) {
         const dx = e.touches[0].clientX - t0.x, dy = e.touches[0].clientY - t0.y;
         if (Math.hypot(dx, dy) < 6) return;
@@ -760,7 +767,12 @@ export function SheetHome() {
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={() => { drag.current = null; }}
+        onPointerCancel={e => {
+          // If the browser ever takes the touch mid sheet-drag, settle instead of freezing.
+          const d = drag.current; drag.current = null;
+          if (d?.mode === 'sheet') { if (d.s0 >= 1) { if (sRef.current < 0.75) closeRef.current(); else animateSheet(1); } else animateSheet(sRef.current > 0.3 ? 1 : 0); }
+          void e;
+        }}
         onClickCapture={onClickCapture}
         // Links and images are natively draggable; that would cancel a swipe that starts on a card.
         onDragStart={e => e.preventDefault()}

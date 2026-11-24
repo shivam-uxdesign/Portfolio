@@ -489,8 +489,9 @@ export function ContactCell() {
   const SERIF = "'Playfair Display', Georgia, serif";
 
   return (
-    <div className="w-full min-h-full flex items-start md:items-center bg-background px-1 md:px-16 lg:px-20 pt-1 pb-[80px] md:py-6">
-      <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-4 lg:gap-14 items-center">
+    // Phones: the ask at the top, the compose card fills the rest down to the navigator.
+    <div className="w-full min-h-full flex items-stretch md:items-center bg-background px-1 md:px-16 lg:px-20 pt-1 pb-[80px] md:py-6">
+      <div className="w-full max-w-5xl mx-auto flex flex-col md:grid md:grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-5 md:gap-4 lg:gap-14 md:items-center">
         {/* Left — greeting, status, signature */}
         <div className="flex flex-col gap-3 md:gap-5 max-w-[420px]">
           <div className="flex items-center gap-2">
@@ -499,17 +500,16 @@ export function ContactCell() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
             </span>
             <span className="text-[10.5px] md:text-[11px] tracking-[0.08em] uppercase text-muted-foreground">
-              Open to select freelance &amp; full-time work
+              Open to <span className="hidden md:inline">select </span>freelance &amp; full-time work
             </span>
           </div>
 
-          <h2 className="text-[23px] md:text-[36px] leading-[1.15] md:leading-[1.12] text-foreground">
+          <h2 className="text-[clamp(23px,7.2cqw,27px)] md:text-[36px] leading-[1.12] text-foreground" style={{ letterSpacing: '-0.02em' }}>
             Got a project, a role,<br className="hidden md:inline" />{' '}
             or just want to{' '}
-            <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>
-              talk shop
+            <span className="whitespace-nowrap">
+              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>talk shop</span>?
             </span>
-            ?
           </h2>
 
           <p className="ct-extra text-[13px] text-muted-foreground leading-relaxed">
@@ -517,7 +517,7 @@ export function ContactCell() {
           </p>
 
           <p
-            className="hidden md:block text-[13px] text-muted-foreground/70 border-l-2 border-border pl-3 leading-snug"
+            className="ct-sig hidden md:block text-[13px] text-muted-foreground/70 border-l-2 border-border pl-3 leading-snug"
             style={{ fontFamily: SERIF, fontStyle: 'italic' }}
           >
             Let's build something worth shipping. — Shivam
@@ -525,7 +525,7 @@ export function ContactCell() {
         </div>
 
         {/* Right — CTA */}
-        <div className="w-full max-w-[420px] lg:justify-self-end">
+        <div className="w-full max-w-[420px] lg:justify-self-end flex flex-1 min-h-0 max-h-[400px] md:block md:max-h-none">
           <CTACard />
         </div>
       </div>

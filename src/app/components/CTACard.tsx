@@ -64,7 +64,7 @@ export function CTACard() {
         transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
       />
 
-      <div className="relative z-10 flex flex-col h-full justify-center">
+      <div className="relative z-10 flex flex-col h-full w-full justify-center">
         <p className="text-[12px] text-background/70 mb-1.5 uppercase tracking-[0.07em]">Let's Connect</p>
         <p className="text-[15px] text-background/90 mb-1.5 leading-snug">
           I read every message myself — usually within a day, chai in hand.
@@ -74,7 +74,7 @@ export function CTACard() {
         </p>
 
         {/* Optional name + message — folded into the mailto if filled in */}
-        <div className="flex flex-col gap-1.5 mb-2">
+        <div className="flex flex-col gap-1.5 mb-2 max-md:flex-1 max-md:min-h-0 max-md:mt-1">
           <input
             type="text"
             value={name}
@@ -89,7 +89,7 @@ export function CTACard() {
             placeholder="Your message (optional)"
             aria-label="Your message (optional)"
             rows={1}
-            className="w-full resize-none bg-background/10 border border-background/20 rounded-lg px-3 py-1.5 text-[13px] text-background placeholder:text-background/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 transition-colors"
+            className="w-full resize-none max-md:flex-1 max-md:min-h-[44px] max-md:py-2.5 max-md:text-[14px] bg-background/10 border border-background/20 rounded-lg px-3 py-1.5 text-[13px] text-background placeholder:text-background/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 transition-colors"
           />
         </div>
 
