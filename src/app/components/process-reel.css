@@ -1,0 +1,26 @@
+.pr-root { display: flex; flex-direction: column; gap: 12px; height: 100%; min-height: 0; }
+.pr-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex: none; }
+.pr-eyebrow { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); }
+.pr-sub { font-size: 12px; color: var(--muted-foreground); font-style: italic; font-family: 'Playfair Display', Georgia, serif; }
+.pr-cols {
+  flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; overflow: hidden; border-radius: 18px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+}
+.pr-col { position: relative; overflow: hidden; min-height: 0; }
+.pr-track { display: flex; flex-direction: column; will-change: transform; animation: pr-up linear infinite; }
+.pr-down { animation-name: pr-down; }
+.pr-set { display: flex; flex-direction: column; gap: 14px; padding-bottom: 14px; }
+.pr-cols:hover .pr-track { animation-play-state: paused; }
+.pr-tile { position: relative; margin: 0; border-radius: 14px; overflow: hidden; background: color-mix(in oklab, var(--foreground) 6%, transparent); }
+.pr-tile img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.6) contrast(1.02); transition: filter .5s, transform .6s; }
+.pr-tile:hover img { filter: none; transform: scale(1.04); }
+.pr-tile figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 18px 10px 9px; background: linear-gradient(to top, rgba(15, 15, 14, .6), transparent); color: #fff;
+}
+.pr-title { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pr-tag { font-size: 9.5px; letter-spacing: .05em; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .45); white-space: nowrap; }
+@keyframes pr-up { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+@keyframes pr-down { from { transform: translateY(-50%); } to { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .pr-track { animation: none; } }

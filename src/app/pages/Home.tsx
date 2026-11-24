@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { Home as HomeIcon, ArrowUp, Download } from 'lucide-react';
 import { Link } from 'react-router';
+import { ProcessReel } from '../components/ProcessReel';
 import { ImageGallery } from '../components/ImageGallery';
 import { InterestGrid } from '../components/InterestGrid';
 import { AboutBlock } from '../components/AboutBlock';
@@ -375,12 +376,12 @@ export function AboutCell() {
   const SERIF = "'Playfair Display', Georgia, serif";
 
   return (
-    <div className="w-full min-h-full flex items-center bg-background px-8 md:px-16 lg:px-20 py-6">
+    <div className="w-full min-h-full flex items-center bg-background px-8 md:px-16 lg:px-20 py-4">
       <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-16 items-center">
         {/* Left — hook + bio rail */}
         <div>
-          <p className="text-[11px] tracking-[0.15em] text-muted-foreground mb-5 uppercase">About</p>
-          <div className="space-y-1 mb-10">
+          <p className="text-[11px] tracking-[0.15em] text-muted-foreground mb-4 uppercase">About</p>
+          <div className="space-y-1 mb-7 lg:mb-8">
             {[
               { text: ['Designer by ', 'training'], color: 'var(--primary)' },
               { text: ['Problem solver by ', 'instinct'], color: 'var(--accent-blue)' },
@@ -401,7 +402,7 @@ export function AboutCell() {
             ))}
           </div>
 
-          <div className="space-y-6 relative">
+          <div className="space-y-5 relative">
             <div className="absolute left-[9px] top-2 bottom-2 w-px bg-border" />
             {bio.map((p, i) => (
               <motion.div
@@ -426,30 +427,14 @@ export function AboutCell() {
           </div>
         </div>
 
-        {/* Right — photo, hidden below lg to keep text the priority on narrow screens */}
+        {/* Right — Process & Practice reel (lg+). Sized to the cell, never taller. */}
         <motion.div
-          className="hidden lg:block"
-          initial={{ opacity: 0, scale: 0.97 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="hidden lg:block h-[min(560px,calc(100cqh-64px))] min-h-[320px]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
         >
-          <div
-            className="relative rounded-2xl overflow-hidden group"
-            style={{
-              aspectRatio: '4 / 5',
-              boxShadow: '0 40px 80px -30px rgba(20,20,18,0.35), 0 12px 24px -12px rgba(20,20,18,0.2)',
-            }}
-          >
-            <img
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&w=700&h=875"
-              alt="Shivam"
-              className="w-full h-full object-cover transition-all duration-700 ease-out"
-              style={{ filter: 'grayscale(85%) contrast(1.02)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.filter = 'grayscale(0%) contrast(1.02)')}
-              onMouseLeave={(e) => (e.currentTarget.style.filter = 'grayscale(85%) contrast(1.02)')}
-            />
-            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 pointer-events-none" />
-          </div>
+          <ProcessReel />
         </motion.div>
       </div>
     </div>

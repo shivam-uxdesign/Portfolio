@@ -7,7 +7,7 @@ import { HATS, PAL, type WearableId } from '../components/hats/hatsData';
 import type { HatId } from '../components/hats/props';
 import type { HatsEngine } from '../components/hats/hatsEngine';
 import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
-import { PROJECTS, AboutCell, GalleryCell, ContactCell, ResumeCell, StackCell, InterestsCell } from './Home';
+import { PROJECTS, AboutCell, ContactCell, ResumeCell, StackCell, InterestsCell } from './Home';
 import { WorkAndPlay } from '../components/WorkAndPlay';
 import { FUN_PROJECTS } from '../components/FunProjects';
 import './sheet.css';
@@ -47,7 +47,7 @@ const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia
 
 // Old links to merged sections land on the cell that now holds them, scrolled to the section.
 const ALIASES: Record<string, { cell: SheetCellId; section?: string }> = {
-  gallery: { cell: 'about', section: 'process-section' },
+  gallery: { cell: 'about' },
   fun: { cell: 'work' },
 };
 
@@ -113,12 +113,9 @@ function worldTransform(col: number, row: number, ov: number, W: number, H: numb
 function CellContent({ id }: { id: SheetCellId }) {
   switch (id) {
     case 'work': return <ScrollCell><WorkAndPlay work={PROJECTS} play={FUN_PROJECTS} /></ScrollCell>;
-    // About, then Process & Practice as a second page.
+    // About, with Process & Practice as a reel beside it.
     case 'about': return (
-      <ScrollCell more={{ label: 'Process & Practice', target: 'process-section' }}>
-        <section className="sh-page"><AboutCell /></section>
-        <section id="process-section" className="sh-page sh-page-fixed"><GalleryCell /></section>
-      </ScrollCell>
+      <ScrollCell><section className="sh-page"><AboutCell /></section></ScrollCell>
     );
     case 'interests': return <ScrollCell><section className="sh-page sh-min-interests"><InterestsCell /></section></ScrollCell>;
     case 'stack': return <ScrollCell><section className="sh-page sh-min-stack"><StackCell /></section></ScrollCell>;

@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 // Static editorial layout — vary width/heightPct per image for the staggered
 // rhythm, `meta` renders as a small rotated placard label beside the frame.
 // Swap `src` for real photos whenever they're ready.
-const galleryImages = [
+export const galleryImages = [
   { src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=800&fit=crop', title: 'Studio', tag: 'Process', meta: '2024', width: 210, heightPct: 100 },
   { src: 'https://images.unsplash.com/photo-1516796181074-bf453fbfa3e6?w=800&h=500&fit=crop', title: 'Desk, most days', tag: 'Craft', meta: '2024', width: 320, heightPct: 78 },
   { src: 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=600&h=800&fit=crop', title: 'Sketch', tag: 'Sketchbook', meta: '2023', width: 200, heightPct: 92 },
