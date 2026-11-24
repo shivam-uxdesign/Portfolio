@@ -378,10 +378,10 @@ export function AboutCell() {
   const [openBio, setOpenBio] = useState(0);
 
   return (
-    <div className="w-full min-h-full flex items-start md:items-center bg-background px-1 md:px-16 lg:px-20 py-2 md:py-4">
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6 md:gap-10 lg:gap-16 items-center">
-        {/* Left — hook + bio rail */}
-        <div>
+    <div className="w-full min-h-full flex items-stretch md:items-center bg-background px-1 md:px-16 lg:px-20 pt-2 pb-[80px] md:py-4">
+      <div className="w-full max-w-6xl mx-auto flex flex-col md:grid md:grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6 md:gap-10 lg:gap-16 md:items-center">
+        {/* Left — hook + bio rail (+ the filmstrip below lg, taking whatever height is left on phones) */}
+        <div className="flex flex-1 min-h-0 flex-col md:block">
           <p className="text-[11px] tracking-[0.15em] text-muted-foreground mb-3 md:mb-4 uppercase">About</p>
           <div className="space-y-0.5 md:space-y-1 mb-3 md:mb-7 lg:mb-6">
             {[
@@ -405,7 +405,6 @@ export function AboutCell() {
           </div>
 
           {/* Process & Practice as a sideways filmstrip below lg (the reel needs a column). */}
-          <ProcessStrip className="lg:hidden mb-3.5 md:mb-7" />
 
           <div className="space-y-2.5 md:space-y-5 relative">
             <div className="absolute left-[9px] top-2 bottom-2 w-px bg-border" />
@@ -442,6 +441,9 @@ export function AboutCell() {
               </motion.div>
             ))}
           </div>
+
+          {/* Process & Practice filmstrip: bottom of the page, fills the leftover space on phones. */}
+          <ProcessStrip className="ps2-fill lg:hidden mt-4 md:mt-8" />
         </div>
 
         {/* Right — Process & Practice reel (lg+). Sized to the cell, never taller. */}

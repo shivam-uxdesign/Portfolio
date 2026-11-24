@@ -32,7 +32,13 @@
   -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
   mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
 }
+.ps2-window { display: flex; flex-direction: column; gap: 10px; container-type: size; }
+.ps2-row { flex: 1 1 0; min-height: 0; overflow: hidden; }
+.ps2-row-1 { display: none; }
+/* Tall enough for two rows of comfortable tiles: show the second, drifting the other way. */
+@container (min-height: 130px) { .ps2-row-1 { display: block; } }
 .ps2-track { display: flex; height: 100%; width: max-content; will-change: transform; animation: ps2-left 30s linear infinite; }
+.ps2-row-1 .ps2-track { animation-name: ps2-right; animation-duration: 36s; }
 .ps2-set { display: flex; gap: 10px; padding-right: 10px; height: 100%; }
 .ps2-tile { position: relative; margin: 0; height: 100%; border-radius: 10px; overflow: hidden; background: color-mix(in oklab, var(--foreground) 6%, transparent); flex: none; }
 .ps2-tile img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.5); }
@@ -41,9 +47,16 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: linear-gradient(to top, rgba(15, 15, 14, .6), transparent);
 }
 @keyframes ps2-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes ps2-right { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 @media (prefers-reduced-motion: reduce) { .ps2-track { animation: none; } }
-/* Short phones (cell under ~470px tall): slimmer strip, no label row. */
+/* Phones: the strip sits at the bottom and grows into whatever space the
+   timeline leaves (and shrinks as an entry opens). */
+@media (max-width: 767px) {
+  .ps2-fill { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+  .ps2-fill .ps2-window { flex: 1 1 0; height: auto; min-height: 56px; max-height: 300px; }
+}
+/* Short phones (cell under ~470px tall): no label row. */
 @container (max-height: 470px) {
-  .ps2-window { height: 58px; }
   .ps2-root > .pr-head { display: none; }
+  .ps2-fill { margin-top: 10px; }
 }

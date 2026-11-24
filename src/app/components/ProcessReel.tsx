@@ -57,19 +57,24 @@ export function ProcessStrip({ className = '' }: { className?: string }) {
         <span className="pr-eyebrow">Process &amp; Practice</span>
         <span className="pr-sub">Brush before pixel.</span>
       </div>
+      {/* Two rows drifting opposite ways; the second row only shows when there's height for it. */}
       <div className="ps2-window">
-        <div className="ps2-track">
-          {[0, 1].map(copy => (
-            <div key={copy} className="ps2-set" aria-hidden={copy === 1 || undefined}>
-              {galleryImages.map(img => (
-                <figure key={img.title} className="ps2-tile" style={{ aspectRatio: img.heightPct >= 95 ? '4 / 5' : '4 / 3' }}>
-                  <img src={img.src} alt={copy === 0 ? img.title : ''} loading="lazy" draggable={false} onError={e => { e.currentTarget.style.visibility = 'hidden'; }} />
-                  <figcaption>{img.title}</figcaption>
-                </figure>
+        {[galleryImages, [...galleryImages.slice(2), ...galleryImages.slice(0, 2)]].map((row, r) => (
+          <div key={r} className={`ps2-row ps2-row-${r}`}>
+            <div className="ps2-track">
+              {[0, 1].map(copy => (
+                <div key={copy} className="ps2-set" aria-hidden={copy === 1 || r === 1 || undefined}>
+                  {row.map(img => (
+                    <figure key={img.title} className="ps2-tile" style={{ aspectRatio: img.heightPct >= 95 ? '4 / 5' : '4 / 3' }}>
+                      <img src={img.src} alt={copy === 0 && r === 0 ? img.title : ''} loading="lazy" draggable={false} onError={e => { e.currentTarget.style.visibility = 'hidden'; }} />
+                      <figcaption>{img.title}</figcaption>
+                    </figure>
+                  ))}
+                </div>
               ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
