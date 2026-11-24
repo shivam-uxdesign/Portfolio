@@ -41,6 +41,8 @@ export function StackPanel() {
                 >
                   <span className="stk-inner" aria-hidden="true">
                     <span className="stk-front">
+                      {/* Phones: a hint that the card turns over. */}
+                      <svg className="stk-flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 5v6h-6" /></svg>
                       <span className="stk-logo"><span>{c.logo}</span></span>
                       <span className="stk-text">
                         <span className="stk-name">{c.name}</span>

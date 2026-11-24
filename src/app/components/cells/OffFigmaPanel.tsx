@@ -59,7 +59,7 @@ export function OffFigmaPanel() {
             {row.items.map(it => (
               <li key={it.label}>
                 <Link to={it.to} className="of-card" style={{ '--c': it.color, '--t': it.tint } as React.CSSProperties} aria-label={`${it.label}, ${it.line}`} draggable={false}>
-                  <span className="of-emblem" aria-hidden="true">{it.emblem}</span>
+                  <span className="of-disc" aria-hidden="true"><span className="of-emblem">{it.emblem}</span></span>
                   <span className="of-text">
                     <span className="of-name">{it.label}</span>
                     <span className="of-line">{it.line}</span>
