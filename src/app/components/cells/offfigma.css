@@ -1,0 +1,53 @@
+/* Off Figma: header, then two rows of three cover cards sharing the height. */
+.of { display: flex; flex-direction: column; gap: 14px; padding: 4px 4px 2px; }
+.of-title { font-size: clamp(22px, 6.4cqw, 26px); line-height: 1.22; font-weight: 400; letter-spacing: -0.02em; margin: 0; }
+.of-row { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.of-row-label { margin: 0; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-foreground); }
+.of-cards { flex: 1 1 0; min-height: 0; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.of-cards > li { min-height: 0; display: flex; }
+
+.of-card {
+  container-type: size; position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between;
+  padding: 12px; border-radius: 16px; text-decoration: none; color: var(--foreground);
+  background: color-mix(in oklab, var(--t) 80%, var(--background)); border: 1px solid color-mix(in oklab, var(--c) 14%, transparent);
+  transition: background-color .3s, color .3s, transform .3s cubic-bezier(.3, 1.4, .5, 1), opacity .25s, box-shadow .3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.of-card:active { transform: scale(.97); }
+.of-card:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.of-emblem { color: var(--c); width: min(60px, 52cqw, 38cqh); aspect-ratio: 1; transition: color .3s, transform .3s; }
+.of-emblem svg { width: 100%; height: 100%; display: block; }
+.of-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.of-name { font-size: 14px; font-weight: 500; line-height: 1.2; }
+.of-line { font-size: 12px; line-height: 1.3; color: color-mix(in oklab, var(--c) 55%, var(--foreground)); transition: color .3s; }
+.of-open { font-size: 12px; font-weight: 500; height: 0; opacity: 0; overflow: hidden; transform: translateY(4px); transition: opacity .25s, transform .3s, height .3s; }
+/* Short cards (small phones): name only. */
+@container (max-height: 84px) { .of-line { display: none; } }
+
+/* Laptops: hover fills the card with its colour, lifts it, and shows "Open". */
+@media (hover: hover) {
+  .of:has(.of-card:hover) .of-card:not(:hover) { opacity: .72; }
+  .of-card:hover, .of-card:focus-visible { background: var(--c); color: #fff; transform: translateY(-4px) rotate(-1deg); box-shadow: 0 18px 34px -20px color-mix(in oklab, var(--c) 70%, transparent); }
+  .of-card:hover .of-emblem, .of-card:focus-visible .of-emblem { color: #fff; transform: rotate(-6deg) scale(1.06); }
+  .of-card:hover .of-line, .of-card:focus-visible .of-line { color: rgba(255, 255, 255, .8); }
+  .of-card:hover .of-open, .of-card:focus-visible .of-open { height: 18px; opacity: 1; transform: none; margin-top: 4px; }
+}
+
+@media (min-width: 768px) {
+  .of { gap: 20px; padding: 8px 24px; }
+  .of-title { font-size: 30px; }
+  .of-cards { gap: 14px; }
+  .of-card { padding: 18px; border-radius: 20px; }
+  .of-emblem { width: min(64px, 34cqw, 40cqh); }
+  .of-name { font-size: 16px; }
+  .of-line { font-size: 13px; }
+}
+@media (min-width: 1024px) {
+  .of { padding: 8px 40px; max-width: 1100px; margin: 0 auto; }
+  .of-title { font-size: clamp(30px, 2.8vw, 40px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .of-card, .of-emblem, .of-open { transition: background-color .2s, color .2s, opacity .2s; }
+  .of-card:hover, .of-card:focus-visible, .of-card:active { transform: none; }
+  .of-card:hover .of-emblem { transform: none; }
+}

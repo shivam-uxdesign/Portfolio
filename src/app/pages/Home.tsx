@@ -4,7 +4,7 @@ import { Home as HomeIcon, ArrowUp, Download } from 'lucide-react';
 import { Link } from 'react-router';
 import { AboutPanel } from '../components/cells/AboutPanel';
 import { ImageGallery } from '../components/ImageGallery';
-import { InterestGrid } from '../components/InterestGrid';
+import { OffFigmaPanel } from '../components/cells/OffFigmaPanel';
 import { AboutBlock } from '../components/AboutBlock';
 import { ResumeCards } from '../components/ResumeCards';
 import { FunProjects } from '../components/FunProjects';
@@ -432,20 +432,7 @@ export function ContactCell() {
 }
 
 export function InterestsCell() {
-  return (
-    <div className="w-full h-full bg-background flex flex-col">
-      <div className="px-8 md:px-12 pt-12 pb-6 flex-shrink-0">
-        <p className="text-[11px] tracking-[0.1em] text-muted-foreground uppercase mb-3">Interests</p>
-        <h2 className="text-[28px] md:text-[34px] text-foreground leading-tight mb-2">Off Figma</h2>
-        <p className="text-[13px] text-muted-foreground max-w-md leading-snug">
-          The things I make and consume when I'm not shipping product.
-        </p>
-      </div>
-      <div className="flex-1 min-h-0 px-4 pb-4 flex flex-col">
-        <InterestGrid />
-      </div>
-    </div>
-  );
+  return <OffFigmaPanel />;
 }
 
 export function ResumeCell() {
