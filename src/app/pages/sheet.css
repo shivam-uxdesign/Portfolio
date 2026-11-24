@@ -99,3 +99,22 @@
 
 @keyframes sh-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 @media (prefers-reduced-motion: reduce) { .work-peek.sheet-peek { transition: none; } }
+
+/* Scrollable cells (merged sections stack as pages) */
+.sh-scroll {
+  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain; touch-action: pan-y;
+  scrollbar-width: thin; -webkit-overflow-scrolling: touch;
+}
+.sh-page { min-height: 100%; display: flex; flex-direction: column; }
+.sh-page > * { flex: 1 1 auto; }
+.sh-page-fixed { height: 100%; }
+.sh-page + .sh-page { border-top: 1px solid var(--border); }
+.sh-more {
+  position: absolute; left: 50%; bottom: 6px; transform: translate(-50%, 6px); z-index: 3;
+  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+  background: rgba(255, 255, 255, .92); backdrop-filter: blur(8px); color: var(--foreground);
+  font-size: 11px; font-weight: 600; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+}
+.sh-more.on { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+.sh-more:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }

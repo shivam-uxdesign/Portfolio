@@ -6,7 +6,7 @@ import { SheetPeek } from '../components/hats/SheetPeek';
 import { HATS, PAL, type WearableId } from '../components/hats/hatsData';
 import type { HatId } from '../components/hats/props';
 import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
-import { PROJECTS, WorkCell, AboutCell, GalleryCell, ContactCell, ResumeCell, StackCell } from './Home';
+import { PROJECTS, WorkCell, AboutCell, GalleryCell, ContactCell, ResumeCell, StackCell, InterestsCell, FunCell } from './Home';
 import './sheet.css';
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
@@ -14,18 +14,18 @@ import './sheet.css';
 // the bottom; slide it up and it takes 80% of the screen, with Shivam hanging
 // on its top edge. Inside the sheet: a 3×2 grid, wrapping left/right only.
 
-type SheetCellId = 'about' | 'work' | 'resume' | 'gallery' | 'contact' | 'stack';
+type SheetCellId = 'about' | 'work' | 'resume' | 'interests' | 'fun' | 'stack';
 type Pos = { row: number; col: number };
 
 const GRID: { id: SheetCellId; label: string }[][] = [
   [{ id: 'about', label: 'About' }, { id: 'work', label: 'Work' }, { id: 'resume', label: 'Resume' }],
-  [{ id: 'gallery', label: 'Off the clock' }, { id: 'contact', label: 'Contact' }, { id: 'stack', label: 'Stack' }],
+  [{ id: 'interests', label: 'Off Figma' }, { id: 'fun', label: 'Fun' }, { id: 'stack', label: 'Stack' }],
 ];
 const START: Pos = { row: 0, col: 1 }; // opening the sheet lands on Work
 
 // Hat he wears on each cell, unless the visitor already picked one on the hero.
 const CONTEXT_HAT: Record<SheetCellId, HatId> = {
-  work: 'notes', about: 'cat', resume: 'helmet', gallery: 'beret', contact: 'party', stack: 'propeller',
+  work: 'notes', about: 'cat', resume: 'party', interests: 'beret', fun: 'propeller', stack: 'helmet',
 };
 
 const NAV_MS = 600;
@@ -41,9 +41,56 @@ const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+// Old links to merged sections land on the cell that now holds them, scrolled to the section.
+const ALIASES: Record<string, { cell: SheetCellId; section: string }> = {
+  contact: { cell: 'resume', section: 'contact-section' },
+  gallery: { cell: 'about', section: 'process-section' },
+};
+
 function findCell(id: string): Pos | null {
-  for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) if (GRID[r][c].id === id) return { row: r, col: c };
+  const target = ALIASES[id]?.cell ?? id;
+  for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) if (GRID[r][c].id === target) return { row: r, col: c };
   return null;
+}
+
+// ── Nested scrolling ──
+// Cells scroll on their own; the grid only takes a vertical gesture once the
+// cell can't scroll any further that way.
+const SCROLL_SEL = '[data-cell-scroll]';
+function canScroll(target: EventTarget | null, dir: number): boolean {
+  const el = (target as Element | null)?.closest?.(SCROLL_SEL) as HTMLElement | null;
+  if (!el) return false;
+  return dir > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 1;
+}
+
+function ScrollCell({ children, more }: { children: React.ReactNode; more?: { label: string; target: string } }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [showMore, setShowMore] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !more) return;
+    const update = () => setShowMore(el.scrollHeight > el.clientHeight + 8 && el.scrollTop < 40);
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => { el.removeEventListener('scroll', update); ro.disconnect(); };
+  }, [more]);
+  return (
+    <div className="relative w-full h-full">
+      <div ref={ref} data-cell-scroll className="sh-scroll">{children}</div>
+      {more && (
+        <button
+          type="button"
+          className={`sh-more${showMore ? ' on' : ''}`}
+          tabIndex={showMore ? 0 : -1}
+          onClick={() => ref.current?.querySelector(`#${more.target}`)?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth' })}
+        >
+          {more.label} <span aria-hidden="true">↓</span>
+        </button>
+      )}
+    </div>
+  );
 }
 
 // World = 5 columns (3 real + a clone each side for wraparound) × 2 rows.
@@ -57,12 +104,24 @@ function worldTransform(col: number, row: number, ov: number, W: number, H: numb
 // ─── Cells ────────────────────────────────────────────────────────────────────
 function CellContent({ id }: { id: SheetCellId }) {
   switch (id) {
-    case 'work': return <WorkCell />;
-    case 'about': return <AboutCell />;
-    case 'resume': return <ResumeCell />;
-    case 'gallery': return <GalleryCell />;
-    case 'contact': return <ContactCell />;
-    case 'stack': return <StackCell />;
+    case 'work': return <ScrollCell><WorkCell /></ScrollCell>;
+    // About, then Process & Practice as a second page.
+    case 'about': return (
+      <ScrollCell more={{ label: 'Process & Practice', target: 'process-section' }}>
+        <section className="sh-page"><AboutCell /></section>
+        <section id="process-section" className="sh-page sh-page-fixed"><GalleryCell /></section>
+      </ScrollCell>
+    );
+    // Resume, then Contact as a second page.
+    case 'resume': return (
+      <ScrollCell more={{ label: 'Contact', target: 'contact-section' }}>
+        <section className="sh-page"><ResumeCell /></section>
+        <section id="contact-section" className="sh-page"><ContactCell /></section>
+      </ScrollCell>
+    );
+    case 'interests': return <ScrollCell><InterestsCell /></ScrollCell>;
+    case 'fun': return <ScrollCell><FunCell /></ScrollCell>;
+    case 'stack': return <ScrollCell><StackCell /></ScrollCell>;
   }
 }
 
@@ -206,6 +265,8 @@ function initialPos(): Pos | null {
 
 export function SheetHome() {
   const [deepLink] = useState(initialPos);
+  // Read before the hash-sync effect rewrites an alias like #contact to #resume.
+  const [initialHash] = useState(() => (typeof window !== 'undefined' ? window.location.hash.replace('#', '') : ''));
   const reduce = useRef(reducedMotion()).current;
 
   // Sheet: 0 = resting bar, 1 = open.
@@ -348,6 +409,19 @@ export function SheetHome() {
     trackEvent('cell_view', { cell: cellId });
   }, [isOpen, cellId]);
 
+  // Old #contact / #gallery links: scroll the merged cell to that section.
+  useEffect(() => {
+    const alias = ALIASES[initialHash];
+    if (!alias) return;
+    const t = setTimeout(() => {
+      // The wraparound clones carry the same ids; take the copy in the real cell.
+      const sec = Array.from(clipRef.current?.querySelectorAll<HTMLElement>(`#${alias.section}`) ?? []).find(el => !el.closest('[inert]'));
+      const sc = sec?.closest(SCROLL_SEL) as HTMLElement | null;
+      if (sec && sc) sc.scrollTop = sec.offsetTop;
+    }, 60);
+    return () => clearTimeout(t);
+  }, []);
+
   // Deep-link arrival: he rises once on his own, then the tip says what he's for.
   useEffect(() => {
     if (!deepLink) return;
@@ -429,6 +503,7 @@ export function SheetHome() {
   // ── Wheel / trackpad ──
   useEffect(() => {
     const acc = { x: 0, y: 0 };
+    let innerScrollAt = 0;
     let reset: ReturnType<typeof setTimeout> | null = null, pinchEnd: ReturnType<typeof setTimeout> | null = null;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -444,6 +519,16 @@ export function SheetHome() {
         return;
       }
       if (lockedRef.current || gestureRef.current || ovRef.current > 0) return;
+      // Vertical wheel over a cell that can still scroll that way: let it scroll,
+      // and hold off grid moves briefly so trackpad momentum doesn't spill over.
+      if (sRef.current >= 1 && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        if (canScroll(e.target, Math.sign(e.deltaY))) {
+          const el = (e.target as Element).closest(SCROLL_SEL) as HTMLElement;
+          el.scrollTop += e.deltaY;
+          innerScrollAt = performance.now(); acc.x = acc.y = 0; return;
+        }
+        if (performance.now() - innerScrollAt < 450) { innerScrollAt = performance.now(); acc.x = acc.y = 0; return; }
+      }
       acc.x += e.deltaX; acc.y += e.deltaY;
       if (reset) clearTimeout(reset);
       reset = setTimeout(() => { acc.x = 0; acc.y = 0; }, 350);
@@ -460,6 +545,28 @@ export function SheetHome() {
     return () => { window.removeEventListener('wheel', onWheel); if (reset) clearTimeout(reset); if (pinchEnd) clearTimeout(pinchEnd); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animateOv]);
+
+  // ── Touch inside a scrollable cell: native scroll until its edge, then the grid ──
+  useEffect(() => {
+    let t0: { x: number; y: number; target: EventTarget | null; mode: 'native' | 'grid' | null } | null = null;
+    const onStart = (e: TouchEvent) => {
+      t0 = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY, target: e.target, mode: null } : null;
+    };
+    const onMove = (e: TouchEvent) => {
+      if (!t0 || e.touches.length !== 1 || sRef.current < 1 || !(t0.target as Element | null)?.closest?.(SCROLL_SEL)) return;
+      if (t0.mode === null) {
+        const dx = e.touches[0].clientX - t0.x, dy = e.touches[0].clientY - t0.y;
+        if (Math.hypot(dx, dy) < 6) return;
+        // Finger moving up = content scrolls down.
+        t0.mode = Math.abs(dy) > Math.abs(dx) && canScroll(t0.target, dy < 0 ? 1 : -1) ? 'native' : 'grid';
+        if (t0.mode === 'native') drag.current = null;
+      }
+      if (t0.mode === 'grid' && e.cancelable) e.preventDefault();
+    };
+    window.addEventListener('touchstart', onStart, { passive: true, capture: true });
+    window.addEventListener('touchmove', onMove, { passive: false, capture: true });
+    return () => { window.removeEventListener('touchstart', onStart, { capture: true }); window.removeEventListener('touchmove', onMove, { capture: true }); };
+  }, []);
 
   // ── Touch pinch → overview (sheet open) ──
   useEffect(() => {
@@ -510,6 +617,7 @@ export function SheetHome() {
       const vertical = Math.abs(dy) > Math.abs(dx);
       if (ovRef.current > 0) d.mode = 'none';
       else if (sRef.current < 1) d.mode = vertical && !lockedRef.current ? 'sheet' : 'none';
+      else if (vertical && canScroll(e.target, dy < 0 ? 1 : -1)) d.mode = 'none';
       else d.mode = vertical && dy > 0 && posRef.current.row === 0 && !lockedRef.current ? 'sheet' : 'grid';
       if (d.mode === 'sheet') { cancelAnimationFrame(sheetAnim.current); introRef.current?.skip(); }
     }

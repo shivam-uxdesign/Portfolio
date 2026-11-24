@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { Home as HomeIcon, ArrowUp } from 'lucide-react';
+import { Home as HomeIcon, ArrowUp, Download } from 'lucide-react';
 import { Link } from 'react-router';
 import { ImageGallery } from '../components/ImageGallery';
 import { InterestGrid } from '../components/InterestGrid';
@@ -375,7 +375,7 @@ export function AboutCell() {
   const SERIF = "'Playfair Display', Georgia, serif";
 
   return (
-    <div className="w-full h-full flex items-center bg-background px-8 md:px-16 lg:px-20 overflow-hidden">
+    <div className="w-full min-h-full flex items-center bg-background px-8 md:px-16 lg:px-20 py-6">
       <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-16 items-center">
         {/* Left — hook + bio rail */}
         <div>
@@ -473,7 +473,7 @@ export function GalleryCell() {
   );
 }
 
-function FunCell() {
+export function FunCell() {
   return (
     <div className="w-full h-full bg-background p-4">
       <FunProjects />
@@ -485,7 +485,7 @@ export function ContactCell() {
   const SERIF = "'Playfair Display', Georgia, serif";
 
   return (
-    <div className="w-full h-full flex items-center bg-background px-6 md:px-16 lg:px-20 overflow-hidden">
+    <div className="w-full min-h-full flex items-center bg-background px-6 md:px-16 lg:px-20 py-6">
       <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-4 lg:gap-14 items-center">
         {/* Left — greeting, status, signature */}
         <div className="flex flex-col gap-4 md:gap-5 max-w-[420px]">
@@ -529,7 +529,7 @@ export function ContactCell() {
   );
 }
 
-function InterestsCell() {
+export function InterestsCell() {
   return (
     <div className="w-full h-full bg-background flex flex-col">
       <div className="px-8 md:px-12 pt-12 pb-6 flex-shrink-0">
@@ -548,11 +548,20 @@ function InterestsCell() {
 
 export function ResumeCell() {
   return (
-    <div className="w-full h-full bg-background flex flex-col">
-      <div className="px-8 md:px-12 pt-8 pb-3">
+    <div className="w-full min-h-full bg-background flex flex-col">
+      <div className="px-4 md:px-12 pt-6 md:pt-8 pb-3 flex items-center justify-between gap-3">
         <p className="text-[11px] tracking-[0.1em] text-muted-foreground uppercase">Resume</p>
+        <a
+          href="/resume.pdf"
+          download="Shivam_Sehgal_Resume.pdf"
+          onClick={() => trackEvent('resume_download', {})}
+          className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3.5 py-2 text-[12px] font-medium transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <Download className="w-3.5 h-3.5" strokeWidth={1.75} aria-hidden="true" />
+          Download resume
+        </a>
       </div>
-      <div className="flex-1 min-h-0 px-4 pb-3 overflow-hidden flex flex-col">
+      <div className="flex-1 px-4 pb-3 flex flex-col">
         <ResumeCards />
       </div>
     </div>
