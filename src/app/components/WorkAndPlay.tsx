@@ -1,6 +1,9 @@
-import type { ReactNode } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { trackEvent } from '../../lib/analytics';
+import { ProjectStacks } from './projects/ProjectStacks';
+import { ProjectOverlay } from './projects/ProjectOverlay';
+import type { ProjectGroup, ProjectGroupId } from './projects/types';
 
 // One page, two sides: corporate case studies on the left, things built for
 // fun (mostly with AI) on the right. Side by side from md up, stacked on
@@ -42,10 +45,45 @@ function SideHeader({ eyebrow, title, sub }: { eyebrow: string; title: ReactNode
   );
 }
 
+// Phones: two decks — tap one and its projects open in a bottom sheet.
+function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
+  const groups = useMemo<ProjectGroup[]>(() => [
+    {
+      id: 'work', label: 'Shipped at work', count: `${work.length} case studies`,
+      heading: 'Shipped at work', sub: 'Product design at Rupyy and before.',
+      items: work.map(p => ({ title: p.title, descriptor: p.descriptor, link: p.link, external: p.external, bg: p.bg, thumbnail: p.thumbnail, tag: `Case study ${p.number}` })),
+    },
+    {
+      id: 'fun', label: 'Built for fun, with AI', count: `${play.length} apps`,
+      heading: 'Built for fun, with AI', sub: 'Small apps I made to play with ideas and AI tools.',
+      items: play.map(f => ({ title: f.title, descriptor: f.description, link: f.link, bg: f.color, image: f.image, tag: f.tag })),
+    },
+  ], [work, play]);
+  const [open, setOpen] = useState<{ id: ProjectGroupId; from: DOMRect; trigger: HTMLElement } | null>(null);
+  const onOpen = useCallback((id: ProjectGroupId, from: DOMRect, trigger: HTMLElement) => {
+    setOpen({ id, from, trigger });
+    trackEvent('project_stack_opened', { stack: id });
+  }, []);
+  const onClose = useCallback(() => setOpen(o => { o?.trigger.focus({ preventScroll: true }); return null; }), []);
+  const group = open && groups.find(g => g.id === open.id);
+  return (
+    <div className="md:hidden w-full min-h-full flex flex-col gap-5 pt-1 pb-4 px-1">
+      <div>
+        <p className="text-[11px] font-medium tracking-[0.09em] uppercase text-muted-foreground">Work &amp; Play</p>
+        <h2 className="mt-1 text-[1.35rem] font-medium leading-tight text-foreground" style={{ letterSpacing: '-0.03em' }}>Pick a stack</h2>
+      </div>
+      <ProjectStacks groups={groups} onOpen={onOpen} layout="column" />
+      {open && group && <ProjectOverlay group={group} from={open.from} onClose={onClose} />}
+    </div>
+  );
+}
+
 export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
   const SERIF = "'Playfair Display', Georgia, serif";
   return (
-    <div className="w-full min-h-full bg-background grid grid-cols-1 md:grid-cols-2 items-start md:content-center gap-6 lg:gap-10 py-2 md:py-4">
+    <>
+    <PhoneStacks work={work} play={play} />
+    <div className="hidden w-full min-h-full bg-background md:grid grid-cols-2 items-start content-center gap-6 lg:gap-10 py-4">
       {/* Corporate */}
       <section className="@container flex flex-col px-2 lg:px-4 md:pt-5 lg:pt-6" aria-labelledby="wp-work">
         <SideHeader eyebrow="Selected work" title={<span id="wp-work">Shipped at work</span>} sub="Product design at Rupyy and before. Case studies with the numbers." />
@@ -62,13 +100,6 @@ export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[]
           ))}
         </ul>
       </section>
-
-      {/* Phone divider */}
-      <div className="md:hidden flex items-center gap-3 px-2" aria-hidden="true">
-        <span className="h-px flex-1 bg-border" />
-        <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">and for fun</span>
-        <span className="h-px flex-1 bg-border" />
-      </div>
 
       {/* Fun / AI experiments — a distinct, playful panel */}
       <section className="@container flex flex-col rounded-3xl border border-dashed border-foreground/15 bg-foreground/[0.025] px-4 py-5 md:px-6 md:py-6 lg:px-8" aria-labelledby="wp-play">
@@ -91,5 +122,6 @@ export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[]
         </ul>
       </section>
     </div>
+    </>
   );
 }
