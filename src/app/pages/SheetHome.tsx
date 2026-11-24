@@ -97,6 +97,10 @@ function ScrollCell({ children, more }: { children: React.ReactNode; more?: { la
   );
 }
 
+// Resting zoom: shows a little more of the page in the bar without letting
+// the neighbouring cells (beyond their safe-zone padding) peek in at the sides.
+const barScale = (W: number) => Math.max(0.9, 1 - 64 / Math.max(1, W));
+
 // World = 5 columns (3 real + a clone each side for wraparound) × 2 rows.
 // Interpolates the visible world rect (cell → whole 3×2) so the zoom stays centred.
 function worldTransform(col: number, row: number, ov: number, W: number, H: number) {
@@ -200,24 +204,13 @@ const HeroPane = memo(function HeroPane({ onEngine }: { onEngine: (e: HatsEngine
 });
 
 // ─── Resting bar ──────────────────────────────────────────────────────────────
-const Teaser = memo(function Teaser({ onOpen }: { onOpen: () => void }) {
+// No stand-in: the bar is the real top of the sheet (the Work & Play page),
+// slightly zoomed out. This invisible button just makes it tappable.
+const BarButton = memo(function BarButton({ onOpen }: { onOpen: () => void }) {
   return (
-    <button type="button" className="sh-teaser" onClick={onOpen} aria-label={`Open my work: ${PROJECTS.length} case studies and side projects`}>
+    <button type="button" className="sh-bar" onClick={onOpen} aria-label={`Open my work: ${PROJECTS.length} case studies and ${FUN_PROJECTS.length} side projects`}>
       <span className="sh-handle" aria-hidden="true" />
-      <span className="sh-teaser-row">
-        <span className="sh-teaser-text">
-          <span className="sh-teaser-title">Work &amp; Play</span>
-          <span className="sh-teaser-sub">{PROJECTS.length} case studies + {FUN_PROJECTS.length} AI side projects · swipe up</span>
-        </span>
-        <span className="sh-teaser-arrow" aria-hidden="true">↑</span>
-      </span>
-      <span className="sh-thumbs" aria-hidden="true">
-        {PROJECTS.map(p => (
-          <span key={p.number} className="sh-thumb" style={{ background: p.bg }}>
-            <span className="sh-thumb-inner">{p.thumbnail}</span>
-          </span>
-        ))}
-      </span>
+      <span className="sh-bar-arrow" aria-hidden="true">↑</span>
     </button>
   );
 });
@@ -761,6 +754,9 @@ export function SheetHome() {
             onHome={() => closeRef.current()}
           />
           <div ref={clipRef} className="sh-clip" aria-hidden={!sheetVisible}>
+            {/* Zoomed out a touch at rest, growing to full size as the sheet rises:
+                the bar and the open sheet are the same surface. */}
+            <div className="absolute inset-0" style={{ transformOrigin: '50% 0', transform: s < 1 ? `scale(${lerp(barScale(size.W), 1, s).toFixed(4)})` : undefined }}>
             <div
               ref={el => { if (el) el.inert = !isOpen; }}
               className="absolute"
@@ -786,9 +782,10 @@ export function SheetHome() {
                 );
               }))}
             </div>
-            {/* Resting bar content — fades as the sheet rises. */}
-            <div className="sh-teaser-wrap" style={{ opacity: 1 - seg(s, 0.02, 0.35), pointerEvents: s > 0.05 ? 'none' : undefined }}>
-              <Teaser onOpen={() => openRef.current()} />
+            </div>
+            {/* Tap target + handle; the handle fades as his head arrives. */}
+            <div className="sh-bar-wrap" style={{ opacity: 1 - seg(s, 0, 0.35), pointerEvents: s > 0.05 ? 'none' : undefined, visibility: s >= 0.35 ? 'hidden' : undefined }}>
+              <BarButton onOpen={() => openRef.current()} />
             </div>
           </div>
 

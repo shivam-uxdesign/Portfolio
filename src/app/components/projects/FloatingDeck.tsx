@@ -6,23 +6,30 @@ import type { ProjectGroup } from './types';
 import './floating.css';
 
 // A deck's projects fly out and float over the sheet: the page stays visible
-// behind them (lightly washed), the three cards hang at slight angles and bob
-// gently. Nothing under them moves. Tap the background, × or Esc and they fly
-// back into the deck.
+// behind them (lightly washed). Work cards land straight and aligned; fun cards
+// hang at slight angles and bob. Nothing under them moves, and his hands stay
+// on top. Tap the background, × or Esc and they fly back into the deck.
 
 const reduced = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 const BLOCKED = ['wheel', 'touchstart', 'touchmove', 'touchend', 'gesturestart', 'gesturechange', 'gestureend'] as const;
 const FOCUSABLE = 'a[href],button:not([disabled])';
-// Resting pose of each card: a little tilt and sideways offset so they read as floating, not listed.
-const POSE = [{ r: -2.4, x: 0 }, { r: 1.8, x: 14 }, { r: -1.2, x: 4 }];
+// Resting pose of each card. Fun: a little tilt and sideways offset so they read
+// as floating, not listed. Work: straight and aligned.
+const PLAYFUL = [{ r: -2.4, x: 0 }, { r: 1.8, x: 14 }, { r: -1.2, x: 4 }];
+const STRAIGHT = [{ r: 0, x: 0 }, { r: 0, x: 0 }, { r: 0, x: 0 }];
 // Where each card sits in the deck (matches .ps-card-0/1/2), for the fly-out.
 const DECK_TILT = [0, 4, -6];
 
-export function FloatingDeck({ group, trigger, onClose }: { group: ProjectGroup; trigger: HTMLElement; onClose: () => void }) {
+export function FloatingDeck({ group, trigger, anchor, onClose }: { group: ProjectGroup; trigger: HTMLElement; anchor?: HTMLElement | null; onClose: () => void }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const closing = useRef(false);
+  const playful = group.id !== 'work';
+  const POSE = playful ? PLAYFUL : STRAIGHT;
+  // Inside the sheet so his hands (higher in the sheet's stack) stay above us.
+  const [host] = useState(() => trigger.closest<HTMLElement>('.sh-sheet'));
   const [region, setRegion] = useState(() => sheetRegion());
+  const [head, setHead] = useState(() => headBox(anchor, host));
   const [settled, setSettled] = useState(false);
 
   // The cards live in the deck while they're out: hide its own copies.
@@ -40,6 +47,7 @@ export function FloatingDeck({ group, trigger, onClose }: { group: ProjectGroup;
       const inDeck = `translate(${dx}px, ${dy}px) scale(${s}) rotate(${DECK_TILT[i]}deg) rotateX(55deg)`;
       const pose = `rotate(${POSE[i].r}deg)`;
       // Out: lift off the deck, unfurl flat (rotateX → 0), overshoot a touch past the pose, settle.
+      // Work overshoots straight up; fun swings past its tilt.
       const frames: Keyframe[] = out
         ? [{ transform: inDeck, opacity: 0.6 }, { transform: `translateY(-10px) rotate(${POSE[i].r * 1.8}deg)`, opacity: 1, offset: 0.7 }, { transform: pose, opacity: 1 }]
         : [{ transform: pose, opacity: 1 }, { transform: `translateY(-8px) rotate(${POSE[i].r * 1.6}deg)`, opacity: 1, offset: 0.25 }, { transform: inDeck, opacity: 0.5 }];
@@ -85,7 +93,8 @@ export function FloatingDeck({ group, trigger, onClose }: { group: ProjectGroup;
         else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
       }
     };
-    const onResize = () => setRegion(sheetRegion());
+    const onResize = () => { setRegion(sheetRegion()); setHead(headBox(anchor, host)); };
+    document.body.classList.add('fd-open');
     BLOCKED.forEach(t => window.addEventListener(t, stop, { capture: true }));
     window.addEventListener('keydown', onKey, { capture: true });
     window.addEventListener('resize', onResize);
@@ -94,6 +103,7 @@ export function FloatingDeck({ group, trigger, onClose }: { group: ProjectGroup;
       BLOCKED.forEach(t => window.removeEventListener(t, stop, { capture: true }));
       window.removeEventListener('keydown', onKey, { capture: true });
       window.removeEventListener('resize', onResize);
+      document.body.classList.remove('fd-open');
     };
   }, [requestClose]);
 
@@ -102,8 +112,8 @@ export function FloatingDeck({ group, trigger, onClose }: { group: ProjectGroup;
   return createPortal(
     <div
       ref={rootRef}
-      className={`fd-root${settled ? ' fd-settled' : ''}`}
-      style={{ top: region.top, height: region.height }}
+      className={`fd-root ${playful ? 'fd-playful' : 'fd-straight'}${host ? ' fd-in-sheet' : ''}${settled ? ' fd-settled' : ''}`}
+      style={{ ...(host ? null : { top: region.top, height: region.height }), paddingTop: head.bottom + 14 }}
       role="dialog"
       aria-modal="true"
       aria-label={group.heading}
@@ -113,12 +123,14 @@ export function FloatingDeck({ group, trigger, onClose }: { group: ProjectGroup;
       onClick={stopReact}
     >
       <div className="fd-scrim" onClick={requestClose} />
-      <div className="fd-head">
-        <span className="fd-chip">{group.heading}</span>
-        <button ref={closeRef} type="button" className="fd-close" onClick={requestClose} aria-label="Close">
+      {/* Takes the place of the page's own heading (which fades out), so nothing doubles up. */}
+      <div className="fd-head" style={{ top: head.top, left: head.left }}>
+        <p className="fd-eyebrow">Work &amp; Play</p>
+        <h2 className="fd-heading">{group.heading}</h2>
+      </div>
+      <button ref={closeRef} type="button" className="fd-close" style={{ top: head.top + (head.bottom - head.top) / 2 - 19 }} onClick={requestClose} aria-label="Close">
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
         </button>
-      </div>
       <ul className="fd-cards">
         {group.items.slice(0, 3).map((item, i) => {
           const body = (
@@ -144,8 +156,16 @@ export function FloatingDeck({ group, trigger, onClose }: { group: ProjectGroup;
         })}
       </ul>
     </div>,
-    document.body,
+    host ?? document.body,
   );
+}
+
+// Where the page's heading sits, relative to the host (sheet) or the screen.
+function headBox(anchor: HTMLElement | null | undefined, host: HTMLElement | null) {
+  const base = host?.getBoundingClientRect() ?? { top: sheetRegion().top, left: 0 };
+  if (!anchor) return { top: 16, left: 24, bottom: 62 };
+  const r = anchor.getBoundingClientRect();
+  return { top: r.top - base.top, left: r.left - base.left, bottom: r.bottom - base.top };
 }
 
 // The open sheet's area (the 80% below his head); falls back to the bottom 80%.

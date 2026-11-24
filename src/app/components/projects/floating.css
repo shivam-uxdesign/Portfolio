@@ -1,21 +1,21 @@
 /* Floating deck: project cards hanging over the sheet, page still visible behind. */
 .fd-root { position: fixed; left: 0; right: 0; z-index: 100; display: flex; flex-direction: column; padding: 14px 16px 18px; }
 .fd-scrim {
-  position: absolute; inset: 0; border-radius: 26px 26px 0 0;
+  position: absolute; inset: 0; border-radius: 28px 28px 0 0;
   background: color-mix(in oklab, var(--background) 42%, transparent);
   animation: fd-fade .25s ease-out both;
 }
 .fd-closing .fd-scrim { animation: fd-fade-out .3s ease-in .15s both; }
-.fd-head { position: relative; pointer-events: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; animation: fd-fade .25s .25s ease-out both; }
-.fd-closing .fd-head { animation: fd-fade-out .15s ease-in both; }
-.fd-chip, .fd-close { pointer-events: auto; }
-.fd-chip {
-  font-size: 12px; font-weight: 600; color: var(--foreground); padding: 7px 12px; border-radius: 999px;
-  background: var(--background); border: 1px solid var(--border); box-shadow: 0 6px 18px -10px rgba(20, 20, 18, .4);
-}
+.fd-in-sheet { position: absolute; top: 0; bottom: 0; z-index: 6; }
+/* Sits exactly where the page's own heading was. */
+.fd-head { position: absolute; z-index: 1; pointer-events: none; animation: fd-fade .25s .1s ease-out both; }
+.fd-closing .fd-head, .fd-closing .fd-close { animation: fd-fade-out .15s ease-in both; }
+.fd-eyebrow { margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .09em; text-transform: uppercase; color: var(--muted-foreground); }
+.fd-heading { margin: 4px 0 0; font-size: 1.35rem; font-weight: 500; line-height: 1.25; letter-spacing: -.03em; color: var(--foreground); }
 .fd-close {
-  width: 38px; height: 38px; border-radius: 999px; display: grid; place-items: center; cursor: pointer;
+  position: absolute; right: 18px; z-index: 1; width: 38px; height: 38px; border-radius: 999px; display: grid; place-items: center; cursor: pointer;
   background: var(--background); color: var(--foreground); border: 1px solid var(--border); box-shadow: 0 6px 18px -10px rgba(20, 20, 18, .4);
+  animation: fd-fade .25s .1s ease-out both;
 }
 .fd-close:focus-visible, .fd-link:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 
@@ -24,7 +24,7 @@
 .fd-card { min-height: 0; transform-origin: 50% 0; will-change: transform; }
 .fd-link { display: block; height: 100%; color: inherit; text-decoration: none; border-radius: 20px; }
 .fd-bob { display: block; height: 100%; }
-.fd-settled .fd-bob { animation: fd-bob 3.4s ease-in-out infinite alternate; }
+.fd-playful.fd-settled .fd-bob { animation: fd-bob 3.4s ease-in-out infinite alternate; }
 .fd-lift {
   display: flex; height: 100%; gap: 12px; padding: 10px; border-radius: 20px;
   background: var(--background); border: 1px solid var(--border);
@@ -46,6 +46,8 @@
 @keyframes fd-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fd-fade-out { from { opacity: 1; } to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .fd-settled .fd-bob, .fd-scrim, .fd-head { animation: none !important; }
+  .fd-settled .fd-bob, .fd-scrim, .fd-head, .fd-close { animation: none !important; }
   .fd-lift { transition: none; }
 }
+/* Work: one clean, aligned column. */
+.fd-straight .fd-cards { padding: 0 6px; }

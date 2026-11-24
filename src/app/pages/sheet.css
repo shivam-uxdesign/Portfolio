@@ -18,27 +18,20 @@
   box-shadow: 0 -24px 48px -28px rgba(20, 20, 18, .35);
 }
 
-/* Resting bar (the top 25% of the sheet = 20% of the screen) */
-.sh-teaser-wrap { position: absolute; left: 0; right: 0; top: 0; height: 25%; background: var(--background); z-index: 2; }
-.sh-teaser {
-  position: absolute; inset: 0; width: 100%; display: flex; flex-direction: column; align-items: stretch;
-  padding: 10px 24px 0; border: 0; background: none; cursor: grab; text-align: left; color: inherit;
-  -webkit-tap-highlight-color: transparent; overflow: hidden;
+/* Resting bar = the top of the real sheet (25% of it = 20% of the screen). */
+.sh-bar-wrap { position: absolute; left: 0; right: 0; top: 0; height: 25%; z-index: 2; }
+.sh-bar {
+  position: absolute; inset: 0; width: 100%; border: 0; padding: 0; background: none; cursor: grab; color: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
-.sh-teaser:focus-visible { outline: 2px solid var(--ring); outline-offset: -4px; border-radius: 28px 28px 0 0; }
-.sh-handle { align-self: center; width: 40px; height: 4px; border-radius: 4px; background: var(--border); margin-bottom: 10px; flex: none; }
-.sh-teaser-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: none; max-width: 980px; width: 100%; margin: 0 auto; }
-.sh-teaser-text { display: flex; flex-direction: column; }
-.sh-teaser-title { font-size: 17px; font-weight: 600; letter-spacing: -.02em; color: var(--foreground); }
-.sh-teaser-sub { font-size: 11px; color: var(--muted-foreground); }
-.sh-teaser-arrow {
-  width: 32px; height: 32px; border-radius: 999px; border: 1px solid var(--border); display: grid; place-items: center;
-  font-size: 14px; color: var(--foreground);
+.sh-bar:focus-visible { outline: 2px solid var(--ring); outline-offset: -4px; border-radius: 28px 28px 0 0; }
+.sh-handle { position: absolute; top: 10px; left: 50%; margin-left: -20px; width: 40px; height: 4px; border-radius: 4px; background: var(--border); }
+.sh-bar-arrow {
+  position: absolute; top: 22px; right: 22px; width: 32px; height: 32px; border-radius: 999px; border: 1px solid var(--border);
+  display: grid; place-items: center; font-size: 14px; color: var(--foreground); background: var(--background);
 }
-@media (prefers-reduced-motion: no-preference) { .sh-teaser-arrow { animation: sh-nudge 2.4s ease-in-out infinite; } }
-.sh-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px auto 0; width: 100%; max-width: 980px; flex: 1 1 auto; min-height: 40px; }
-.sh-thumb { position: relative; border-radius: 12px 12px 0 0; overflow: hidden; outline: 1px solid rgba(0,0,0,.06); outline-offset: -1px; height: 200px; }
-.sh-thumb-inner { position: absolute; left: 0; top: 0; width: 200%; height: 200%; transform: scale(.5); transform-origin: 0 0; }
+@media (min-width: 768px) { .sh-bar-arrow { top: 28px; right: 32px; } }
+@media (prefers-reduced-motion: no-preference) { .sh-bar-arrow { animation: sh-nudge 2.4s ease-in-out infinite; } }
 
 /* Overview overlay cells */
 .sh-ov-cell { position: absolute; width: 20%; height: 50%; border: 3px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -128,3 +121,10 @@
 .work-peek.sheet-peek.hands-only.is-hidden .wp-head { pointer-events: none; }
 /* While peeking the portrait slides outside its own box; don't clip it. */
 .sh-hero.peeking .hh-cell, .sh-hero.peeking .hh-stage-wrap { overflow: visible; }
+
+/* Floating deck open: the hands stay above it, the Compass steps aside. */
+.sh-sheet .work-peek.sheet-peek { z-index: 8; }
+body.fd-open .work-peek.sheet-peek { pointer-events: none; }
+body.fd-open .work-peek.sheet-peek * { pointer-events: none !important; }
+.sh-compass { transition: opacity .25s; }
+body.fd-open .sh-compass { opacity: 0; pointer-events: none; }

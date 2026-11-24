@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { trackEvent } from '../../lib/analytics';
 import { ProjectStacks } from './projects/ProjectStacks';
@@ -66,14 +66,16 @@ function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
   }, []);
   const onClose = useCallback(() => setOpen(o => { o?.trigger.focus({ preventScroll: true }); return null; }), []);
   const group = open && groups.find(g => g.id === open.id);
+  const headRef = useRef<HTMLDivElement>(null);
   return (
     <div className="md:hidden w-full min-h-full flex flex-col gap-5 pt-1 pb-4 px-1">
-      <div>
+      {/* While a deck is out, its own title takes this heading's place. */}
+      <div ref={headRef} className="transition-opacity duration-200" style={{ opacity: open ? 0 : 1 }}>
         <p className="text-[11px] font-medium tracking-[0.09em] uppercase text-muted-foreground">Work &amp; Play</p>
         <h2 className="mt-1 text-[1.35rem] font-medium leading-tight text-foreground" style={{ letterSpacing: '-0.03em' }}>Pick a stack</h2>
       </div>
       <ProjectStacks groups={groups} onOpen={onOpen} layout="column" />
-      {open && group && <FloatingDeck group={group} trigger={open.trigger} onClose={onClose} />}
+      {open && group && <FloatingDeck group={group} trigger={open.trigger} anchor={headRef.current} onClose={onClose} />}
     </div>
   );
 }
@@ -83,7 +85,7 @@ export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[]
   return (
     <>
     <PhoneStacks work={work} play={play} />
-    <div className="hidden w-full min-h-full bg-background md:grid grid-cols-2 items-start content-center gap-6 lg:gap-10 py-4">
+    <div className="hidden w-full min-h-full bg-background md:grid grid-cols-2 items-start content-start gap-6 lg:gap-10 py-4">
       {/* Corporate */}
       <section className="@container flex flex-col px-2 lg:px-4 md:pt-5 lg:pt-6" aria-labelledby="wp-work">
         <SideHeader eyebrow="Selected work" title={<span id="wp-work">Shipped at work</span>} sub="Product design at Rupyy and before. Case studies with the numbers." />
