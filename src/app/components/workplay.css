@@ -1,0 +1,60 @@
+/* Work & Play on md+: header, then two columns (hairline between), each with a
+   featured card and two smaller cards beneath, sharing the full height. */
+.wpd { width: 100%; height: 100%; flex-direction: column; gap: 18px; padding: 8px 24px; background: var(--background); }
+.wpd-h { font-size: 30px; line-height: 1.2; font-weight: 400; letter-spacing: -0.02em; margin: 0; }
+.wpd-cols { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; }
+.wpd-col { min-height: 0; display: flex; flex-direction: column; gap: 12px; padding-right: 28px; }
+.wpd-col + .wpd-col { padding: 0 0 0 28px; border-left: 1px solid var(--border); }
+.wpd-heading { margin: 0; font-size: 11px; font-weight: 400; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-foreground); }
+
+.wpd-feature, .wpd-small {
+  position: relative; display: flex; min-height: 0; text-decoration: none; color: var(--foreground); border-radius: 18px;
+  transition: transform .28s cubic-bezier(.3, 1.4, .5, 1);
+}
+.wpd-feature:focus-visible, .wpd-small:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.wpd-thumb { position: relative; display: block; overflow: hidden; border-radius: 14px; outline: 1px solid rgba(0, 0, 0, .05); outline-offset: -1px; }
+.wpd-thumb > * { transition: transform .4s cubic-bezier(.2, .8, .3, 1); }
+.wpd-eyebrow { font-size: 10.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
+.wpd-title { font-size: 15px; font-weight: 500; line-height: 1.3; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+
+/* Featured: thumbnail left, words right. */
+.wpd-feature { flex: 1.15 1 0; gap: 16px; align-items: stretch; }
+.wpd-feature .wpd-thumb { flex: 0 0 44%; }
+.wpd-text { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+.wpd-feature .wpd-title { font-size: 17px; }
+.wpd-desc { font-size: 13px; line-height: 1.45; color: var(--muted-foreground); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.wpd-cta { margin-top: 4px; font-size: 12.5px; font-weight: 500; }
+.wpd-cta span { display: inline-block; transition: transform .2s; }
+
+/* Two smaller ones beneath: thumbnail on top. */
+.wpd-pair { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.wpd-small { flex-direction: column; gap: 4px; }
+.wpd-small .wpd-thumb { flex: 1 1 0; min-height: 40px; margin-bottom: 4px; }
+.wpd-small .wpd-title { -webkit-line-clamp: 1; }
+/* Fun side keeps a little play: the small cards sit tilted until hovered. */
+.wpd-col.playful .wpd-small:nth-child(1) { transform: rotate(-1.6deg); }
+.wpd-col.playful .wpd-small:nth-child(2) { transform: rotate(1.3deg); }
+
+@media (hover: hover) {
+  .wpd-feature:hover, .wpd-small:hover, .wpd-col.playful .wpd-small:hover { transform: translateY(-3px) rotate(0deg); }
+  .wpd-feature:hover .wpd-thumb > *, .wpd-small:hover .wpd-thumb > * { transform: scale(1.04); }
+  .wpd-feature:hover .wpd-cta span { transform: translateX(3px); }
+}
+/* Short laptops: one-line descriptions. */
+@media (max-height: 760px) { .wpd-desc { -webkit-line-clamp: 1; } .wpd { gap: 14px; } }
+
+@media (min-width: 1024px) {
+  .wpd { padding: 8px 40px; max-width: 1240px; margin: 0 auto; }
+  .wpd-h { font-size: clamp(28px, 2.6vw, 38px); }
+  .wpd-col { padding-right: 36px; } .wpd-col + .wpd-col { padding-left: 36px; }
+}
+/* iPad upright: columns are narrow, so the featured card stacks too. */
+@media (max-width: 1023px) and (orientation: portrait) {
+  .wpd-feature { flex-direction: column; gap: 8px; }
+  .wpd-feature .wpd-thumb { flex: 1 1 0; min-height: 80px; }
+  .wpd-text { flex: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wpd-feature, .wpd-small, .wpd-thumb > * { transition: none; }
+  .wpd-feature:hover, .wpd-small:hover { transform: none; }
+}

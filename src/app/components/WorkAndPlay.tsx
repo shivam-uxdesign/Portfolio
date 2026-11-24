@@ -1,49 +1,17 @@
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { trackEvent } from '../../lib/analytics';
+import './workplay.css';
 import { ProjectStacks } from './projects/ProjectStacks';
 import { FloatingDeck } from './projects/FloatingDeck';
 import type { ProjectGroup, ProjectGroupId } from './projects/types';
 
-// One page, two sides: corporate case studies on the left, things built for
-// fun (mostly with AI) on the right. Side by side from md up, stacked on
-// phones. Cards respond to their column's width (container queries), not the
-// viewport, so they hold up at every split.
+// One page, two sides: corporate case studies and things built for fun (mostly
+// with AI). Phones: two stacks that fly open. md+: two columns, each with a
+// featured project and two smaller ones.
 
 export interface WorkItem { title: string; descriptor: string; number: string; bg: string; link: string; external?: boolean; thumbnail: ReactNode }
 export interface PlayItem { title: string; description: string; tag: string; color: string; image: string; link: string }
-
-function Card({ to, external, onOpen, thumb, eyebrow, title, desc, cta }: {
-  to: string; external?: boolean; onOpen: () => void; thumb: ReactNode; eyebrow: string; title: string; desc: string; cta: string;
-}) {
-  const cls = 'wp-card group flex items-stretch gap-3 @md:gap-4 rounded-2xl p-2 -m-2 text-left transition-colors hover:bg-foreground/[0.035] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
-  const body = (
-    <>
-      <span className="relative shrink-0 w-[34%] @md:w-[40%] aspect-[4/3] @lg:aspect-[16/10] rounded-xl overflow-hidden outline outline-1 -outline-offset-1 outline-black/5">
-        {thumb}
-      </span>
-      <span className="flex min-w-0 flex-col justify-center gap-1 py-0.5">
-        <span className="text-[10px] font-semibold tracking-[0.09em] uppercase text-muted-foreground">{eyebrow}</span>
-        <span className="text-[13px] @md:text-[15px] font-semibold leading-snug text-foreground line-clamp-3 @md:line-clamp-2">{title}</span>
-        <span className="hidden @2xs:block text-[12px] @md:text-[13px] leading-snug text-muted-foreground line-clamp-2">{desc}</span>
-        <span className="mt-0.5 text-[11.5px] font-semibold text-foreground opacity-80 group-hover:opacity-100">{cta} <span aria-hidden="true" className="inline-block transition-transform group-hover:translate-x-0.5">→</span></span>
-      </span>
-    </>
-  );
-  return external
-    ? <a href={to} target="_blank" rel="noopener noreferrer" className={cls} onClick={onOpen}>{body}</a>
-    : <Link to={to} className={cls} onClick={onOpen}>{body}</Link>;
-}
-
-function SideHeader({ eyebrow, title, sub }: { eyebrow: string; title: ReactNode; sub: string }) {
-  return (
-    <div className="mb-3 @md:mb-5">
-      <p className="text-[11px] font-medium tracking-[0.09em] uppercase text-muted-foreground">{eyebrow}</p>
-      <h2 className="mt-1 text-[1.35rem] @md:text-[1.7rem] font-medium leading-tight text-foreground" style={{ letterSpacing: '-0.03em' }}>{title}</h2>
-      <p className="mt-1 text-[12.5px] @md:text-[13px] text-muted-foreground">{sub}</p>
-    </div>
-  );
-}
 
 // Phones: two decks — tap one and its projects fly out and float over the sheet.
 function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
@@ -80,50 +48,69 @@ function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
   );
 }
 
+// Laptops: two columns split by a hairline. Each: one featured project across
+// the column, two smaller ones beneath — all six visible, no scrolling.
+interface Entry { to: string; external?: boolean; side: 'work' | 'play'; thumb: ReactNode; eyebrow: string; title: string; desc: string; cta: string }
+
+function EntryLink({ e, className, children }: { e: Entry; className: string; children: ReactNode }) {
+  const onClick = () => trackEvent('project_open', { side: e.side, link: e.to });
+  return e.external
+    ? <a href={e.to} target="_blank" rel="noopener noreferrer" className={className} onClick={onClick} draggable={false}>{children}</a>
+    : <Link to={e.to} className={className} onClick={onClick} draggable={false}>{children}</Link>;
+}
+
+function Column({ id, heading, entries, playful }: { id: string; heading: ReactNode; entries: Entry[]; playful?: boolean }) {
+  const [main, ...rest] = entries;
+  return (
+    <section className={`wpd-col${playful ? ' playful' : ''}`} aria-labelledby={id}>
+      <h3 id={id} className="wpd-heading">{heading}</h3>
+      <EntryLink e={main} className="wpd-feature">
+        <span className="wpd-thumb">{main.thumb}</span>
+        <span className="wpd-text">
+          <span className="wpd-eyebrow">{main.eyebrow}</span>
+          <span className="wpd-title">{main.title}</span>
+          <span className="wpd-desc">{main.desc}</span>
+          <span className="wpd-cta">{main.cta} <span aria-hidden="true">→</span></span>
+        </span>
+      </EntryLink>
+      <div className="wpd-pair">
+        {rest.map(e => (
+          <EntryLink key={e.to} e={e} className="wpd-small">
+            <span className="wpd-thumb">{e.thumb}</span>
+            <span className="wpd-eyebrow">{e.eyebrow}</span>
+            <span className="wpd-title">{e.title}</span>
+          </EntryLink>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
   const SERIF = "'Playfair Display', Georgia, serif";
+  const workEntries: Entry[] = work.map(p => ({
+    to: p.link, external: p.external, side: 'work', eyebrow: `Case study ${p.number}`, title: p.title, desc: p.descriptor, cta: 'Read case study',
+    thumb: <span className="absolute inset-0" style={{ background: p.bg }}><span className="wp-thumb">{p.thumbnail}</span></span>,
+  }));
+  const playEntries: Entry[] = play.map(f => ({
+    to: f.link, side: 'play', eyebrow: f.tag, title: f.title, desc: f.description, cta: 'Try it',
+    thumb: <span className="absolute inset-0" style={{ background: f.color }}><img src={f.image} alt="" loading="lazy" draggable={false} className="w-full h-full object-cover" onError={e => { e.currentTarget.style.visibility = 'hidden'; }} /></span>,
+  }));
   return (
     <>
-    <PhoneStacks work={work} play={play} />
-    <div className="hidden w-full min-h-full bg-background md:grid grid-cols-2 items-start content-start gap-6 lg:gap-10 py-4">
-      {/* Corporate */}
-      <section className="@container flex flex-col px-2 lg:px-4 md:pt-5 lg:pt-6" aria-labelledby="wp-work">
-        <SideHeader eyebrow="Selected work" title={<span id="wp-work">Shipped at work</span>} sub="Product design at Rupyy and before. Case studies with the numbers." />
-        <ul className="flex flex-col gap-4 @md:gap-5">
-          {work.map(p => (
-            <li key={p.link}>
-              <Card
-                to={p.link} external={p.external}
-                onOpen={() => trackEvent('project_open', { side: 'work', link: p.link })}
-                thumb={<span className="absolute inset-0" style={{ background: p.bg }}><span className="wp-thumb">{p.thumbnail}</span></span>}
-                eyebrow={`Case study ${p.number}`} title={p.title} desc={p.descriptor} cta="Read case study"
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Fun / AI experiments — a distinct, playful panel */}
-      <section className="@container flex flex-col rounded-3xl border border-dashed border-foreground/15 bg-foreground/[0.025] px-4 py-5 md:px-6 md:py-6 lg:px-8" aria-labelledby="wp-play">
-        <SideHeader
-          eyebrow="Fun & experiments"
-          title={<span id="wp-play">Built for <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500 }} className="text-primary">fun</span>, with AI</span>}
-          sub="Small apps I made to play with ideas and AI tools."
-        />
-        <ul className="flex flex-col gap-4 @md:gap-5">
-          {play.map(f => (
-            <li key={f.link}>
-              <Card
-                to={f.link}
-                onOpen={() => trackEvent('project_open', { side: 'play', link: f.link })}
-                thumb={<span className="absolute inset-0" style={{ background: f.color }}><img src={f.image} alt="" loading="lazy" draggable={false} className="w-full h-full object-cover" onError={e => { e.currentTarget.style.visibility = 'hidden'; }} /></span>}
-                eyebrow={f.tag} title={f.title} desc={f.description} cta="Try it"
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
+      <PhoneStacks work={work} play={play} />
+      <div className="wpd hidden md:flex">
+        <header className="wpd-head">
+          <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase mb-3">Work &amp; Play</p>
+          <h2 className="wpd-h text-foreground">
+            Things I've <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>shipped</span>, and things I've played with.
+          </h2>
+        </header>
+        <div className="wpd-cols">
+          <Column id="wp-work" heading="Shipped at work" entries={workEntries} />
+          <Column id="wp-play" heading="Built for fun, with AI" entries={playEntries} playful />
+        </div>
+      </div>
     </>
   );
 }

@@ -126,7 +126,7 @@ function themeVars(hat: WearableId): React.CSSProperties | undefined {
 // ─── Cells ────────────────────────────────────────────────────────────────────
 function CellContent({ id }: { id: SheetCellId }) {
   switch (id) {
-    case 'work': return <ScrollCell><WorkAndPlay work={PROJECTS} play={FUN_PROJECTS} /></ScrollCell>;
+    case 'work': return <ScrollCell><section className="sh-page sh-page-fixed"><WorkAndPlay work={PROJECTS} play={FUN_PROJECTS} /></section></ScrollCell>;
     // About, with Process & Practice as a reel beside it.
     case 'about': return (
       <ScrollCell><section className="sh-page sh-page-fixed"><AboutCell /></section></ScrollCell>
