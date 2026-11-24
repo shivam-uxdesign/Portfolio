@@ -1,0 +1,183 @@
+/* Hats hero + Work peek. Ported from design-ref/hats/hats-hero-reference.html.
+   Everything is scoped under .hats-hero / .work-peek so nothing leaks into the
+   rest of the grid. The page background never changes: per-hat colour lives
+   only inside the portrait card (#bgrect / #bghalo) and --hh-accent. */
+
+.hats-hero, .hh-text, .work-peek {
+  --hh-accent: #8A9E7B;
+  --hh-shadow: rgba(20, 20, 18, .14);
+  --hh-glow: rgba(255, 255, 255, 0);
+}
+.dark .hats-hero, .dark .hh-text, .dark .work-peek {
+  --hh-shadow: rgba(0, 0, 0, .5);
+  --hh-glow: rgba(255, 255, 255, .35);
+}
+
+/* ── Stage sizing ───────────────────────────────────────────────────────────
+   The wrapper is a size container; the stage takes the largest box that fits
+   the cell's safe area (square from md up, slightly taller on phones). */
+.hh-cell { container-type: size; }
+.hh-stage-wrap {
+  container-type: size; position: relative; display: flex; align-items: center; justify-content: center;
+  flex: 1 1 0; min-height: 0; max-height: min(600px, 120cqw);
+}
+.hats-hero { position: relative; width: min(100cqw, 540px); height: min(100cqh, 100cqw * 1.2, 600px); }
+@media (min-width: 768px) {
+  .hh-stage-wrap { max-height: min(540px, 100cqw); }
+  .hats-hero { width: min(100cqw, 100cqh, 540px); height: min(100cqw, 100cqh, 540px); }
+}
+
+.hats-hero .hh-stage {
+  position: absolute; inset: 0; container-type: size;
+  user-select: none; -webkit-user-select: none;
+}
+.hats-hero .hh-me {
+  position: absolute; left: 50%; top: 54%;
+  width: min(58cqw, 58cqh); height: auto;
+  transform: translate(-50%, -50%);
+  border-radius: 24px; overflow: hidden; cursor: pointer;
+  box-shadow: 0 24px 48px -26px var(--hh-shadow);
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow .5s;
+}
+.hats-hero #bg rect, .hats-hero #bg circle { transition: fill .6s, opacity .5s; }
+
+/* ── Orbit, ring, hats ──────────────────────────────────────────────────── */
+.hats-hero .ring {
+  position: absolute; border-radius: 50%; border: 2px dashed var(--hh-accent);
+  opacity: 0; transform: scale(.8); pointer-events: none; z-index: 3;
+  transition: opacity .25s, transform .35s cubic-bezier(.3, 1.5, .5, 1);
+}
+.hats-hero .dragging .ring { opacity: .6; transform: scale(1); }
+.hats-hero .dragging .ring.hot { opacity: 1; transform: scale(1.12); border-style: solid; }
+
+.hats-hero .hat {
+  position: absolute; left: 0; top: 0; width: var(--hs, 60px); height: var(--hs, 60px);
+  padding: 0; border: 0; background: none; cursor: grab;
+  touch-action: none; z-index: 5; will-change: transform;
+  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, .18)) drop-shadow(0 0 8px var(--hh-glow));
+  transition: opacity .35s;
+}
+.hats-hero .hat:active { cursor: grabbing; }
+.hats-hero .hat svg { width: 100%; height: 100%; display: block; pointer-events: none; overflow: visible; }
+.hats-hero .hat.worn { opacity: 0; pointer-events: none; }
+.hats-hero .hat .tag {
+  position: absolute; left: 50%; top: 100%; transform: translate(-50%, 2px);
+  white-space: nowrap; font: 600 11px var(--font-body, inherit);
+  background: var(--foreground); color: var(--background);
+  padding: 3px 8px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.hats-hero .hat:hover .tag, .hats-hero .hat:focus-visible .tag { opacity: 1; }
+.hats-hero .hat:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 12px; }
+
+/* Overview: orbiting hats fade out; the portrait stays, wearing the hat. */
+.hats-hero.is-overview .hat { opacity: 0; pointer-events: none; transition: opacity .25s; }
+.hats-hero.is-overview .hh-me { cursor: default; }
+
+.hats-hero .ripple {
+  position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
+  border: 3px solid var(--hh-accent); pointer-events: none; z-index: 4;
+  animation: hh-rip .9s cubic-bezier(.2, .7, .3, 1) forwards;
+}
+.hats-hero .p { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 6; }
+.hats-hero .speed { position: absolute; left: 0; height: 3px; border-radius: 3px; background: var(--foreground); opacity: .4; pointer-events: none; z-index: 2; }
+.hats-hero .pop {
+  position: absolute; z-index: 7; background: #fff; color: #1d1d1d;
+  font: 600 12px var(--font-body, inherit); padding: 7px 11px; border-radius: 12px;
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .35); pointer-events: none; white-space: nowrap;
+}
+
+/* ── Expression state (data-* on the svg) ─────────────────────────────────── */
+.hats-hero .hh-me .m { display: none; }
+.hats-hero .hh-me[data-mouth=grin] #m-grin, .hats-hero .hh-me[data-mouth=o] #m-o,
+.hats-hero .hh-me[data-mouth=small] #m-small, .hats-hero .hh-me[data-mouth=smile] #m-smile,
+.hats-hero .hh-me[data-mouth=flat] #m-flat, .hats-hero .hh-me[data-mouth=tongue] #m-tongue,
+.hats-hero .hh-me[data-mouth=laugh] #m-laugh, .hats-hero .hh-me[data-mouth=hmm] #m-hmm,
+.hats-hero .hh-me[data-mouth=soft] #m-soft { display: inline; }
+.hats-hero .hh-me .eye > * { display: none; }
+.hats-hero .hh-me[data-eyes=open] .pupil, .hats-hero .hh-me[data-eyes=happy] .e-happy,
+.hats-hero .hh-me[data-eyes=squint] .e-squint, .hats-hero .hh-me[data-eyes=closed] .e-closed { display: inline; }
+.hats-hero #brow-l, .hats-hero #brow-r { transform-box: fill-box; transform-origin: 50% 50%; transition: transform .25s cubic-bezier(.3, 1.5, .5, 1); }
+.hats-hero .hh-me[data-brows=up] #brow-l, .hats-hero .hh-me[data-brows=up] #brow-r { transform: translateY(-14px); }
+.hats-hero .hh-me[data-brows=down] #brow-l { transform: translateY(8px) rotate(8deg); }
+.hats-hero .hh-me[data-brows=down] #brow-r { transform: translateY(8px) rotate(-8deg); }
+.hats-hero .hh-me[data-brows=worried] #brow-l { transform: translateY(-6px) rotate(-10deg); }
+.hats-hero .hh-me[data-brows=worried] #brow-r { transform: translateY(-6px) rotate(10deg); }
+.hats-hero .hh-me[data-brows=think] #brow-l { transform: translateY(-9px) rotate(-14deg); }
+.hats-hero .hh-me[data-brows=think] #brow-r { transform: translateY(16px) rotate(6deg); }
+.hats-hero #blush { transition: opacity .3s; }
+.hats-hero .hh-me[data-blush=hot] #blush { opacity: .85; }
+.hats-hero .hh-me[data-hat=helmet] #hair, .hats-hero .hh-me[data-hat=helmet] #hair-under, .hats-hero .hh-me[data-hat=helmet] #sideburns { display: none; }
+.hats-hero .hh-me[data-hat=notes][data-brows=think][data-eyes=open] #thinklid { display: inline; }
+.hats-hero #head { transform-box: view-box; transform-origin: 400px 620px; transition: transform .6s cubic-bezier(.3, 1.5, .5, 1); }
+.hats-hero .hh-me[data-hat=notes][data-eyes=happy][data-mouth=soft] #head { transform: rotate(-12deg); }
+.hats-hero #glasses { transform-box: view-box; transform-origin: 400px 440px; }
+.hats-hero #nose { transform-box: fill-box; transform-origin: 50% 30%; }
+.hats-hero #ears { transform-box: view-box; transform-origin: 400px 466px; }
+.hats-hero #hair { transform-box: view-box; transform-origin: 400px 420px; }
+.hats-hero #props { transform-box: view-box; transform-origin: 400px 230px; }
+
+/* Shared by hero and peek: helmet visor resting position + prop micro-motion. */
+.hats-hero .visor, .work-peek .visor { transform-box: view-box; transform-origin: 400px 342px; transform: translateY(-58px) scaleY(.3); }
+@media (prefers-reduced-motion: no-preference) {
+  .hats-hero .eye, .work-peek .eye { transform-box: fill-box; transform-origin: 50% 50%; animation: hh-blink 4.2s infinite; }
+  .hats-hero #bodywrap { animation: hh-breathe 4s ease-in-out infinite; }
+  .hats-hero #headwrap { transform-box: view-box; transform-origin: 400px 640px; animation: hh-bob 4s ease-in-out infinite; }
+  .hats-hero .on .visor { animation: hh-visor 1.5s .1s both; }
+  .hats-hero .on .drip { transform-box: fill-box; transform-origin: 50% 0; animation: hh-drip 1s .3s ease-out both; }
+  .hats-hero .cattail, .work-peek .cattail { transform-box: view-box; transform-origin: 300px 196px; animation: hh-tail 2.4s ease-in-out infinite alternate; }
+  .hats-hero .catlid, .work-peek .catlid { transform-box: fill-box; transform-origin: 50% 100%; animation: hh-catblink 5s infinite; }
+  .hats-hero .tails, .work-peek .tails { transform-box: view-box; transform-origin: 560px 310px; animation: hh-flap 1.6s ease-in-out infinite alternate; }
+}
+
+/* Off the Hero cell (or in overview / mid-pan): freeze every CSS animation. */
+.hats-hero.paused, .hats-hero.paused *,
+.work-peek.paused, .work-peek.paused * { animation-play-state: paused !important; }
+
+/* ── Text block ─────────────────────────────────────────────────────────── */
+.hh-text .hh-tagline { transition: opacity .2s, transform .2s; text-wrap: balance; }
+.hh-text .hh-tagline.swap { opacity: 0; transform: translateY(5px); }
+.hh-text .hh-tagline em {
+  font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500;
+  color: var(--hh-accent); transition: color .6s;
+}
+
+/* ── Work peek ──────────────────────────────────────────────────────────── */
+.work-peek {
+  position: absolute; left: 50%; bottom: 0; z-index: 10; width: clamp(116px, 17vw, 200px);
+  transform: translateX(-50%); pointer-events: none; transition: opacity .25s, visibility .25s;
+}
+.work-peek.is-hidden { opacity: 0; visibility: hidden; }
+.work-peek .wp-clip { position: absolute; inset: 0; overflow: hidden; }
+.work-peek [data-part=bg] { display: none; }
+.work-peek .wp-head {
+  display: block; width: 100%; height: 100%; cursor: pointer; pointer-events: auto;
+  padding: 0; border: 0; background: none; -webkit-tap-highlight-color: transparent;
+}
+.work-peek .wp-head:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 12px; }
+.work-peek .wp-head svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.dark .work-peek .wp-head svg { filter: drop-shadow(0 0 10px rgba(255, 255, 255, .22)); }
+.work-peek .wp-hand { position: absolute; overflow: visible; pointer-events: none; opacity: 0; }
+.work-peek[data-hat=helmet] [data-part=hair],
+.work-peek[data-hat=helmet] [data-part=hair-under],
+.work-peek[data-hat=helmet] [data-part=sideburns] { display: none; }
+
+@keyframes hh-rip { from { transform: scale(.3); opacity: 1; } to { transform: scale(7); opacity: 0; } }
+@keyframes hh-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+@keyframes hh-breathe { 50% { transform: translateY(3px); } }
+@keyframes hh-bob { 50% { transform: translateY(2px) rotate(-.6deg); } }
+@keyframes hh-visor {
+  0%, 48% { transform: none; animation-timing-function: ease-in; }
+  56% { transform: translateY(6px) scaleY(.98); animation-timing-function: cubic-bezier(.2, .8, .3, 1); }
+  84% { transform: translateY(-66px) scaleY(.26); }
+  92% { transform: translateY(-54px) scaleY(.32); }
+  100% { transform: translateY(-58px) scaleY(.3); }
+}
+@keyframes hh-drip { from { transform: scaleY(0); } to { transform: none; } }
+@keyframes hh-tail { from { transform: rotate(-4deg); } to { transform: rotate(5deg); } }
+@keyframes hh-catblink { 0%, 90%, 100% { transform: scaleY(1); } 94% { transform: scaleY(1.9); } }
+@keyframes hh-flap { from { transform: skewY(-4deg); } to { transform: skewY(5deg) translateY(4px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hats-hero *, .work-peek * { animation: none !important; transition: none !important; }
+}

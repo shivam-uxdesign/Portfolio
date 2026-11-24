@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { Home as HomeIcon } from 'lucide-react';
+import { Home as HomeIcon, ArrowUp } from 'lucide-react';
 import { Link } from 'react-router';
 import { ImageGallery } from '../components/ImageGallery';
 import { InterestGrid } from '../components/InterestGrid';
@@ -10,6 +10,10 @@ import { FunProjects } from '../components/FunProjects';
 import { CTACard } from '../components/CTACard';
 import { StackContent } from './StackPage';
 import { trackEvent } from '../../lib/analytics';
+import { HatsHero } from '../components/hats/HatsHero';
+import { WorkPeek } from '../components/hats/WorkPeek';
+import { HATS, PAL, type WearableId } from '../components/hats/hatsData';
+import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
 
 // ─── Grid config ─────────────────────────────────────────────────────────────
 // Layout:  [Gallery]  [Work ↑]   [Fun]
@@ -187,155 +191,119 @@ const PROJECTS = [
 
 // ─── Cell components ──────────────────────────────────────────────────────────
 
-function HeroCell() {
-  const [isPolaroidHovered, setIsPolaroidHovered] = useState(false);
+type NavDir = 'up' | 'down';
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+function HeroCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
   const [isNameHovered, setIsNameHovered] = useState(false);
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const bridge = useHeroBridgeStore();
+  const heroActive = useHeroBridge(s => s.heroActive);
+  // Quantised so a pinch re-renders this cell only at 0 → partial → 1, not per frame.
+  const overviewStep = useHeroBridge(s => (s.overview <= 0 ? 0 : s.overview >= 1 ? 1 : 0.5));
+  const hat = useHeroBridge(s => s.hat);
+  // Decided once: hats wait off-screen and fly in when the intro's zoom lands.
+  const [deferEntrance] = useState(() => bridge.get().introActive);
+
+  // Tagline swap: fade the old line out, then bring the new one in.
+  const [shownHat, setShownHat] = useState<WearableId>(hat);
+  const [swapping, setSwapping] = useState(false);
+  useEffect(() => {
+    if (hat === shownHat) return;
+    if (prefersReducedMotion()) { setShownHat(hat); return; }
+    setSwapping(true);
+    const t = setTimeout(() => { setShownHat(hat); setSwapping(false); }, 200);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hat]);
+  const info = HATS.find(h => h.id === shownHat);
+
+  const onHatChange = useCallback((h: WearableId) => bridge.set({ hat: h }), [bridge]);
+  const onWear = useCallback((h: string) => trackEvent('hat_worn', { hat: h }), []);
 
   return (
-    <div className="w-full h-full flex flex-col items-center bg-background pt-6 md:pt-8 pb-4 md:pb-6 px-5 md:px-12 gap-4 md:gap-5 select-text overflow-hidden">
+    <div className="hh-cell w-full h-full flex flex-col items-center justify-center bg-background gap-3 md:gap-4 select-text overflow-hidden">
 
-      {/* ── Identity block ── */}
-      <div className="flex-shrink-0 flex flex-col items-center text-center gap-3">
-        {/* Compact polaroid */}
+      {/* ── Text: above the stage on phones, below it from md up ── */}
+      <div
+        className="hh-text order-1 md:order-2 flex-shrink-0 flex flex-col items-center text-center w-full"
+        style={{ '--hh-accent': PAL[hat].accent } as React.CSSProperties}
+      >
         <motion.div
-          initial={{ opacity: 0, y: 16, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.15, duration: 0.8, type: 'spring', stiffness: 100 }}
-          onMouseEnter={() => setIsPolaroidHovered(true)}
-          onMouseLeave={() => setIsPolaroidHovered(false)}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="text-[11px] font-medium tracking-[0.09em] text-muted-foreground uppercase mb-1"
         >
-          <motion.div
-            animate={{
-              rotate: isPolaroidHovered ? 0 : -3,
-              scale: isPolaroidHovered ? 1.02 : 1,
-              y: isPolaroidHovered ? 0 : [0, -4, 0],
-            }}
-            transition={{
-              rotate: { duration: 0.45, ease: isPolaroidHovered ? [0.34, 1.56, 0.64, 1] : 'easeOut' },
-              scale: { duration: 0.4 },
-              y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 2 },
-            }}
-            className="bg-white rounded border p-2 md:p-2.5 pb-5 md:pb-6 relative"
-            style={{ borderColor: '#E0DDD8', borderWidth: '0.5px', width: 'clamp(100px, 28vw, 160px)' }}
-          >
-            <div className="absolute -top-2.5 left-6 flex gap-2.5">
-              <div className="w-3 h-5 rounded-full" style={{ border: '2px solid #B0ADA8', transform: 'rotate(-8deg)' }} />
-              <div className="w-3 h-5 rounded-full" style={{ border: '2px solid #B0ADA8', transform: 'rotate(6deg)' }} />
-            </div>
-            <div className="w-full aspect-[13/12] rounded-sm overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&w=600&h=560"
-                alt="Shivam Sehgal"
-                className="w-full h-full object-cover object-top"
-              />
-            </div>
-          </motion.div>
+          Hey, I am
         </motion.div>
-
-        {/* Name */}
-        <div>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
+        <div className="overflow-hidden">
+          <motion.h1
+            initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="text-[11px] font-medium tracking-[0.09em] text-muted-foreground uppercase mb-1"
+            transition={{ delay: 0.55, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            className="font-medium leading-[0.92] cursor-default relative"
+            style={{
+              fontSize: 'clamp(2.4rem, 7vw, 4rem)',
+              color: 'var(--foreground)',
+              letterSpacing: isNameHovered ? '0.01em' : '-0.04em',
+              transition: 'letter-spacing 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+            onMouseEnter={() => setIsNameHovered(true)}
+            onMouseLeave={() => setIsNameHovered(false)}
           >
-            Hey, I am
-          </motion.div>
-          <div className="overflow-hidden">
-            <motion.h1
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-              className="font-medium leading-[0.92] cursor-default relative"
-              style={{
-                fontSize: 'clamp(2.4rem, 7vw, 4rem)',
-                color: 'var(--foreground)',
-                letterSpacing: isNameHovered ? '0.01em' : '-0.04em',
-                transition: 'letter-spacing 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-              }}
-              onMouseEnter={() => setIsNameHovered(true)}
-              onMouseLeave={() => setIsNameHovered(false)}
-            >
-              Shivam
-              <motion.span
-                initial={{ x: '-100%', opacity: 0 }}
-                animate={{ x: '200%', opacity: [0, 1, 0] }}
-                transition={{ delay: 1.2, duration: 0.9, ease: 'easeInOut' }}
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none"
-              />
-            </motion.h1>
-          </div>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.5 }}
-            className="text-[14px] leading-snug text-muted-foreground mt-1"
-          >
-            A product designer who works from strategy to pixel.
-          </motion.p>
+            Shivam
+            <motion.span
+              initial={{ x: '-100%', opacity: 0 }}
+              animate={{ x: '200%', opacity: [0, 1, 0] }}
+              transition={{ delay: 1.2, duration: 0.9, ease: 'easeInOut' }}
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none"
+            />
+          </motion.h1>
         </div>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
+          aria-live="polite"
+          className={`hh-tagline text-[13px] md:text-[14px] leading-snug text-muted-foreground mt-2 max-w-[34em] min-h-[2.9em]${swapping ? ' swap' : ''}`}
+        >
+          {info
+            ? <><em>{info.name}.</em> {info.line}</>
+            : <>A product designer who works from <em>strategy</em> to pixel. I wear a lot of hats.</>}
+        </motion.p>
+        <button
+          type="button"
+          onClick={() => onNavigateDir('up')}
+          aria-label="Go to Work"
+          className="mt-2 inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Work <ArrowUp size={11} strokeWidth={2.25} aria-hidden="true" />
+        </button>
       </div>
 
-      {/* ── Project cards ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.0, duration: 0.6 }}
-        className="flex-1 min-h-0 w-full max-w-5xl flex flex-col gap-2"
-      >
-        <p className="text-[10px] tracking-[0.1em] text-muted-foreground uppercase flex-shrink-0">Selected Work</p>
-        <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
-          {PROJECTS.slice(0, 2).map((project, idx) => {
-            const isHov = hoveredCard === idx;
-            const inner = (
-              <>
-                {project.thumbnail}
-                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.78) 45%, rgba(0,0,0,0.95) 100%)' }} />
-                <div
-                  className="absolute top-3 right-3 text-[10px] font-medium tracking-[0.06em] text-white rounded-full px-2 py-0.5"
-                  style={{ backgroundColor: `rgba(0,0,0,${isHov ? 0.45 : 0.3})`, backdropFilter: 'blur(4px)', transition: 'background-color 0.3s ease' }}
-                >
-                  {project.number}
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-4 pr-16">
-                  <div className="text-white text-[11px] font-medium leading-[1.35]" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.7)' }}>{project.title}</div>
-                </div>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: isHov ? 1 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute bottom-4 right-4 text-white/80 text-[10px] font-medium whitespace-nowrap"
-                >
-                  View →
-                </motion.div>
-              </>
-            );
-            const props = {
-              className: "rounded-xl overflow-hidden relative block h-full min-h-[130px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              style: { backgroundColor: project.bg },
-              onMouseEnter: () => setHoveredCard(idx),
-              onMouseLeave: () => setHoveredCard(null),
-              animate: { y: isHov ? -3 : 0 },
-              transition: { duration: 0.3, ease: [0.34, 1.2, 0.64, 1] as const },
-            };
-            return project.external ? (
-              <motion.a key={idx} href={project.link} target="_blank" rel="noopener noreferrer" {...props}>{inner}</motion.a>
-            ) : (
-              <MotionLink key={idx} to={project.link} {...props}>{inner}</MotionLink>
-            );
-          })}
-        </div>
-      </motion.div>
+      {/* ── Stage: the portrait card with the hat orbit ── */}
+      <div className="hh-stage-wrap order-2 md:order-1 w-full">
+        <HatsHero
+          isActive={heroActive}
+          overviewProgress={overviewStep}
+          deferEntrance={deferEntrance}
+          onHatChange={onHatChange}
+          onWear={onWear}
+        />
+      </div>
     </div>
   );
 }
 
-function WorkCell() {
+function WorkCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   return (
+    // Outer wrapper stays overflow-visible so the peek's fingers can curl over
+    // the bottom edge into the cell's safe-area padding.
+    <div className="relative w-full h-full">
     <div className="w-full h-full bg-background flex flex-col overflow-hidden">
       <div className="px-8 md:px-12 pt-6 md:pt-12 pb-3 md:pb-4 flex-shrink-0">
         <p className="text-[11px] tracking-[0.1em] text-muted-foreground uppercase mb-1.5 md:mb-2">Selected Work</p>
@@ -379,6 +347,8 @@ function WorkCell() {
           );
         })}
       </div>
+    </div>
+    <WorkPeek onBackToHero={() => onNavigateDir('down')} />
     </div>
   );
 }
@@ -628,7 +598,7 @@ function CellSkeleton({ id, revealRank }: { id: CellId; revealRank: number }) {
 // Both layers stay mounted throughout (opacity-only crossfade, no
 // mount/unmount) so the real content's images start downloading during the
 // skeleton phase — a free head start for the Unsplash-backed cells.
-function CellCrossfade({ id, skeletonMode, revealRank }: { id: CellId; skeletonMode: boolean; revealRank: number }) {
+function CellCrossfade({ id, skeletonMode, revealRank, onNavigateDir }: { id: CellId; skeletonMode: boolean; revealRank: number; onNavigateDir: (dir: NavDir) => void }) {
   const delay = revealRank * 0.07; // seconds — one consistent top-left → bottom-right stagger
   // Same duration/easing/delay for every cell (no per-cell variance) — the only
   // thing that differs across cells is this shared delay.
@@ -641,7 +611,7 @@ function CellCrossfade({ id, skeletonMode, revealRank }: { id: CellId; skeletonM
         animate={{ opacity: skeletonMode ? 0 : 1, scale: skeletonMode ? 0.98 : 1, y: skeletonMode ? 8 : 0 }}
         transition={revealTransition}
       >
-        <CellContent id={id} />
+        <CellContent id={id} onNavigateDir={onNavigateDir} />
       </motion.div>
       <motion.div
         className="absolute inset-0"
@@ -656,10 +626,10 @@ function CellCrossfade({ id, skeletonMode, revealRank }: { id: CellId; skeletonM
   );
 }
 
-function CellContent({ id }: { id: CellId }) {
+function CellContent({ id, onNavigateDir }: { id: CellId; onNavigateDir: (dir: NavDir) => void }) {
   switch (id) {
-    case 'hero':      return <HeroCell />;
-    case 'work':      return <WorkCell />;
+    case 'hero':      return <HeroCell onNavigateDir={onNavigateDir} />;
+    case 'work':      return <WorkCell onNavigateDir={onNavigateDir} />;
     case 'about':     return <AboutCell />;
     case 'gallery':   return <GalleryCell />;
     case 'fun':       return <FunCell />;
@@ -883,7 +853,7 @@ function worldTransform(physPos: Pos, progress: number) {
 // during the overview (not the high-frequency per-frame pinch updates), so
 // re-rendering on it is cheap and doesn't reintroduce the cost this memo
 // exists to avoid.
-const WorldCells = memo(function WorldCells({ runIntro, skeletonMode, hoveredCell }: { runIntro: boolean; skeletonMode: boolean; hoveredCell: string | null }) {
+const WorldCells = memo(function WorldCells({ runIntro, skeletonMode, hoveredCell, onNavigateDir }: { runIntro: boolean; skeletonMode: boolean; hoveredCell: string | null; onNavigateDir: (dir: NavDir) => void }) {
   return (
     <>
       {([-1, 0, 1, 2, 3]).flatMap(pr =>
@@ -936,9 +906,10 @@ const WorldCells = memo(function WorldCells({ runIntro, skeletonMode, hoveredCel
                       id={cell.id}
                       skeletonMode={skeletonMode}
                       revealRank={REVEAL_RANK[actualRow][actualCol]}
+                      onNavigateDir={onNavigateDir}
                     />
                   ) : (
-                    <CellContent id={cell.id} />
+                    <CellContent id={cell.id} onNavigateDir={onNavigateDir} />
                   )}
                 </div>
               </div>
@@ -1276,6 +1247,35 @@ export function Home() {
 
   useEffect(() => { navigateRef.current = navigateTo; }, [navigateTo]);
 
+  // Relative up/down step through the existing navigation, for in-cell nudges
+  // (Hero's "Work ↑", tapping the Work peek). Stable identity, so it can be
+  // passed through the memoised WorldCells without re-rendering them.
+  const navigateDir = useCallback((dir: NavDir) => {
+    const p = physPosRef.current;
+    navigateRef.current(p.row + (dir === 'up' ? -1 : 1), p.col);
+  }, []);
+
+  // ── Hero/hats bridge — read-only mirror of grid state for the hats ──
+  const [heroBridge] = useState(() => createHeroBridge({ introActive: runIntro, overview: runIntro ? 1 : 0 }));
+  const currentCellId = GRID[actualPos.row][actualPos.col].id;
+  const prevCellRef = useRef<string | null>(null);
+  const lastCellRef = useRef<string>(currentCellId);
+  if (lastCellRef.current !== currentCellId) {
+    prevCellRef.current = lastCellRef.current;
+    lastCellRef.current = currentCellId;
+  }
+  const cellSettled = overviewProgress === 0 && !introActive && !locked;
+  useEffect(() => {
+    heroBridge.set({
+      cell: currentCellId,
+      prevCell: prevCellRef.current,
+      settled: cellSettled,
+      heroActive: cellSettled && physPos.row === HOME_POS.row && physPos.col === HOME_POS.col,
+      overview: overviewProgress,
+      introActive,
+    });
+  }, [heroBridge, currentCellId, cellSettled, physPos.row, physPos.col, overviewProgress, introActive]);
+
   // ── Dismiss overview onto a specific tapped/clicked cell ──
   // Only actionable once fully settled in overview (progress === 1). Repositioning
   // happens instantly with no snap trick needed: at progress exactly 1, worldTransform
@@ -1534,6 +1534,7 @@ export function Home() {
   const hintOpacity = introActive ? 0 : clamp01((overviewProgress - 0.6) / 0.4);
 
   return (
+    <HeroBridgeContext.Provider value={heroBridge}>
     <div
       className="fixed inset-0 overflow-hidden bg-background select-none"
       style={{ touchAction: 'none' }}
@@ -1559,7 +1560,7 @@ export function Home() {
             willChange: 'transform',
           }}
         >
-          <WorldCells runIntro={runIntro} skeletonMode={skeletonMode} hoveredCell={hoveredCell} />
+          <WorldCells runIntro={runIntro} skeletonMode={skeletonMode} hoveredCell={hoveredCell} onNavigateDir={navigateDir} />
         </div>
 
         {/* ── Grid chrome overlay ── */}
@@ -1794,5 +1795,6 @@ export function Home() {
         )}
       </AnimatePresence>
     </div>
+    </HeroBridgeContext.Provider>
   );
 }
