@@ -24,3 +24,26 @@
 @keyframes pr-up { from { transform: translateY(0); } to { transform: translateY(-50%); } }
 @keyframes pr-down { from { transform: translateY(-50%); } to { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .pr-track { animation: none; } }
+
+/* Filmstrip (below lg) */
+.ps2-root > .pr-head { margin-bottom: 8px; }
+.ps2-window {
+  height: clamp(76px, 14cqh, 120px); overflow: hidden; border-radius: 12px;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+.ps2-track { display: flex; height: 100%; width: max-content; will-change: transform; animation: ps2-left 30s linear infinite; }
+.ps2-set { display: flex; gap: 10px; padding-right: 10px; height: 100%; }
+.ps2-tile { position: relative; margin: 0; height: 100%; border-radius: 10px; overflow: hidden; background: color-mix(in oklab, var(--foreground) 6%, transparent); flex: none; }
+.ps2-tile img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.5); }
+.ps2-tile figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 7px 5px; font-size: 10.5px; font-weight: 600; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: linear-gradient(to top, rgba(15, 15, 14, .6), transparent);
+}
+@keyframes ps2-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .ps2-track { animation: none; } }
+/* Short phones (cell under ~470px tall): slimmer strip, no label row. */
+@container (max-height: 470px) {
+  .ps2-window { height: 58px; }
+  .ps2-root > .pr-head { display: none; }
+}

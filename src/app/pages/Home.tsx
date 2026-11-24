@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { Home as HomeIcon, ArrowUp, Download } from 'lucide-react';
 import { Link } from 'react-router';
-import { ProcessReel } from '../components/ProcessReel';
+import { ProcessReel, ProcessStrip } from '../components/ProcessReel';
 import { ImageGallery } from '../components/ImageGallery';
 import { InterestGrid } from '../components/InterestGrid';
 import { AboutBlock } from '../components/AboutBlock';
@@ -374,14 +374,16 @@ export function AboutCell() {
   ];
 
   const SERIF = "'Playfair Display', Georgia, serif";
+  // Phones: one timeline entry open at a time (tap a heading). md+: all open.
+  const [openBio, setOpenBio] = useState(0);
 
   return (
-    <div className="w-full min-h-full flex items-center bg-background px-8 md:px-16 lg:px-20 py-4">
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-16 items-center">
+    <div className="w-full min-h-full flex items-start md:items-center bg-background px-1 md:px-16 lg:px-20 py-2 md:py-4">
+      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6 md:gap-10 lg:gap-16 items-center">
         {/* Left — hook + bio rail */}
         <div>
-          <p className="text-[11px] tracking-[0.15em] text-muted-foreground mb-4 uppercase">About</p>
-          <div className="space-y-1 mb-7 lg:mb-8">
+          <p className="text-[11px] tracking-[0.15em] text-muted-foreground mb-3 md:mb-4 uppercase">About</p>
+          <div className="space-y-0.5 md:space-y-1 mb-3 md:mb-7 lg:mb-6">
             {[
               { text: ['Designer by ', 'training'], color: 'var(--primary)' },
               { text: ['Problem solver by ', 'instinct'], color: 'var(--accent-blue)' },
@@ -390,7 +392,7 @@ export function AboutCell() {
               <motion.p
                 key={i}
                 className="leading-[1.15] select-text text-foreground"
-                style={{ fontSize: 'clamp(1.4rem, 2.6vw, 2.25rem)', letterSpacing: '-0.01em', fontWeight: 400 }}
+                style={{ fontSize: 'clamp(1.3rem, 2.6vw, 2.25rem)', letterSpacing: '-0.01em', fontWeight: 400 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.12, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -402,7 +404,10 @@ export function AboutCell() {
             ))}
           </div>
 
-          <div className="space-y-5 relative">
+          {/* Process & Practice as a sideways filmstrip below lg (the reel needs a column). */}
+          <ProcessStrip className="lg:hidden mb-3.5 md:mb-7" />
+
+          <div className="space-y-2.5 md:space-y-5 relative">
             <div className="absolute left-[9px] top-2 bottom-2 w-px bg-border" />
             {bio.map((p, i) => (
               <motion.div
@@ -418,9 +423,21 @@ export function AboutCell() {
                 >
                   {p.n}
                 </span>
-                <div>
-                  <h3 className="text-[13px] font-semibold text-foreground mb-1 tracking-[0.01em]">{p.heading}</h3>
-                  <p className="text-[13px] leading-[1.65] text-muted-foreground select-text max-w-md">{p.body}</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-[13px] font-semibold text-foreground mb-1 tracking-[0.01em]">
+                    <button
+                      type="button"
+                      className="md:pointer-events-none flex w-full items-center justify-between gap-2 pr-2 md:pr-0 text-left text-[13px] font-semibold leading-snug focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+                      aria-expanded={openBio === i}
+                      onClick={() => setOpenBio(i)}
+                    >
+                      {p.heading}
+                      <span aria-hidden="true" className={`md:hidden w-4 shrink-0 text-center text-muted-foreground transition-transform duration-200 ${openBio === i ? 'rotate-45' : ''}`}>+</span>
+                    </button>
+                  </h3>
+                  <div className={`grid transition-[grid-template-rows] duration-300 ease-out md:!grid-rows-[1fr] ${openBio === i ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                    <p className="overflow-hidden text-[13px] leading-[1.6] md:leading-[1.65] text-muted-foreground select-text max-w-md">{p.body}</p>
+                  </div>
                 </div>
               </motion.div>
             ))}

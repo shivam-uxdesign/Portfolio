@@ -48,3 +48,29 @@ export function ProcessReel({ className = '' }: { className?: string }) {
     </div>
   );
 }
+
+// Below lg: the same photos as a short filmstrip sliding sideways on its own.
+export function ProcessStrip({ className = '' }: { className?: string }) {
+  return (
+    <div className={`ps2-root ${className}`} role="region" aria-label="Process and practice: photos of the desk, the sketchbook and work in progress">
+      <div className="pr-head">
+        <span className="pr-eyebrow">Process &amp; Practice</span>
+        <span className="pr-sub">Brush before pixel.</span>
+      </div>
+      <div className="ps2-window">
+        <div className="ps2-track">
+          {[0, 1].map(copy => (
+            <div key={copy} className="ps2-set" aria-hidden={copy === 1 || undefined}>
+              {galleryImages.map(img => (
+                <figure key={img.title} className="ps2-tile" style={{ aspectRatio: img.heightPct >= 95 ? '4 / 5' : '4 / 3' }}>
+                  <img src={img.src} alt={copy === 0 ? img.title : ''} loading="lazy" draggable={false} onError={e => { e.currentTarget.style.visibility = 'hidden'; }} />
+                  <figcaption>{img.title}</figcaption>
+                </figure>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
