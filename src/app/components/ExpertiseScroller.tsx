@@ -43,8 +43,15 @@ export function ExpertiseScroller() {
       {/* Header */}
       <p className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-2">What I do best</p>
 
-      {/* Content area — fixed height to prevent layout shift between slides */}
-      <div className="relative overflow-hidden" style={{ height: '64px' }}>
+      {/* Content area — sized to the tallest slide (invisible sizers share one grid
+          cell), so no slide is cut off at any width and nothing shifts between slides. */}
+      <div className="relative overflow-hidden grid">
+        {expertise.map((e, i) => (
+          <div key={i} aria-hidden="true" className="invisible [grid-area:1/1] flex flex-col gap-1">
+            <h3 className="font-semibold leading-tight text-[18px]">{e.title}</h3>
+            <p className="text-[12px] leading-snug">{e.description}</p>
+          </div>
+        ))}
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={currentIndex}

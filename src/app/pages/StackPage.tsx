@@ -124,27 +124,43 @@ export function StackContent({ standalone = false }: { standalone?: boolean }) {
   const [cols, setCols] = useState(4);
 
   useLayoutEffect(() => {
+    // Sized from the grid's own box (not the window), so it works full-screen
+    // and inside smaller containers like the home sheet. Embedded, tiles never
+    // shrink below MIN_TILE: the section grows and its container scrolls instead.
+    const MIN_TILE = 112;
     function measure() {
       const el = gridWrapRef.current;
       if (!el) return;
-      const nextCols = window.innerWidth >= 640 ? 4 : 2;
+      if (!standalone) el.style.minHeight = '';
+      const cs = getComputedStyle(el);
+      const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+      const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      const availableWidth = el.clientWidth - padX;
+      const availableHeight = el.clientHeight - padY;
+      const nextCols = availableWidth >= 520 ? 4 : 2;
       const rows = Math.ceil(tools.length / nextCols);
-      const availableWidth = el.clientWidth;
-      const availableHeight = el.clientHeight;
       const sizeFromWidth = (availableWidth - GRID_GAP * (nextCols - 1)) / nextCols;
       const sizeFromHeight = (availableHeight - GRID_GAP * (rows - 1)) / rows;
+      const fit = Math.min(sizeFromWidth, sizeFromHeight);
+      const size = Math.floor(standalone || fit >= MIN_TILE ? fit : Math.min(sizeFromWidth, Math.max(MIN_TILE, Math.min(sizeFromWidth, 150))));
+      if (!standalone && size > sizeFromHeight) el.style.minHeight = `${rows * size + GRID_GAP * (rows - 1) + padY}px`;
       setCols(nextCols);
-      setTileSize(Math.floor(Math.min(sizeFromWidth, sizeFromHeight)));
+      setTileSize(size);
     }
     measure();
+    const ro = new ResizeObserver(measure);
+    if (gridWrapRef.current) ro.observe(gridWrapRef.current);
     window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
+    return () => { ro.disconnect(); window.removeEventListener('resize', measure); };
+  }, [standalone]);
+
+  // Embedded on phones, the page's own side padding doubles up with the host's.
+  const padX = standalone ? 'px-8 md:px-16 lg:px-24' : 'px-2 sm:px-8 md:px-16 lg:px-24';
 
   return (
-    <div className="h-full w-full overflow-hidden bg-white flex flex-col">
+    <div className={`${standalone ? 'h-full overflow-hidden' : 'min-h-full'} w-full bg-white flex flex-col`}>
       {/* Header */}
-      <div className="w-full px-8 md:px-16 lg:px-24 pt-8 md:pt-10 pb-5 flex-shrink-0">
+      <div className={`w-full ${padX} pt-8 md:pt-10 pb-5 flex-shrink-0`}>
         <motion.div
           className="max-w-7xl mx-auto"
           initial={{ opacity: 0, y: 16 }}
@@ -177,7 +193,7 @@ export function StackContent({ standalone = false }: { standalone?: boolean }) {
       {/* Tool grid — fills remaining space; tiles are computed square so they never stretch */}
       <div
         ref={gridWrapRef}
-        className="flex-1 min-h-0 w-full px-8 md:px-16 lg:px-24 pb-4 overflow-hidden flex items-center justify-center"
+        className={`flex-1 min-h-0 w-full ${padX} pb-4 overflow-hidden flex items-center justify-center`}
       >
         <div
           className="grid"
@@ -264,7 +280,7 @@ export function StackContent({ standalone = false }: { standalone?: boolean }) {
       </div>
 
       {/* Currently learning — a proper tile, not just a caption strip */}
-      <div className="w-full px-8 md:px-16 lg:px-24 pb-6 md:pb-8 flex-shrink-0">
+      <div className={`w-full ${padX} pb-6 md:pb-8 flex-shrink-0`}>
         <motion.div
           className="max-w-7xl mx-auto rounded-2xl px-6 py-5 flex items-center gap-4 relative overflow-hidden"
           style={{ backgroundColor: '#1A1A1A', boxShadow: '0 24px 48px -24px rgba(20,20,18,0.55)' }}

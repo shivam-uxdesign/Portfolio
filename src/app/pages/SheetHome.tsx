@@ -6,7 +6,9 @@ import { SheetPeek } from '../components/hats/SheetPeek';
 import { HATS, PAL, type WearableId } from '../components/hats/hatsData';
 import type { HatId } from '../components/hats/props';
 import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
-import { PROJECTS, WorkCell, AboutCell, GalleryCell, ContactCell, ResumeCell, StackCell, InterestsCell, FunCell } from './Home';
+import { PROJECTS, AboutCell, GalleryCell, ContactCell, ResumeCell, StackCell, InterestsCell } from './Home';
+import { WorkAndPlay } from '../components/WorkAndPlay';
+import { FUN_PROJECTS } from '../components/FunProjects';
 import './sheet.css';
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
@@ -14,18 +16,18 @@ import './sheet.css';
 // the bottom; slide it up and it takes 80% of the screen, with Shivam hanging
 // on its top edge. Inside the sheet: a 3×2 grid, wrapping left/right only.
 
-type SheetCellId = 'about' | 'work' | 'resume' | 'interests' | 'fun' | 'stack';
+type SheetCellId = 'about' | 'work' | 'interests' | 'stack' | 'resume' | 'contact';
 type Pos = { row: number; col: number };
 
 const GRID: { id: SheetCellId; label: string }[][] = [
-  [{ id: 'about', label: 'About' }, { id: 'work', label: 'Work' }, { id: 'resume', label: 'Resume' }],
-  [{ id: 'interests', label: 'Off Figma' }, { id: 'fun', label: 'Fun' }, { id: 'stack', label: 'Stack' }],
+  [{ id: 'about', label: 'About' }, { id: 'work', label: 'Work & Play' }, { id: 'interests', label: 'Off Figma' }],
+  [{ id: 'stack', label: 'Built with' }, { id: 'resume', label: 'Resume' }, { id: 'contact', label: 'Contact' }],
 ];
 const START: Pos = { row: 0, col: 1 }; // opening the sheet lands on Work
 
 // Hat he wears on each cell, unless the visitor already picked one on the hero.
 const CONTEXT_HAT: Record<SheetCellId, HatId> = {
-  work: 'notes', about: 'cat', resume: 'party', interests: 'beret', fun: 'propeller', stack: 'helmet',
+  about: 'cat', work: 'notes', interests: 'beret', stack: 'propeller', resume: 'helmet', contact: 'party',
 };
 
 const NAV_MS = 600;
@@ -42,9 +44,9 @@ const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 // Old links to merged sections land on the cell that now holds them, scrolled to the section.
-const ALIASES: Record<string, { cell: SheetCellId; section: string }> = {
-  contact: { cell: 'resume', section: 'contact-section' },
+const ALIASES: Record<string, { cell: SheetCellId; section?: string }> = {
   gallery: { cell: 'about', section: 'process-section' },
+  fun: { cell: 'work' },
 };
 
 function findCell(id: string): Pos | null {
@@ -104,7 +106,7 @@ function worldTransform(col: number, row: number, ov: number, W: number, H: numb
 // ─── Cells ────────────────────────────────────────────────────────────────────
 function CellContent({ id }: { id: SheetCellId }) {
   switch (id) {
-    case 'work': return <ScrollCell><WorkCell /></ScrollCell>;
+    case 'work': return <ScrollCell><WorkAndPlay work={PROJECTS} play={FUN_PROJECTS} /></ScrollCell>;
     // About, then Process & Practice as a second page.
     case 'about': return (
       <ScrollCell more={{ label: 'Process & Practice', target: 'process-section' }}>
@@ -112,16 +114,10 @@ function CellContent({ id }: { id: SheetCellId }) {
         <section id="process-section" className="sh-page sh-page-fixed"><GalleryCell /></section>
       </ScrollCell>
     );
-    // Resume, then Contact as a second page.
-    case 'resume': return (
-      <ScrollCell more={{ label: 'Contact', target: 'contact-section' }}>
-        <section className="sh-page"><ResumeCell /></section>
-        <section id="contact-section" className="sh-page"><ContactCell /></section>
-      </ScrollCell>
-    );
-    case 'interests': return <ScrollCell><InterestsCell /></ScrollCell>;
-    case 'fun': return <ScrollCell><FunCell /></ScrollCell>;
-    case 'stack': return <ScrollCell><StackCell /></ScrollCell>;
+    case 'interests': return <ScrollCell><section className="sh-page sh-min-interests"><InterestsCell /></section></ScrollCell>;
+    case 'stack': return <ScrollCell><section className="sh-page sh-min-stack"><StackCell /></section></ScrollCell>;
+    case 'resume': return <ScrollCell><section className="sh-page"><ResumeCell /></section></ScrollCell>;
+    case 'contact': return <ScrollCell><section className="sh-page"><ContactCell /></section></ScrollCell>;
   }
 }
 
@@ -204,12 +200,12 @@ const HeroPane = memo(function HeroPane() {
 // ─── Resting bar ──────────────────────────────────────────────────────────────
 const Teaser = memo(function Teaser({ onOpen }: { onOpen: () => void }) {
   return (
-    <button type="button" className="sh-teaser" onClick={onOpen} aria-label={`Open my work: ${PROJECTS.length} case studies`}>
+    <button type="button" className="sh-teaser" onClick={onOpen} aria-label={`Open my work: ${PROJECTS.length} case studies and side projects`}>
       <span className="sh-handle" aria-hidden="true" />
       <span className="sh-teaser-row">
         <span className="sh-teaser-text">
-          <span className="sh-teaser-title">Work</span>
-          <span className="sh-teaser-sub">{PROJECTS.length} case studies · swipe up</span>
+          <span className="sh-teaser-title">Work &amp; Play</span>
+          <span className="sh-teaser-sub">{PROJECTS.length} case studies + {FUN_PROJECTS.length} AI side projects · swipe up</span>
         </span>
         <span className="sh-teaser-arrow" aria-hidden="true">↑</span>
       </span>
@@ -396,6 +392,8 @@ export function SheetHome() {
       const p = initialPos();
       if (!p && sRef.current > 0) closeRef.current(true);
       else if (p && sRef.current === 0) { posRef.current = p; setPos(p); pushedRef.current = true; openRef.current(); }
+      // A link to another cell while the sheet is open: jump straight there.
+      else if (p && sRef.current >= 1) { const cur = posRef.current; if (p.row !== cur.row || p.col !== mod(cur.col, 3)) { posRef.current = p; setPos(p); } }
     };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
@@ -412,7 +410,7 @@ export function SheetHome() {
   // Old #contact / #gallery links: scroll the merged cell to that section.
   useEffect(() => {
     const alias = ALIASES[initialHash];
-    if (!alias) return;
+    if (!alias?.section) return;
     const t = setTimeout(() => {
       // The wraparound clones carry the same ids; take the copy in the real cell.
       const sec = Array.from(clipRef.current?.querySelectorAll<HTMLElement>(`#${alias.section}`) ?? []).find(el => !el.closest('[inert]'));
@@ -602,7 +600,14 @@ export function SheetHome() {
   // sheet up. Open: on the top row, dragging down scrubs it closed; every other
   // swipe moves through the grid on release.
   const drag = useRef<{ x: number; y: number; t: number; s0: number; mode: 'none' | 'sheet' | 'grid' | null; lastY: number; lastT: number; vy: number } | null>(null);
+  const suppressClick = useRef(false);
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (!suppressClick.current) return;
+    suppressClick.current = false;
+    e.preventDefault(); e.stopPropagation();
+  };
   const onPointerDown = (e: React.PointerEvent) => {
+    suppressClick.current = false;
     if (!e.isPrimary || gestureRef.current) return;
     introRef.current?.skip();
     drag.current = { x: e.clientX, y: e.clientY, t: performance.now(), s0: sRef.current, mode: null, lastY: e.clientY, lastT: performance.now(), vy: 0 };
@@ -631,6 +636,7 @@ export function SheetHome() {
     drag.current = null;
     if (!d || !e.isPrimary) return;
     const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (d.mode !== null && Math.hypot(dx, dy) > 8) suppressClick.current = true;
     if (d.mode === 'sheet') {
       const v = sRef.current;
       const open = d.s0 < 1 ? (v > 0.3 || d.vy < -0.45) && d.vy < 0.45 : !(v < 0.75 || d.vy > 0.45);
@@ -672,6 +678,9 @@ export function SheetHome() {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={() => { drag.current = null; }}
+        onClickCapture={onClickCapture}
+        // Links and images are natively draggable; that would cancel a swipe that starts on a card.
+        onDragStart={e => e.preventDefault()}
       >
         {/* Hero backdrop: lives in the top 80%, lifts and fades as the sheet rises. */}
         <div

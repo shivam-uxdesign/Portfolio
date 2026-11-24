@@ -29,6 +29,8 @@ const funProjects = [
   },
 ];
 
+export const FUN_PROJECTS = funProjects;
+
 export function FunProjects() {
   const navigate = useNavigate();
 

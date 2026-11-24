@@ -118,3 +118,6 @@
 }
 .sh-more.on { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
 .sh-more:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+/* Work & Play thumbnails: drawn thumbnails render large and scale down. */
+.wp-thumb { position: absolute; left: 0; top: 0; width: 250%; height: 250%; transform: scale(.4); transform-origin: 0 0; }
