@@ -298,20 +298,51 @@ export function SheetHome() {
   const curOffset = useRef({ x: 0, y: 0 });
   const [geo, setGeo] = useState({ dy: 0, cx: 0, w: 140, headH: 90 });
   const measureGeo = useCallback(() => {
-    const me = heroRef.current?.querySelector<SVGSVGElement>('.hh-me');
-    if (!me) return;
-    const r = me.getBoundingClientRect();
-    if (!r.width) return;
-    // Measure the resting position: undo whatever offset is applied right now.
-    const top = r.top - curOffset.current.y, left = r.left - curOffset.current.x;
-    const glassesY = top + r.height * 0.494;
-    setGeo({ dy: window.innerHeight * 0.2 - glassesY, cx: left + r.width / 2, w: r.width, headH: r.height * 0.4 });
+    // Read the portrait's box from its HTML container and its used CSS width,
+    // not the SVG's own client rect: with overflow:visible (while peeking),
+    // Safari reports the SVG's painted overflow, which threw the head off-screen
+    // and blew the hands up on iPad.
+    const stage = heroRef.current?.querySelector<HTMLElement>('.hh-stage');
+    const me = stage?.querySelector<SVGSVGElement>('.hh-me');
+    if (!stage || !me) return;
+    const sr = stage.getBoundingClientRect();
+    const w = parseFloat(getComputedStyle(me).width) || Math.min(sr.width, sr.height) * 0.58;
+    if (!w || !sr.width || w > window.innerWidth * 0.6) return;
+    const h = w * 1.25; // viewBox 800×1000
+    // Resting position: undo the offset applied right now. Read the live
+    // (possibly mid-transition) transform, not the target, or a rotation while
+    // open measures against a half-finished glide.
+    const hero = stage.closest<HTMLElement>('.hats-hero');
+    let ox = curOffset.current.x, oy = curOffset.current.y;
+    try { const m = new DOMMatrixReadOnly(hero ? getComputedStyle(hero).transform : 'none'); ox = m.m41; oy = m.m42; } catch { /* keep target */ }
+    // (.hh-me: left 50%, top 54%, centred)
+    const cx = sr.left - ox + sr.width / 2;
+    const top = sr.top - oy + sr.height * 0.54 - h / 2;
+    const glassesY = top + h * 0.494;
+    setGeo(g => {
+      const n = { dy: window.innerHeight * 0.2 - glassesY, cx, w, headH: h * 0.4 };
+      return Math.abs(n.dy - g.dy) < 0.5 && Math.abs(n.cx - g.cx) < 0.5 && Math.abs(n.w - g.w) < 0.5 ? g : n;
+    });
   }, []);
   useEffect(() => {
     measureGeo();
     const t = setTimeout(measureGeo, 400); // after fonts/layout settle
-    window.addEventListener('resize', measureGeo);
-    return () => { clearTimeout(t); window.removeEventListener('resize', measureGeo); };
+    // Re-measure whenever the portrait's own box changes (rotation, URL bar,
+    // late layout), not just on window resize.
+    let raf = 0;
+    const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(measureGeo)); };
+    const ro = new ResizeObserver(later);
+    const st = heroRef.current?.querySelector('.hh-stage');
+    if (st) ro.observe(st);
+    if (heroRef.current) ro.observe(heroRef.current);
+    window.addEventListener('resize', later);
+    window.addEventListener('orientationchange', later);
+    window.visualViewport?.addEventListener('resize', later);
+    return () => {
+      clearTimeout(t); cancelAnimationFrame(raf); ro.disconnect();
+      window.removeEventListener('resize', later); window.removeEventListener('orientationchange', later);
+      window.visualViewport?.removeEventListener('resize', later);
+    };
   }, [measureGeo, engineReady]);
   useEffect(() => { posRef.current = pos; }, [pos]);
   useEffect(() => { lockedRef.current = locked; }, [locked]);
