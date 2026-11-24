@@ -12,10 +12,10 @@ import { StackPanel } from '../components/cells/StackPanel';
 import { HatShelf, flyHat, type ShelfItem } from '../components/nav/HatShelf';
 import { HandleMap } from '../components/nav/HandleMap';
 
-// Navigation prototypes, switchable with ?nav=rack | handle | both | compass.
+// Navigation: the handle map by default; ?nav=rack | both | compass for the other prototypes.
 type NavMode = 'rack' | 'handle' | 'both' | 'compass';
 function readNavMode(): NavMode {
-  try { const m = new URLSearchParams(window.location.search).get('nav'); return m === 'rack' || m === 'handle' || m === 'compass' ? m : 'both'; } catch { return 'both'; }
+  try { const m = new URLSearchParams(window.location.search).get('nav'); return m === 'rack' || m === 'both' || m === 'compass' ? m : 'handle'; } catch { return 'handle'; }
 }
 import { WorkAndPlay } from '../components/WorkAndPlay';
 import { FUN_PROJECTS } from '../components/FunProjects';
@@ -821,7 +821,7 @@ export function SheetHome() {
         </div>
 
         {/* The sheet */}
-        <div className={`sh-sheet nav-${navMode}${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)` }}>
+        <div className={`sh-sheet navmode-${navMode}${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)` }}>
           <SheetPeek
             handsOnly
             width={geo.w}
@@ -892,7 +892,16 @@ export function SheetHome() {
             </>
           )}
           {rackOn && chromeOn && <HatShelf rows={shelfRows} current={actual} away={hatAway} onPick={rackPick} />}
-          {handleOn && isOpen && <HandleMap current={actual} open={ov > 0} onToggle={toggleOverview} />}
+          {handleOn && isOpen && (
+            <HandleMap
+              current={actual}
+              labels={GRID.map(row => row.map(c => c.label))}
+              x={[geo.w / 2 + 18, size.W / 2, size.W - geo.w / 2 - 18][actual.col] ?? size.W / 2}
+              open={ov > 0}
+              onToggle={toggleOverview}
+              onPick={pickCell}
+            />
+          )}
         </div>
 
         {chromeOn && navMode === 'compass' && <SheetCompass pos={actual} onPick={pickCell} />}

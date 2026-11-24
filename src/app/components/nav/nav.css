@@ -33,27 +33,45 @@
 .nav-fly svg { width: 100%; height: 100%; overflow: visible; }
 
 /* ── Handle map ────────────────────────────────────────────────────────── */
+/* Sits under his chin, between his hands, and glides with his head. */
 .nav-handle {
-  position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 7;
-  padding: 8px 12px; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: 999px;
+  position: absolute; top: 4px; z-index: 7; transform: translateX(-50%);
+  padding: 8px 10px 10px; border: 0; background: none; cursor: pointer; touch-action: none;
+  -webkit-tap-highlight-color: transparent; border-radius: 999px;
+  transition: left .46s cubic-bezier(.45, 0, .2, 1);
 }
 .nav-handle:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
-.nav-handle-grid {
-  display: grid; grid-template-columns: repeat(3, 6px); gap: 4px 5px; padding: 5px 8px; border-radius: 999px;
-  background: color-mix(in oklab, var(--foreground) 6%, transparent); transition: background .2s, transform .2s;
+.nav-handle-pill {
+  display: flex; align-items: center; padding: 5px 8px; border-radius: 999px;
+  background: color-mix(in oklab, var(--foreground) 6%, transparent);
+  transition: background .2s, transform .2s, box-shadow .2s;
 }
-.nav-handle-grid span { width: 6px; height: 6px; border-radius: 99px; background: color-mix(in oklab, var(--foreground) 22%, transparent); transition: background .25s, transform .25s; }
-.nav-handle-grid span.on { background: var(--primary); transform: scale(1.25); }
-@media (hover: hover) { .nav-handle:hover .nav-handle-grid { background: color-mix(in oklab, var(--foreground) 10%, transparent); } }
-.nav-handle:active .nav-handle-grid { transform: scale(.94); }
-.nav-handle.open .nav-handle-grid { background: var(--foreground); }
+.nav-handle-grid { display: grid; grid-template-columns: repeat(3, 6px); gap: 4px 5px; }
+.nav-handle-grid span { width: 6px; height: 6px; border-radius: 99px; background: color-mix(in oklab, var(--foreground) 22%, transparent); transition: background .2s, transform .2s; }
+.nav-handle-grid span.on { background: var(--primary); transform: scale(1.3); }
+/* The page name drops out under the pill for a moment (his hands are either side). */
+.nav-handle-name {
+  position: absolute; top: calc(100% - 4px); left: 50%; transform: translate(-50%, -6px) scale(.9); pointer-events: none;
+  white-space: nowrap; font-size: 11px; font-weight: 500; letter-spacing: .02em; color: var(--background);
+  background: var(--foreground); padding: 4px 9px; border-radius: 999px; opacity: 0;
+  transition: opacity .2s, transform .25s cubic-bezier(.3, 1.4, .5, 1);
+}
+.nav-handle.named .nav-handle-name { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.nav-handle.named .nav-handle-pill, .nav-handle.scrubbing .nav-handle-pill {
+  background: var(--background); box-shadow: 0 6px 18px -8px rgba(20, 20, 18, .28), 0 0 0 1px color-mix(in oklab, var(--border) 70%, transparent);
+}
+.nav-handle.scrubbing .nav-handle-pill { transform: scale(1.08); }
+@media (hover: hover) { .nav-handle:hover .nav-handle-pill { background: color-mix(in oklab, var(--foreground) 10%, transparent); } }
+.nav-handle:active .nav-handle-pill { transform: scale(.95); }
+.nav-handle.open .nav-handle-pill { background: var(--foreground); }
 .nav-handle.open .nav-handle-grid span { background: color-mix(in oklab, var(--background) 45%, transparent); }
 .nav-handle.open .nav-handle-grid span.on { background: var(--primary); }
+@media (prefers-reduced-motion: reduce) { .nav-handle, .nav-handle-name, .nav-handle-pill { transition: none; } }
 
 /* ── Modes: how much room pages keep at the bottom ─────────────────────── */
 .sh-sheet { --nav-reserve: 80px; }
-.sh-sheet.nav-rack, .sh-sheet.nav-both, .sh-sheet.nav-handle { --nav-reserve: 6px; }
-.sh-sheet.nav-rack .sh-edge-down, .sh-sheet.nav-both .sh-edge-down { display: none; }
+.sh-sheet.navmode-rack, .sh-sheet.navmode-both, .sh-sheet.navmode-handle { --nav-reserve: 6px; }
+.sh-sheet.navmode-rack .sh-edge-down, .sh-sheet.navmode-both .sh-edge-down { display: none; }
 body.fd-open .nav-shelf { opacity: 0; pointer-events: none; }
 .nav-shelf { transition: opacity .25s; }
 @media (prefers-reduced-motion: reduce) { .nav-hat svg, .nav-peg, .nav-handle-grid span { transition: none; } }
