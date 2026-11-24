@@ -119,7 +119,6 @@ function themeVars(hat: WearableId): React.CSSProperties | undefined {
     '--primary': p.accent,
     '--accent': p.accent,
     '--background': `color-mix(in oklab, ${p.card} 4%, #fff)`,
-    '--sh-halo': p.halo,
   } as React.CSSProperties;
 }
 
@@ -149,7 +148,10 @@ const SheetWorld = memo(function SheetWorld() {
             key={`${r}:${pc}`}
             ref={el => { if (el) el.inert = !isReal; }}
             className="absolute overflow-hidden"
-            style={{ left: `${(pc + 1) * 20}%`, top: `${r * 50}%`, width: '20%', height: '50%' }}
+            // Off-screen cells (and the wraparound copies) skip style, layout and
+            // paint until they scroll into view: a theme change or a hat swap no
+            // longer recalculates ten pages at once.
+            style={{ left: `${(pc + 1) * 20}%`, top: `${r * 50}%`, width: '20%', height: '50%', contentVisibility: 'auto' }}
           >
             {/* Safe zone: the top clears his hands and the handle. */}
             <div className="w-full h-full box-border pt-[52px] px-5 pb-5 md:pt-14 md:px-12 md:pb-10">
@@ -628,6 +630,15 @@ export function SheetHome() {
   // Hands start once the head is nearly at the edge (as in the prototype).
   const peekProgress = peekOverride ?? s;
   const ownHat = chosenHat !== 'me';
+  // The theme follows the hat a beat later, once the hat has landed: restyling
+  // the sheet is the one expensive step, so it shouldn't share frames with the
+  // hat animation.
+  const [themeHat, setThemeHat] = useState<WearableId>(chosenHat);
+  useEffect(() => {
+    if (themeHat === chosenHat) return;
+    const t = setTimeout(() => setThemeHat(chosenHat), reduce ? 0 : 650);
+    return () => clearTimeout(t);
+  }, [chosenHat, themeHat, reduce]);
   const peekHat: WearableId = ownHat ? chosenHat : CONTEXT_HAT[cellId];
 
   // Page change: no hat of your own → the page hats swap, leaving and arriving
@@ -672,7 +683,7 @@ export function SheetHome() {
     <HeroBridgeContext.Provider value={bridge}>
       <div
         className="sh-root fixed inset-0 overflow-hidden bg-background select-none"
-        style={{ touchAction: 'none', ...themeVars(chosenHat) }}
+        style={{ touchAction: 'none' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -689,13 +700,13 @@ export function SheetHome() {
         {/* Hero backdrop. As the sheet rises, the portrait slides behind it until
             only his head shows above the edge (see the peek effect above). */}
         {/* A chosen hat's soft glow behind his head. */}
-        <div className={`sh-glow${ownHat && s > 0 ? ' on' : ''}`} aria-hidden="true" />
+        <div className={`sh-glow${themeHat !== 'me' && s > 0 ? ' on' : ''}`} style={themeHat !== 'me' ? { '--sh-halo': PAL[themeHat].halo } as React.CSSProperties : undefined} aria-hidden="true" />
         <div ref={heroRef} className={`sh-hero${s > 0 ? ' peeking' : ''}`} aria-hidden={s > 0.5} style={{ pointerEvents: s > 0 ? 'none' : undefined }}>
           <HeroPane onEngine={onEngine} />
         </div>
 
         {/* The sheet */}
-        <div className={`sh-sheet${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)` }}>
+        <div className={`sh-sheet${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)`, ...themeVars(themeHat) }}>
           <SheetPeek
             handsOnly
             width={geo.w}

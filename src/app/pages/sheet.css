@@ -40,7 +40,6 @@
   opacity: 0; transition: opacity .5s;
 }
 .sh-glow.on { opacity: 1; }
-.sh-root, .sh-clip { transition: background-color .45s; }
 
 /* The head on the sheet's top edge */
 .work-peek.sheet-peek {
