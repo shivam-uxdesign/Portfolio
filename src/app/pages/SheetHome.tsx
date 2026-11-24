@@ -7,7 +7,8 @@ import { HATS, PAL, type WearableId } from '../components/hats/hatsData';
 import type { HatId } from '../components/hats/props';
 import type { HatsEngine } from '../components/hats/hatsEngine';
 import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
-import { PROJECTS, AboutCell, ContactCell, ResumeCell, StackCell, InterestsCell } from './Home';
+import { PROJECTS, AboutCell, ContactCell, ResumeCell, InterestsCell } from './Home';
+import { StackPanel } from '../components/cells/StackPanel';
 import { WorkAndPlay } from '../components/WorkAndPlay';
 import { FUN_PROJECTS } from '../components/FunProjects';
 import './sheet.css';
@@ -118,8 +119,8 @@ function CellContent({ id }: { id: SheetCellId }) {
       <ScrollCell><section className="sh-page"><AboutCell /></section></ScrollCell>
     );
     case 'interests': return <ScrollCell><section className="sh-page sh-min-interests"><InterestsCell /></section></ScrollCell>;
-    case 'stack': return <ScrollCell><section className="sh-page sh-min-stack"><StackCell /></section></ScrollCell>;
-    case 'resume': return <ScrollCell><section className="sh-page"><ResumeCell /></section></ScrollCell>;
+    case 'stack': return <ScrollCell><section className="sh-page sh-page-fixed"><StackPanel /></section></ScrollCell>;
+    case 'resume': return <ScrollCell><section className="sh-page sh-page-fixed"><ResumeCell /></section></ScrollCell>;
     case 'contact': return <ScrollCell><section className="sh-page"><ContactCell /></section></ScrollCell>;
   }
 }
@@ -137,8 +138,9 @@ const SheetWorld = memo(function SheetWorld() {
             className="absolute overflow-hidden"
             style={{ left: `${(pc + 1) * 20}%`, top: `${r * 50}%`, width: '20%', height: '50%' }}
           >
-            {/* Safe zone: keeps content clear of the sheet's edge labels and the Compass. */}
-            <div className="w-full h-full box-border pt-9 pl-9 pr-14 pb-14 md:pt-11 md:pl-11 md:pr-16 md:pb-16">
+            {/* Safe zone: keeps content clear of the sheet's edge labels and the Compass.
+                Bottom-row cells carry the "↑ up" label at the top, so they start lower on phones. */}
+            <div className={`w-full h-full box-border ${r === 1 ? 'pt-[52px]' : 'pt-9'} pl-9 pr-14 pb-14 md:pt-11 md:pl-11 md:pr-16 md:pb-16`}>
               <CellContent id={cell.id} />
             </div>
           </div>

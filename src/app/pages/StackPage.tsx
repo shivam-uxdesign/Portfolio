@@ -83,7 +83,7 @@ function LottieLogo() {
   );
 }
 
-function SplineLogo() {
+export function SplineLogo() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="9.5" stroke="white" strokeWidth="1.6" />
@@ -92,7 +92,7 @@ function SplineLogo() {
   );
 }
 
-const tools = [
+export const tools = [
   { name: 'Figma', category: 'Design', color: '#F24E1E', logo: <FigmaLogo />, note: 'Where every screen starts and ends.' },
   { name: 'FigJam', category: 'Workshops', color: '#9747FF', logo: <FigJamLogo />, note: 'Messy thinking, before the clean version.' },
   { name: 'Notion', category: 'Docs', color: '#000000', logo: <NotionLogo />, note: 'Specs, decisions, and the source of truth.' },

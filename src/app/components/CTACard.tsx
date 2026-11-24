@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { ArrowUpRight, Linkedin, Check } from 'lucide-react';
 import { useState } from 'react';
 import { trackEvent } from '../../lib/analytics';
+import './cells/cells.css';
 
 const FORMSPREE_ENDPOINT = import.meta.env.VITE_FORMSPREE_ENDPOINT as string | undefined;
 
@@ -68,7 +69,7 @@ export function CTACard() {
         <p className="text-[15px] text-background/90 mb-1.5 leading-snug">
           I read every message myself — usually within a day, chai in hand.
         </p>
-        <p className="text-[12px] text-background/55 mb-2 leading-snug">
+        <p className="ct-extra text-[12px] text-background/55 mb-2 leading-snug">
           Always happy to talk design, systems, or motorcycles.
         </p>
 
@@ -80,7 +81,7 @@ export function CTACard() {
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name (optional)"
             aria-label="Your name (optional)"
-            className="w-full bg-background/10 border border-background/20 rounded-lg px-3 py-1.5 text-[13px] text-background placeholder:text-background/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 transition-colors"
+            className="hidden md:block w-full bg-background/10 border border-background/20 rounded-lg px-3 py-1.5 text-[13px] text-background placeholder:text-background/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 transition-colors"
           />
           <textarea
             value={message}

@@ -489,10 +489,10 @@ export function ContactCell() {
   const SERIF = "'Playfair Display', Georgia, serif";
 
   return (
-    <div className="w-full min-h-full flex items-center bg-background px-6 md:px-16 lg:px-20 py-6">
+    <div className="w-full min-h-full flex items-start md:items-center bg-background px-1 md:px-16 lg:px-20 pt-1 pb-[80px] md:py-6">
       <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-4 lg:gap-14 items-center">
         {/* Left — greeting, status, signature */}
-        <div className="flex flex-col gap-4 md:gap-5 max-w-[420px]">
+        <div className="flex flex-col gap-3 md:gap-5 max-w-[420px]">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2 flex-shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-70" />
@@ -503,8 +503,8 @@ export function ContactCell() {
             </span>
           </div>
 
-          <h2 className="text-[26px] md:text-[36px] leading-[1.12] text-foreground">
-            Got a project, a role,<br />
+          <h2 className="text-[23px] md:text-[36px] leading-[1.15] md:leading-[1.12] text-foreground">
+            Got a project, a role,<br className="hidden md:inline" />{' '}
             or just want to{' '}
             <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>
               talk shop
@@ -512,12 +512,12 @@ export function ContactCell() {
             ?
           </h2>
 
-          <p className="text-[13px] text-muted-foreground leading-relaxed">
+          <p className="ct-extra text-[13px] text-muted-foreground leading-relaxed">
             Full-time, freelance, or just a second opinion on a flow — I'm one message away.
           </p>
 
           <p
-            className="text-[13px] text-muted-foreground/70 border-l-2 border-border pl-3 leading-snug"
+            className="hidden md:block text-[13px] text-muted-foreground/70 border-l-2 border-border pl-3 leading-snug"
             style={{ fontFamily: SERIF, fontStyle: 'italic' }}
           >
             Let's build something worth shipping. — Shivam
@@ -552,8 +552,8 @@ export function InterestsCell() {
 
 export function ResumeCell() {
   return (
-    <div className="w-full min-h-full bg-background flex flex-col">
-      <div className="px-4 md:px-12 pt-6 md:pt-8 pb-3 flex items-center justify-between gap-3">
+    <div className="w-full h-full bg-background flex flex-col md:justify-center px-1 md:px-10 lg:px-14 pt-1 md:pt-4 pb-[80px] md:pb-5">
+      <div className="rs-head flex-none pb-3 flex items-center justify-between gap-3">
         <p className="text-[11px] tracking-[0.1em] text-muted-foreground uppercase">Resume</p>
         <a
           href="/resume.pdf"
@@ -565,9 +565,7 @@ export function ResumeCell() {
           Download resume
         </a>
       </div>
-      <div className="flex-1 px-4 pb-3 flex flex-col">
-        <ResumeCards />
-      </div>
+      <ResumeCards />
     </div>
   );
 }

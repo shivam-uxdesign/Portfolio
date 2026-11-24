@@ -1,0 +1,76 @@
+/* ── Built with ─────────────────────────────────────────────────────────── */
+.stk-wrap { container-type: size; display: flex; align-items: center; justify-content: center; }
+@media (min-width: 768px) { .stk-wrap { justify-content: flex-start; } }
+.stk-grid {
+  --g: 8px; --ratio: 1.6; --max: 999px;
+  /* Tile width from the width, height from what's left, capped so tiles stay tile-shaped. */
+  --t: min(var(--max), calc((100cqw - 3 * var(--g)) / 4), calc((100cqh - var(--g)) / 2));
+  --th: min(calc(var(--t) * var(--ratio)), calc((100cqh - var(--g)) / 2));
+  display: grid; grid-template-columns: repeat(4, var(--t)); grid-auto-rows: var(--th); gap: var(--g);
+  list-style: none; margin: 0; padding: 0;
+}
+@media (min-width: 768px) { .stk-grid { --g: 12px; --ratio: 1; --max: 184px; } }
+.stk-tile {
+  position: relative; container-type: size; border-radius: 16px; overflow: hidden; outline: none;
+  background: var(--card); border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  box-shadow: 0 16px 32px -20px rgba(20, 20, 18, .18), 0 4px 10px -6px rgba(20, 20, 18, .1);
+  transition: transform .25s cubic-bezier(.3, 1.4, .5, 1);
+}
+.stk-tile:focus-visible { box-shadow: 0 0 0 2px var(--ring); }
+.stk-face { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 6px; text-align: center; }
+.stk-icon { width: min(36px, 46cqw); aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; flex: none; overflow: hidden; box-shadow: inset 0 1px 1px rgba(255, 255, 255, .35), inset 0 -6px 10px rgba(0, 0, 0, .12); }
+.stk-logo { transform: scale(.55); display: grid; place-items: center; }
+.stk-name { font-size: 11px; font-weight: 600; color: var(--foreground); line-height: 1.1; }
+.stk-cat { display: none; font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
+@container (min-height: 96px) and (min-width: 78px) { .stk-cat { display: block; } }
+@container (min-width: 110px) {
+  .stk-face { align-items: flex-start; justify-content: flex-start; padding: 14px; text-align: left; gap: 0; }
+  .stk-icon { width: 36px; margin-bottom: auto; }
+  .stk-logo { transform: scale(.65); }
+  .stk-name { font-size: 14px; margin-bottom: 2px; }
+  .stk-cat { display: block; font-size: 9px; }
+}
+.stk-note {
+  position: absolute; inset: 0; display: flex; flex-direction: column; padding: 14px; opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+}
+.stk-note-name { font-size: 10px; font-weight: 600; opacity: .7; margin-bottom: auto; }
+.stk-note-text { font-size: 12.5px; line-height: 1.4; font-weight: 500; }
+@media (hover: hover) and (min-width: 768px) {
+  .stk-tile:hover, .stk-tile:focus-visible { transform: translateY(-3px); }
+  .stk-tile:hover .stk-note, .stk-tile:focus-visible .stk-note { opacity: 1; }
+}
+.stk-learn {
+  align-items: center; gap: 12px; border-radius: 16px; padding: 10px 14px 10px 10px; flex: none; min-width: 0;
+  background: #1A1A1A; color: #fff; box-shadow: 0 24px 48px -24px rgba(20, 20, 18, .55);
+}
+.stk-learn-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; flex: none; background: var(--primary); box-shadow: inset 0 1px 1px rgba(255, 255, 255, .35), inset 0 -6px 10px rgba(0, 0, 0, .15); }
+.stk-learn-icon > * { transform: scale(.75); }
+.stk-learn-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--primary); }
+.stk-dot { width: 6px; height: 6px; border-radius: 99px; background: var(--primary); }
+.stk-learn-title { font-size: 14px; font-weight: 500; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stk-learn-sub { color: rgba(255, 255, 255, .55); font-weight: 400; font-size: 12.5px; }
+@media (min-width: 768px) {
+  .stk-learn { padding: 14px 18px 14px 14px; max-width: 360px; }
+  .stk-learn-icon { width: 44px; height: 44px; }
+  .stk-learn-title { white-space: normal; }
+  .stk-learn-sub { display: block; }
+}
+@media (prefers-reduced-motion: reduce) { .stk-tile, .stk-note { transition: none; } }
+
+/* ── Resume ─────────────────────────────────────────────────────────────── */
+/* Phones: the quip under the location row goes; short phones also lose the role's sub-line. */
+@media (max-width: 767px) { .rs-quip { display: none; } }
+/* Narrow or short phones: the role's sub-line and the location row go,
+   and the expertise blurb clamps to two lines. */
+@container (max-width: 290px) or (max-height: 470px) {
+  .rs-sub, .rs-foot { display: none; }
+  .rs-head { padding-bottom: 6px; }
+  .rs-cards { gap: 6px; }
+  .rs-card { padding: 11px 12px; }
+  .rs-desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+}
+
+/* ── Contact ────────────────────────────────────────────────────────────── */
+/* Short phones: keep the ask and the form, drop the supporting lines. */
+@container (max-height: 520px) { .ct-extra { display: none; } }

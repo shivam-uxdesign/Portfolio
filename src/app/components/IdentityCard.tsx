@@ -1,6 +1,51 @@
 import { MapPin, Coffee } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+const NOTES = [
+  { label: 'Current focus', text: 'Scaling design systems & simplifying complex workflows' },
+  { label: 'Desk right now', text: 'Coffee, Figma tabs, and too many sticky notes', icon: true },
+  { label: 'Learning', text: '3D in Spline + cinematic UI transitions' },
+];
+
+function NoteLabel({ note }: { note: (typeof NOTES)[number] }) {
+  return (
+    <div className="flex items-center gap-1.5 mb-0.5">
+      {note.icon && <Coffee className="w-[10px] h-[10px] text-muted-foreground" strokeWidth={1.5} aria-hidden="true" />}
+      <p className="text-[9px] uppercase tracking-[0.08em] text-muted-foreground">{note.label}</p>
+    </div>
+  );
+}
+
+// One note at a time, every few seconds; dots to pick. Sized to the tallest
+// note so nothing shifts. Reduced motion: no auto-advance.
+function FocusTicker({ className = '' }: { className?: string }) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const t = setInterval(() => setI(v => (v + 1) % NOTES.length), 4500);
+    return () => clearInterval(t);
+  }, [i]);
+  return (
+    <div className={className}>
+      <div className="grid" aria-live="polite">
+        {NOTES.map((n, k) => (
+          <div key={n.label} className="[grid-area:1/1] transition-opacity duration-500" style={{ opacity: k === i ? 1 : 0 }} aria-hidden={k !== i}>
+            <NoteLabel note={n} />
+            <p className="text-[12px] text-foreground leading-snug">{n.text}</p>
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-1.5 mt-2">
+        {NOTES.map((n, k) => (
+          <button key={n.label} type="button" onClick={() => setI(k)} aria-label={`Show ${n.label}`} aria-current={k === i || undefined} className="p-1 -m-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full">
+            <span className={`block h-1.5 rounded-full transition-all duration-300 ${k === i ? 'w-4 bg-foreground' : 'w-1.5 bg-border'}`} />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function getISTHour(): number {
   return parseInt(
     new Intl.DateTimeFormat('en-US', {
@@ -50,7 +95,7 @@ export function IdentityCard() {
   }, []);
 
   return (
-    <div className="bg-background rounded-2xl border border-border p-3.5 w-full flex flex-col">
+    <div className="rs-card bg-background rounded-2xl border border-border p-3.5 w-full h-full flex flex-col">
       {/* Header — experience timeline */}
       <div className="mb-2.5">
         <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
@@ -62,52 +107,31 @@ export function IdentityCard() {
             Oct 2023 – Present
           </span>
         </div>
-        <p className="text-[11px] text-muted-foreground ml-4 leading-snug mt-0.5">
+        <p className="rs-sub text-[11px] text-muted-foreground ml-4 leading-snug mt-0.5">
           Design + PM-adjacent ownership: internal tooling, design systems, mobile UX
+        </p>
+        {/* Phones: education rides along here instead of its own card. */}
+        <p className="md:hidden text-[11px] text-muted-foreground ml-4 leading-snug mt-1">
+          <span className="text-foreground/70">Education</span> · B.FA, JJ School of Art · M.Des, NIFT Delhi
         </p>
       </div>
 
       {/* Divider */}
       <div className="h-px bg-border mb-2.5" />
 
-      {/* Content Sections */}
-      <div className="flex flex-col space-y-2">
-        {/* Current Focus */}
-        <div>
-          <p className="text-[9px] uppercase tracking-[0.08em] text-muted-foreground mb-0.5">
-            CURRENT FOCUS
-          </p>
-          <p className="text-[12px] text-foreground leading-snug">
-            Scaling design systems & simplifying complex workflows
-          </p>
-        </div>
-
-        {/* Desk Right Now */}
-        <div>
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <Coffee className="w-[10px] h-[10px] text-muted-foreground" strokeWidth={1.5} />
-            <p className="text-[9px] uppercase tracking-[0.08em] text-muted-foreground">
-              DESK RIGHT NOW
-            </p>
+      {/* Phones: the three notes take turns in one line. md+: all three. */}
+      <FocusTicker className="md:hidden" />
+      <div className="hidden md:flex flex-col space-y-2">
+        {NOTES.map(n => (
+          <div key={n.label}>
+            <NoteLabel note={n} />
+            <p className="text-[12px] text-foreground leading-snug">{n.text}</p>
           </div>
-          <p className="text-[12px] text-foreground leading-snug">
-            Coffee, Figma tabs, and too many sticky notes
-          </p>
-        </div>
-
-        {/* Learning */}
-        <div>
-          <p className="text-[9px] uppercase tracking-[0.08em] text-muted-foreground mb-0.5">
-            LEARNING
-          </p>
-          <p className="text-[12px] text-foreground leading-snug">
-            3D in Spline + cinematic UI transitions
-          </p>
-        </div>
+        ))}
       </div>
 
       {/* Footer */}
-      <div className="mt-2">
+      <div className="rs-foot mt-auto pt-2">
         <div className="h-px bg-border my-2" />
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
@@ -119,7 +143,7 @@ export function IdentityCard() {
               <span className="text-[12px] font-medium text-foreground">{currentTime}</span>
             </div>
           </div>
-          <p className="text-[10px] italic text-muted-foreground/60 text-center leading-snug">
+          <p className="rs-quip text-[10px] italic text-muted-foreground/60 text-center leading-snug">
             {statusText}
           </p>
         </div>
