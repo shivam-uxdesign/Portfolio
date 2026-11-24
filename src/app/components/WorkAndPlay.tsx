@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { trackEvent } from '../../lib/analytics';
 import { ProjectStacks } from './projects/ProjectStacks';
-import { ProjectOverlay } from './projects/ProjectOverlay';
+import { FloatingDeck } from './projects/FloatingDeck';
 import type { ProjectGroup, ProjectGroupId } from './projects/types';
 
 // One page, two sides: corporate case studies on the left, things built for
@@ -45,7 +45,7 @@ function SideHeader({ eyebrow, title, sub }: { eyebrow: string; title: ReactNode
   );
 }
 
-// Phones: two decks — tap one and its projects open in a bottom sheet.
+// Phones: two decks — tap one and its projects fly out and float over the sheet.
 function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
   const groups = useMemo<ProjectGroup[]>(() => [
     {
@@ -73,7 +73,7 @@ function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
         <h2 className="mt-1 text-[1.35rem] font-medium leading-tight text-foreground" style={{ letterSpacing: '-0.03em' }}>Pick a stack</h2>
       </div>
       <ProjectStacks groups={groups} onOpen={onOpen} layout="column" />
-      {open && group && <ProjectOverlay group={group} from={open.from} onClose={onClose} />}
+      {open && group && <FloatingDeck group={group} trigger={open.trigger} onClose={onClose} />}
     </div>
   );
 }
