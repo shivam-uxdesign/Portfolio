@@ -1,0 +1,60 @@
+/* Built with: header, then a 3×3 grid of flip cards that fills the page. */
+.stk { display: flex; flex-direction: column; gap: 16px; padding: 4px 4px 2px; }
+.stk-title { font-size: clamp(22px, 6.4cqw, 26px); line-height: 1.22; font-weight: 400; letter-spacing: -0.02em; margin: 0; }
+.stk-wrap { flex: 1 1 0; min-height: 0; container-type: size; display: flex; align-items: stretch; justify-content: center; }
+.stk-grid {
+  --g: 8px;
+  list-style: none; margin: 0; padding: 0; width: 100%; height: 100%;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: var(--g);
+}
+.stk-grid > li { display: flex; min-height: 0; }
+
+.stk-card {
+  flex: 1; min-height: 0; position: relative; padding: 0; border: 0; background: none; cursor: pointer; perspective: 900px;
+  font: inherit; color: inherit; text-align: left; -webkit-tap-highlight-color: transparent; border-radius: 16px;
+}
+.stk-card:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.stk-inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .5s cubic-bezier(.3, 1.2, .4, 1); }
+.stk-front, .stk-back { position: absolute; inset: 0; border-radius: 16px; backface-visibility: hidden; -webkit-backface-visibility: hidden; container-type: size; }
+.stk-front {
+  display: flex; flex-direction: column; justify-content: space-between; padding: 12px;
+  background: color-mix(in oklab, var(--c) 9%, var(--background)); border: 1px solid color-mix(in oklab, var(--c) 16%, transparent);
+}
+.stk-card.learning .stk-front { border: 1.5px dashed color-mix(in oklab, var(--c) 55%, transparent); }
+.stk-back {
+  transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: space-between; gap: 6px; padding: 12px;
+  background: var(--c); color: var(--ink);
+}
+.stk-card.flipped .stk-inner { transform: rotateY(180deg); }
+@media (hover: hover) { .stk-card:hover .stk-inner { transform: rotateY(180deg); } }
+.stk-card:focus-visible .stk-inner { transform: rotateY(180deg); }
+
+.stk-logo { width: min(40px, 34cqw, 34cqh); aspect-ratio: 1; border-radius: 10px; background: var(--c); display: grid; place-items: center; overflow: hidden; flex: none; box-shadow: inset 0 1px 1px rgba(255,255,255,.35), inset 0 -6px 10px rgba(0,0,0,.12); }
+.stk-logo > span { transform: scale(.6); display: grid; place-items: center; }
+.stk-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.stk-name { font-size: 14px; font-weight: 500; line-height: 1.2; }
+.stk-cat { font-size: 12px; color: var(--muted-foreground); line-height: 1.25; }
+.stk-card.learning .stk-cat { color: color-mix(in oklab, var(--c) 75%, var(--foreground)); }
+.stk-back-name { font-size: 11px; font-weight: 500; opacity: .75; }
+.stk-note { font-size: 13px; line-height: 1.35; font-weight: 500; }
+/* Small cards: drop the category / shrink the note. */
+@container (max-height: 78px) { .stk-cat { display: none; } .stk-note { font-size: 12px; } }
+
+@media (min-width: 768px) {
+  .stk { gap: 22px; padding: 8px 24px; }
+  .stk-title { font-size: 30px; }
+  .stk-grid { --g: 14px; }
+  .stk-front, .stk-back { padding: 16px; border-radius: 20px; }
+  .stk-card { border-radius: 20px; }
+  .stk-logo { width: min(48px, 30cqw, 30cqh); border-radius: 12px; }
+  .stk-name { font-size: 16px; }
+  .stk-cat { font-size: 13px; }
+  .stk-note { font-size: 15px; }
+}
+@media (min-width: 1024px) {
+  .stk { padding: 8px 40px; max-width: 1100px; margin: 0 auto; }
+  .stk-title { font-size: clamp(30px, 2.8vw, 40px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stk-inner { transition: none; }
+}
