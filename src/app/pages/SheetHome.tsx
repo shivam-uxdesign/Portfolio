@@ -1,6 +1,9 @@
-import { memo, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { motion } from 'motion/react';
 import { trackEvent } from '../../lib/analytics';
+import { site } from '../../lib/site';
+import { themeVars } from '../../lib/theme';
+import { headBox } from '../components/chrome/MiniHead';
 import { HatsHero } from '../components/hats/HatsHero';
 import { SheetPeek } from '../components/hats/SheetPeek';
 import { HATS, PAL, type WearableId } from '../components/hats/hatsData';
@@ -112,15 +115,6 @@ const MAP_CELLS: MapCell[][] = GRID.map(row => row.map(c => ({ label: c.label, h
 
 // A hat the visitor chose themes the sheet, lightly: accent colour and a faint
 // wash of the hat's card colour. Nothing else moves.
-function themeVars(hat: WearableId): React.CSSProperties | undefined {
-  if (hat === 'me') return undefined;
-  const p = PAL[hat];
-  return {
-    '--primary': p.accent,
-    '--accent': p.accent,
-    '--background': `color-mix(in oklab, ${p.card} 4%, #fff)`,
-  } as React.CSSProperties;
-}
 
 // ─── Cells ────────────────────────────────────────────────────────────────────
 function CellContent({ id }: { id: SheetCellId }) {
@@ -260,6 +254,9 @@ export function SheetHome() {
   // Deep-link arrival: the head rises on its own timeline, then a "Home" tip.
   const [peekOverride, setPeekOverride] = useState<number | null>(deepLink ? 0 : null);
   const [homeTip, setHomeTip] = useState(false);
+  // Back from an inner page: he dove into the page up there; here he rises again, quickly and without the tip.
+  const [returning] = useState(() => site.get().returning && !!deepLink);
+  useEffect(() => { site.set({ returning: false }); }, []);
   const pushedRef = useRef(false);
 
   useEffect(() => { sRef.current = s; }, [s]);
@@ -338,7 +335,7 @@ export function SheetHome() {
   const isOpen = s >= 1;
 
   // ── Bridge for the hats ──
-  const [bridge] = useState(() => createHeroBridge({ settled: true, heroActive: !deepLink }));
+  const [bridge] = useState(() => createHeroBridge({ settled: true, heroActive: !deepLink, hat: site.get().hat }));
   // This component provides the bridge, so it reads the store directly.
   const chosenHat = useSyncExternalStore(bridge.subscribe, () => bridge.get().hat, () => bridge.get().hat);
   useEffect(() => { bridge.set({ heroActive: s === 0 && !lockedRef.current }); }, [bridge, s]);
@@ -425,16 +422,16 @@ export function SheetHome() {
     if (!deepLink) return;
     if (reduce) { setPeekOverride(null); return; }
     let raf = 0;
-    const t0 = performance.now() + 450;
+    const t0 = performance.now() + (returning ? 40 : 450);
     const step = (now: number) => {
       const t = clamp01((now - t0) / 700);
       setPeekOverride(t);
       if (t < 1) raf = requestAnimationFrame(step);
-      else { setPeekOverride(null); setHomeTip(true); setTimeout(() => setHomeTip(false), 2200); }
+      else { setPeekOverride(null); if (!returning) { setHomeTip(true); setTimeout(() => setHomeTip(false), 2200); } }
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [deepLink, reduce]);
+  }, [deepLink, reduce, returning]);
 
   // ── Grid navigation (sheet open only) ──
   // Which way the last move went, for his hat swap.
@@ -631,7 +628,7 @@ export function SheetHome() {
   const peekProgress = peekOverride ?? s;
   const ownHat = chosenHat !== 'me';
   // Dragged his hat off: he stays bare-headed (no page hats) until a hat is picked again.
-  const [bare, setBare] = useState(false);
+  const [bare, setBare] = useState(() => site.get().bare);
   useEffect(() => { if (chosenHat !== 'me') setBare(false); }, [chosenHat]);
   // The theme follows the hat a beat later, once the hat has landed: restyling
   // the sheet is the one expensive step, so it shouldn't share frames with the
@@ -643,6 +640,26 @@ export function SheetHome() {
     return () => clearTimeout(t);
   }, [chosenHat, themeHat, reduce]);
   const peekHat: WearableId = ownHat ? chosenHat : bare ? 'me' : CONTEXT_HAT[cellId];
+  // The app-wide copy: the theme and the head on inner pages read it.
+  const worn: WearableId = isOpen ? peekHat : chosenHat;
+  useEffect(() => { site.set({ hat: chosenHat, bare, worn }); }, [chosenHat, bare, worn]);
+  // Your hat comes back with you from an inner page.
+  useEffect(() => { const h = site.get().hat; if (h !== 'me') engineRef.current?.restore(h); }, [engineReady]);
+  // Leaving for an inner page: hand his head's screen box to the trip.
+  const leaveRef = useRef({ worn, cellId, open: isOpen });
+  leaveRef.current = { worn, cellId, open: isOpen };
+  const sheetRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => () => {
+    if (window.location.pathname === '/') return;
+    const { worn: w, cellId: c, open } = leaveRef.current;
+    site.set({ origin: open ? c : null });
+    const me = heroRef.current?.querySelector<SVGSVGElement>('.hh-me');
+    const m = me?.getScreenCTM();
+    const edge = sheetRef.current?.getBoundingClientRect().top;
+    if (!m || edge == null || !open) return;
+    const [bx, by, bw, bh] = headBox(w);
+    site.startTravel({ dir: 'out', hat: w, edgeY: edge, from: { x: m.a * bx + m.e, y: m.d * by + m.f, w: m.a * bw, h: m.d * bh } });
+  }, []);
 
   // Page change: no hat of your own → the page hats swap, leaving and arriving
   // with the pages; your own hat → a glance the way you're going and a hat tip.
@@ -709,7 +726,7 @@ export function SheetHome() {
         </div>
 
         {/* The sheet */}
-        <div className={`sh-sheet${s > 0 && s < 1 ? ' moving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)`, ...themeVars(themeHat) }}>
+        <div ref={sheetRef} className={`sh-sheet${s > 0 && s < 1 ? ' moving' : ''}${returning ? ' arriving' : ''}`} style={{ transform: `translateY(${((1 - s) * 75).toFixed(3)}%)`, ...themeVars(themeHat) }}>
           <SheetPeek
             handsOnly
             width={geo.w}

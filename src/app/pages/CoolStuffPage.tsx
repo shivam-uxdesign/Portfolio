@@ -1,5 +1,6 @@
+import { NavRight, NavPill, NavSegments } from '../components/chrome/NavRight';
 import { motion } from 'motion/react';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ListFilter, ArrowLeft, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
 
@@ -63,7 +64,12 @@ export function CoolStuffPage() {
   );
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: '#EDE8E0' }}>
+    <div className="min-h-screen relative bg-background">
+      <NavRight>
+        <NavPill label="Next category" onClick={() => setSelectedCategory(categories[(categories.indexOf(selectedCategory) + 1) % categories.length])}>
+          <ListFilter />{selectedCategory}
+        </NavPill>
+      </NavRight>
       {/* Pink-coral gradient strip on right edge */}
       <div
         className="fixed top-0 right-0 w-1 h-full z-50"
@@ -264,23 +270,6 @@ export function CoolStuffPage() {
               </div>
             </motion.div>
           ))}
-        </div>
-      </section>
-
-      {/* SECTION 4 - Back navigation */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-[13px] font-medium group text-muted-foreground"
-            whileHover={{ x: -3 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:text-foreground transition-colors" />
-            <span className="group-hover:text-foreground transition-colors">
-              Back to Shivam's World
-            </span>
-          </motion.button>
         </div>
       </section>
     </div>

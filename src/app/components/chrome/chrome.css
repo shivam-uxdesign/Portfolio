@@ -1,0 +1,84 @@
+/* ── Inner pages: the page is a card that rose out of the sheet ── */
+.pc-root { position: relative; overflow-x: clip; min-height: 100vh; min-height: 100dvh; }
+.pc-behind { position: fixed; inset: 0; z-index: 0; background: var(--background); pointer-events: none; }
+.pc-card { position: relative; z-index: 1; overflow-x: clip; min-height: 100vh; min-height: 100dvh; background: var(--background); color: var(--foreground); }
+/* Only while it moves: the sheet's rounded top and shadow. */
+.pc-card.pc-card-moving {
+  border-radius: 28px 28px 0 0; overflow: clip; will-change: transform;
+  border-top: 1px solid var(--border); box-shadow: 0 -24px 48px -28px rgba(20, 20, 18, .35);
+}
+.pc-content { min-height: inherit; }
+
+/* The bar: invisible. His head on the left, the page's controls on the right. */
+.pc-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  padding: 8px 14px 0 12px; pointer-events: none;
+}
+.pc-bar > * { pointer-events: auto; }
+.pc-home {
+  display: block; padding: 2px; margin: 0; border: 0; background: none; cursor: pointer; border-radius: 14px;
+  -webkit-tap-highlight-color: transparent; transition: transform .25s cubic-bezier(.3, 1.4, .5, 1);
+}
+.pc-home .mh { display: block; height: 46px; width: auto; }
+@media (hover: hover) { .pc-home:hover { transform: translateY(-2px) rotate(-5deg); } }
+.pc-home:active { transform: scale(.92); }
+.pc-home:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.pc-right { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 9px; flex-wrap: wrap; min-width: 0; }
+.pc-slot { display: contents; }
+@media (min-width: 768px) {
+  .pc-bar { padding: 14px 28px 0 24px; }
+  .pc-home .mh { height: 52px; }
+  .pc-right { margin-top: 12px; }
+}
+
+/* Controls: small floating pills (the bar itself has no surface). */
+.pc-pill, .pc-seg {
+  height: 32px; border-radius: 999px; border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--background) 84%, transparent);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  font-size: 12px; font-weight: 500; color: var(--foreground); white-space: nowrap;
+}
+.pc-pill { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s, color .2s, transform .15s; }
+.pc-pill svg { width: 14px; height: 14px; flex: none; }
+.pc-pill.on { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
+.pc-pill:active { transform: scale(.96); }
+.pc-seg { display: inline-flex; padding: 3px; gap: 2px; }
+.pc-seg button {
+  height: 100%; padding: 0 11px; border: 0; border-radius: 999px; background: none; color: var(--muted-foreground);
+  font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s, color .2s;
+}
+.pc-seg button.on { background: var(--foreground); color: var(--background); }
+@media (hover: hover) { .pc-seg button:not(.on):hover, .pc-pill:not(.on):hover { color: var(--foreground); background: color-mix(in oklab, var(--foreground) 6%, var(--background)); } }
+.pc-pill:focus-visible, .pc-seg button:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+/* The head in transit. */
+.pc-trav { position: fixed; z-index: 60; display: none; pointer-events: none; left: 0; top: 0; }
+.pc-trav-in { width: 100%; height: 100%; transform-origin: 50% 100%; }
+.pc-trav .mh { display: block; width: 100%; height: 100%; }
+
+/* ── The mini head ── */
+.mh { overflow: visible; }
+.mh [data-part=bg], .mh [data-part=bodywrap] { display: none; }
+.mh[data-hat=helmet] [data-part=hair], .mh[data-hat=helmet] [data-part=hair-under], .mh[data-hat=helmet] [data-part=sideburns] { display: none; }
+.mh .m { display: none; }
+.mh[data-mouth=grin] [data-part=m-grin], .mh[data-mouth=o] [data-part=m-o], .mh[data-mouth=small] [data-part=m-small],
+.mh[data-mouth=smile] [data-part=m-smile], .mh[data-mouth=laugh] [data-part=m-laugh], .mh[data-mouth=soft] [data-part=m-soft] { display: inline; }
+.mh .pupil { display: none; }
+.mh[data-eyes=open] .pupil, .mh[data-eyes=happy] .e-happy, .mh[data-eyes=closed] .e-closed, .mh[data-eyes=squint] .e-squint { display: inline; }
+.mh [data-part=brow-l], .mh [data-part=brow-r] { transition: transform .2s; }
+.mh[data-brows=up] [data-part=brow-l], .mh[data-brows=up] [data-part=brow-r] { transform: translateY(-14px); }
+
+/* ── TL;DR view ── */
+.pc-tldr { max-width: 640px; margin: 0 auto; padding: 92px 20px 56px; animation: pc-fade .28s ease-out both; }
+.pc-tldr-label { margin: 0 0 10px; font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted-foreground); }
+.pc-tldr-title { margin: 0; font-size: clamp(26px, 7vw, 38px); line-height: 1.15; font-weight: 400; letter-spacing: -0.02em; }
+.pc-tldr-facts { margin: 28px 0 0; }
+.pc-tldr-fact { display: grid; grid-template-columns: 96px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border); }
+.pc-tldr-fact dt { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-foreground); padding-top: 2px; }
+.pc-tldr-fact dd { margin: 0; font-size: 14px; line-height: 1.5; }
+.pc-ph { color: var(--muted-foreground); }
+.pc-tldr-note { margin: 22px 0 0; font-size: 12px; color: var(--muted-foreground); }
+@media (min-width: 768px) { .pc-tldr { padding: 132px 48px 72px; } .pc-tldr-fact { grid-template-columns: 140px 1fr; } }
+@keyframes pc-fade { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .pc-tldr { animation: none; } }

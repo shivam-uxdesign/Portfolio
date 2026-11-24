@@ -6,7 +6,7 @@ export function WhatiswrongwithinPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: '#EDE8E0' }}>
+    <div className="min-h-screen relative bg-background">
       {/* Pink-coral gradient strip on right edge */}
       <div
         className="fixed top-0 right-0 w-1 h-full z-50"
@@ -269,21 +269,6 @@ export function WhatiswrongwithinPage() {
             </div>
           </div>
         </motion.div>
-      </section>
-
-      {/* SECTION 5 - Back navigation */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-[13px] font-medium group text-muted-foreground"
-            whileHover={{ x: -3 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:text-foreground transition-colors" />
-            <span className="group-hover:text-foreground transition-colors">Back to Play</span>
-          </motion.button>
-        </div>
       </section>
     </div>
   );

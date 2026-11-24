@@ -94,3 +94,8 @@
 .sh-sheet .work-peek.sheet-peek { z-index: 8; }
 body.fd-open .work-peek.sheet-peek { pointer-events: none; }
 body.fd-open .work-peek.sheet-peek * { pointer-events: none !important; }
+
+/* Back from an inner page: the page sank into the sheet; the cell fades up in it. */
+.sh-sheet.arriving .sh-page-stage { animation: sh-arrive .34s ease-out both; }
+@keyframes sh-arrive { from { opacity: 0; transform: translateY(10px); } }
+@media (prefers-reduced-motion: reduce) { .sh-sheet.arriving .sh-page-stage { animation: none; } }

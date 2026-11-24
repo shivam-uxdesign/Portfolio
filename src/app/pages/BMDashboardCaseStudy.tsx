@@ -9,7 +9,7 @@ export function BMDashboardCaseStudy() {
   const [isDividerHovered, setIsDividerHovered] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* SECTION 1 - Hero */}
       <section className="w-full px-8 md:px-16 lg:px-24 pt-20 pb-12">
         <motion.div
@@ -259,16 +259,7 @@ export function BMDashboardCaseStudy() {
       <section className="w-full py-16 border-t border-border">
         <div className="max-w-7xl mx-auto px-8 md:px-16 lg:px-24">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            {/* Back to Work */}
-            <motion.button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-[13px] font-medium group text-muted-foreground"
-              whileHover={{ x: -3 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ArrowLeft className="w-4 h-4 group-hover:text-foreground transition-colors" />
-              <span className="group-hover:text-foreground transition-colors">Back to Work</span>
-            </motion.button>
+<span />
 
             {/* Next Case Study */}
             <motion.button

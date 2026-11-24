@@ -1,7 +1,8 @@
+import { NavRight, NavPill, NavSegments } from '../components/chrome/NavRight';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import image14 from '../../imports/image-14.png';
 import image15 from '../../imports/image-15.png';
 import image16 from '../../imports/image-16.png';
@@ -11,6 +12,15 @@ import image19 from '../../imports/image-19.png';
 export function ComicsPage() {
   const navigate = useNavigate();
   const [hoveredPanel, setHoveredPanel] = useState<number | null>(null);
+  // "Next strip": step through the strips, one at a time, from the bar.
+  const stripAt = useRef(-1);
+  const nextStrip = () => {
+    const els = document.querySelectorAll<HTMLElement>('[data-strip]');
+    if (!els.length) return;
+    stripAt.current = (stripAt.current + 1) % els.length;
+    els[stripAt.current].scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+    setHoveredPanel(stripAt.current);
+  };
 
   const comicPanels = [
     {
@@ -56,7 +66,7 @@ export function ComicsPage() {
   ];
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: '#EDE8E0' }}>
+    <div className="min-h-screen relative bg-background">
       {/* Pink-coral gradient strip on right edge */}
       <div
         className="fixed top-0 right-0 w-1 h-full z-50"
@@ -101,6 +111,9 @@ export function ComicsPage() {
         </motion.div>
       </section>
 
+      <NavRight>
+        <NavPill label="Next strip" onClick={nextStrip}>Next strip<ArrowRight /></NavPill>
+      </NavRight>
       {/* SECTION 2 - Comic grid with square thumbnails */}
       <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
         <div className="max-w-7xl mx-auto">
@@ -108,6 +121,7 @@ export function ComicsPage() {
             {comicPanels.map((panel, idx) => (
               <motion.div
                 key={idx}
+                data-strip={idx}
                 className="flex flex-col"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -211,21 +225,6 @@ export function ComicsPage() {
               Read Now
             </button>
           </motion.div>
-        </div>
-      </section>
-
-      {/* SECTION 4 - Back navigation */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-[13px] font-medium group text-muted-foreground"
-            whileHover={{ x: -3 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:text-foreground transition-colors" />
-            <span className="group-hover:text-foreground transition-colors">Back to Home</span>
-          </motion.button>
         </div>
       </section>
     </div>

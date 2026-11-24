@@ -7,7 +7,7 @@ export function MobileAppCaseStudy() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: '#EDE8E0' }}>
+    <div className="min-h-screen relative bg-background">
       {/* Pink-coral gradient strip on right edge */}
       <div
         className="fixed top-0 right-0 w-1 h-full z-50"
@@ -392,17 +392,7 @@ export function MobileAppCaseStudy() {
               <ArrowLeft className="w-4 h-4 group-hover:text-foreground transition-colors" />
               <span className="group-hover:text-foreground transition-colors">Design System</span>
             </motion.button>
-
-            {/* Back to all work */}
-            <motion.button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-[13px] font-medium group text-muted-foreground"
-              whileHover={{ x: 3 }}
-              transition={{ duration: 0.3 }}
-            >
-              <span className="group-hover:text-foreground transition-colors">Back to all work</span>
-              <ArrowRight className="w-4 h-4 group-hover:text-foreground transition-colors" />
-            </motion.button>
+<span />
           </div>
         </div>
       </section>

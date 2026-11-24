@@ -1,3 +1,4 @@
+import { NavRight, NavPill } from '../components/chrome/NavRight';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, VolumeX } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -174,9 +175,14 @@ export function MusicPage() {
   };
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: '#EDE8E0' }}>
+    <div className="min-h-screen relative bg-background">
       {/* Hidden audio element */}
       <audio ref={audioRef} />
+      <NavRight>
+        <NavPill onClick={togglePlay} active={isPlaying} label={isPlaying ? 'Pause' : 'Play'}>
+          {isPlaying ? <Pause /> : <Play />}{isPlaying ? 'Pause' : 'Play'}
+        </NavPill>
+      </NavRight>
 
       {/* Pink-coral gradient strip on right edge */}
       <div
@@ -550,23 +556,6 @@ export function MusicPage() {
               </div>
             );
           })}
-        </div>
-      </section>
-
-      {/* SECTION 4 - Back navigation */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-[13px] font-medium group text-muted-foreground"
-            whileHover={{ x: -3 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:text-foreground transition-colors" />
-            <span className="group-hover:text-foreground transition-colors">
-              Back to Shivam's World
-            </span>
-          </motion.button>
         </div>
       </section>
     </div>

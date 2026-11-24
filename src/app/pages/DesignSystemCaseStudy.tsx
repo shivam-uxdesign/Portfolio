@@ -147,7 +147,7 @@ export function DesignSystemCaseStudy() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* SECTION 1 - Hero */}
       <section className="w-full px-8 md:px-16 lg:px-24 pt-20 pb-12">
         <motion.div

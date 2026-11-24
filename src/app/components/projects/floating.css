@@ -2,7 +2,9 @@
 .fd-root { position: fixed; left: 0; right: 0; z-index: 100; display: flex; flex-direction: column; padding: 14px 16px 18px; }
 .fd-scrim {
   position: absolute; inset: 0; border-radius: 28px 28px 0 0;
-  background: color-mix(in oklab, var(--background) 42%, transparent);
+  /* Frosted: the page behind reads as a soft blur, not a second layout. */
+  background: color-mix(in oklab, var(--background) 80%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1); backdrop-filter: blur(10px) saturate(1.1);
   animation: fd-fade .25s ease-out both;
 }
 .fd-closing .fd-scrim { animation: fd-fade-out .28s ease-out both; }

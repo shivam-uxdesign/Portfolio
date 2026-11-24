@@ -309,25 +309,6 @@ export function NightmareRiderPage() {
           </div>
         </motion.div>
       </section>
-
-      {/* SECTION 4 - Back navigation */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-[13px] font-medium group"
-            style={{ color: 'rgba(255, 255, 255, 0.5)' }}
-            whileHover={{ x: -3 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ArrowLeft
-              className="w-4 h-4 group-hover:text-white transition-colors"
-              style={{ color: 'rgba(255, 255, 255, 0.5)' }}
-            />
-            <span className="group-hover:text-white transition-colors">Back to Play</span>
-          </motion.button>
-        </div>
-      </section>
     </div>
   );
 }

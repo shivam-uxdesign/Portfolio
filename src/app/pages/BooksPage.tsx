@@ -1,3 +1,4 @@
+import { NavRight, NavPill, NavSegments } from '../components/chrome/NavRight';
 import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -117,6 +118,7 @@ const books: Book[] = [
 export function BooksPage() {
   const navigate = useNavigate();
   const [hoveredBook, setHoveredBook] = useState<number | null>(null);
+  const [shelf, setShelf] = useState<'all' | 'reading' | 'finished' | 'pile'>('all');
 
   const readingNow = books.find((b) => b.category === 'Reading Now');
   const finished = books.filter((b) => b.category === 'Finished');
@@ -139,7 +141,7 @@ export function BooksPage() {
   };
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: '#EDE8E0' }}>
+    <div className="min-h-screen relative bg-background">
       {/* Pink-coral gradient strip */}
       <div
         className="fixed top-0 right-0 w-1 h-full z-50"
@@ -260,11 +262,15 @@ export function BooksPage() {
         </div>
       </section>
 
+      <NavRight>
+        <NavSegments label="Show books" value={shelf} onChange={setShelf}
+          options={[{ id: 'all', label: 'All' }, { id: 'reading', label: 'Reading' }, { id: 'finished', label: 'Done' }, { id: 'pile', label: 'Pile' }]} />
+      </NavRight>
       {/* SECTION 3 - Reading sections */}
       <section className="w-full px-8 md:px-16 lg:px-24 pb-8">
         <div className="max-w-7xl mx-auto space-y-12">
           {/* Reading Now */}
-          {readingNow && (
+          {readingNow && shelf !== 'finished' && shelf !== 'pile' && (
             <div>
               <h3 className="text-[13px] tracking-[0.12em] font-semibold mb-4 text-foreground">
                 READING NOW
@@ -329,7 +335,7 @@ export function BooksPage() {
           )}
 
           {/* Finished */}
-          <div>
+          {(shelf === 'all' || shelf === 'finished') && <div>
             <h3 className="text-[13px] tracking-[0.12em] font-semibold mb-4 text-foreground">
               FINISHED
             </h3>
@@ -375,10 +381,10 @@ export function BooksPage() {
                 </motion.div>
               ))}
             </div>
-          </div>
+          </div>}
 
           {/* Pile of Shame */}
-          <div>
+          {(shelf === 'all' || shelf === 'pile') && <div>
             <h3 className="text-[13px] tracking-[0.12em] font-semibold mb-4 text-foreground">
               PILE OF SHAME
             </h3>
@@ -425,24 +431,7 @@ export function BooksPage() {
                 </motion.div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 4 - Back navigation */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-[13px] font-medium group text-muted-foreground"
-            whileHover={{ x: -3 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:text-foreground transition-colors" />
-            <span className="group-hover:text-foreground transition-colors">
-              Back to Shivam's World
-            </span>
-          </motion.button>
+          </div>}
         </div>
       </section>
     </div>

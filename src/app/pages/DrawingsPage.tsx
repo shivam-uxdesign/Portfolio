@@ -1,3 +1,4 @@
+import { NavRight, NavPill, NavSegments } from '../components/chrome/NavRight';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -119,6 +120,7 @@ const drawings: Drawing[] = [
 export function DrawingsPage() {
   const navigate = useNavigate();
   const [selectedMedium, setSelectedMedium] = useState<Medium>('All');
+  const [view, setView] = useState<'grid' | 'large'>('grid');
   const [selectedDrawing, setSelectedDrawing] = useState<number | null>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
@@ -165,7 +167,11 @@ export function DrawingsPage() {
   const currentDrawing = drawings.find((d) => d.id === selectedDrawing);
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: '#EDE8E0' }}>
+    <div className="min-h-screen relative bg-background">
+      <NavRight>
+        <NavSegments label="Drawing size" value={view} onChange={setView}
+          options={[{ id: 'grid', label: 'Grid' }, { id: 'large', label: 'Large' }]} />
+      </NavRight>
       {/* Pink-coral gradient strip on right edge */}
       <div
         className="fixed top-0 right-0 w-1 h-full z-50"
@@ -289,8 +295,8 @@ export function DrawingsPage() {
 
       {/* SECTION 4 - Masonry grid */}
       <section className="w-full px-8 md:px-16 lg:px-24 pb-20">
-        <div className="max-w-7xl mx-auto">
-          <Masonry columnsCount={3} gutter="16px">
+        <div className={view === 'large' ? 'max-w-2xl mx-auto' : 'max-w-7xl mx-auto'}>
+          <Masonry columnsCount={view === 'large' ? 1 : 3} gutter={view === 'large' ? '28px' : '16px'}>
             {gridDrawings.map((drawing, idx) => {
               const heightMap = {
                 short: '280px',
@@ -364,23 +370,6 @@ export function DrawingsPage() {
               );
             })}
           </Masonry>
-        </div>
-      </section>
-
-      {/* SECTION 6 - Back navigation */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-[13px] font-medium group text-muted-foreground"
-            whileHover={{ x: -3 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:text-foreground transition-colors" />
-            <span className="group-hover:text-foreground transition-colors">
-              Back to Shivam's World
-            </span>
-          </motion.button>
         </div>
       </section>
 

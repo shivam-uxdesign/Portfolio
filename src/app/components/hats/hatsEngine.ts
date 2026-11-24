@@ -39,6 +39,8 @@ export interface HatsEngine {
   tipHat(dir: { x: number; y: number }): void;
   /** Toss whatever hat he's wearing off (dragged away in the sheet): bare-headed. */
   takeOff(dx: number, dy: number): void;
+  /** Put a hat straight on with no fuss (back from an inner page). */
+  restore(id: WearableId): void;
   /** Quick look left (-1) or right (1), e.g. before shuffling along the edge. */
   glance(dir: number): void;
   destroy(): void;
@@ -616,6 +618,15 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
         : dir.y > 0 ? ['translateY(-38px)', 'translateY(-32px)'] : ['translateY(10px) scale(1.05, .93)', 'translateY(4px)'];
       props.animate([{ transform: 'none' }, { transform: peak[0], offset: 0.4 }, { transform: peak[1], offset: 0.6 }, { transform: 'none' }],
         { duration: 520, easing: 'cubic-bezier(.35,.1,.3,1)' });
+    },
+    restore(id: WearableId) {
+      if (destroyed || id === current) return;
+      if (id === 'me') { putBack(); relayout(); apply('me', false); return; }
+      const h = hats.find(x => x.id === id);
+      if (!h) return;
+      putBack();
+      h.hidden = true; h.el.classList.add('worn'); h.el.tabIndex = -1; h.el.setAttribute('aria-hidden', 'true');
+      relayout(); apply(id, false);
     },
     takeOff(dx: number, dy: number) {
       // Whatever is on his head goes: the visitor's own hat (back to no pick) or

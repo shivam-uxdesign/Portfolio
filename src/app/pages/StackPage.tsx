@@ -169,17 +169,6 @@ export function StackContent({ standalone = false }: { standalone?: boolean }) {
         >
           <div className="flex items-start justify-between gap-6 mb-3">
             <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase">Tools &amp; Stack</p>
-            {standalone && (
-              <motion.button
-                onClick={() => navigate('/')}
-                className="flex items-center gap-1.5 text-[12px] font-medium group text-muted-foreground flex-shrink-0"
-                whileHover={{ x: -2 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ArrowLeft className="w-3.5 h-3.5 group-hover:text-foreground transition-colors" />
-                <span className="group-hover:text-foreground transition-colors">Back</span>
-              </motion.button>
-            )}
           </div>
           <h1 className="text-[30px] md:text-[38px] leading-[1.05] mb-2 text-foreground" style={{ letterSpacing: '-0.02em' }}>
             What I <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>build</span> with
