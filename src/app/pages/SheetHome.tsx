@@ -630,6 +630,9 @@ export function SheetHome() {
   // Hands start once the head is nearly at the edge (as in the prototype).
   const peekProgress = peekOverride ?? s;
   const ownHat = chosenHat !== 'me';
+  // Dragged his hat off: he stays bare-headed (no page hats) until a hat is picked again.
+  const [bare, setBare] = useState(false);
+  useEffect(() => { if (chosenHat !== 'me') setBare(false); }, [chosenHat]);
   // The theme follows the hat a beat later, once the hat has landed: restyling
   // the sheet is the one expensive step, so it shouldn't share frames with the
   // hat animation.
@@ -639,7 +642,7 @@ export function SheetHome() {
     const t = setTimeout(() => setThemeHat(chosenHat), reduce ? 0 : 650);
     return () => clearTimeout(t);
   }, [chosenHat, themeHat, reduce]);
-  const peekHat: WearableId = ownHat ? chosenHat : CONTEXT_HAT[cellId];
+  const peekHat: WearableId = ownHat ? chosenHat : bare ? 'me' : CONTEXT_HAT[cellId];
 
   // Page change: no hat of your own → the page hats swap, leaving and arriving
   // with the pages; your own hat → a glance the way you're going and a hat tip.
@@ -653,8 +656,8 @@ export function SheetHome() {
     const dir = navDir.current;
     if (dir.x) engine.glance(dir.x);
     if (ownHat) engine.tipHat(dir);
-    else engine.displayHat(CONTEXT_HAT[cellId], dir);
-  }, [cellId, ownHat]);
+    else if (!bare) engine.displayHat(CONTEXT_HAT[cellId], dir);
+  }, [cellId, ownHat, bare]);
 
   useEffect(() => {
     const stage = heroRef.current?.querySelector<HTMLElement>('.hats-hero');
@@ -716,7 +719,7 @@ export function SheetHome() {
             active={isOpen}
             showTip={homeTip}
             onHome={() => closeRef.current()}
-            onHatFling={ownHat ? (dx, dy) => { drag.current = null; engineRef.current?.takeOff(dx, dy); } : undefined}
+            onHatFling={peekHat !== 'me' ? (dx, dy) => { drag.current = null; engineRef.current?.takeOff(dx, dy); setBare(true); } : undefined}
           />
           <div ref={clipRef} className="sh-clip" aria-hidden={!sheetVisible}>
             {/* Zoomed out a touch at rest, growing to full size as the sheet rises:

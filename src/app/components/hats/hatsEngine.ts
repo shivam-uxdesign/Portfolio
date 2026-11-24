@@ -37,7 +37,7 @@ export interface HatsEngine {
   displayHat(id: WearableId | null, dir?: { x: number; y: number }): void;
   /** Page change while wearing your own hat: tip it the way the page is moving. */
   tipHat(dir: { x: number; y: number }): void;
-  /** Toss the worn hat off (dragged away in the sheet): back to no hat. */
+  /** Toss whatever hat he's wearing off (dragged away in the sheet): bare-headed. */
   takeOff(dx: number, dy: number): void;
   /** Quick look left (-1) or right (1), e.g. before shuffling along the edge. */
   glance(dir: number): void;
@@ -618,8 +618,16 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
         { duration: 520, easing: 'cubic-bezier(.35,.1,.3,1)' });
     },
     takeOff(dx: number, dy: number) {
-      if (destroyed || current === 'me') return;
-      const done = () => { putBack(); relayout(); apply('me', false); shownHat = null; };
+      // Whatever is on his head goes: the visitor's own hat (back to no pick) or
+      // a page hat shown in the sheet. Either way he ends up bare-headed.
+      const wearing = shownHat ?? current;
+      if (destroyed || wearing === 'me') return;
+      const own = current !== 'me';
+      shownHat = 'me';
+      const done = () => {
+        if (own) { putBack(); relayout(); apply('me', false); }
+        setProps('me');
+      };
       if (reduce) { done(); return; }
       const d = Math.hypot(dx, dy) || 1;
       const ux = dx / d, uy = dy / d;
