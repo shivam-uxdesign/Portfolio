@@ -97,3 +97,40 @@
 
 /* An embedded case study fills the screen under the bar and scrolls itself. */
 .pc-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: var(--background); }
+
+
+/* ── Sticker outline on his head: dark pages only, the whole silhouette (hat included) ── */
+.pc-card[data-theme="dark"] .pc-home .mh,
+.pc-trav[data-ring] .mh {
+  --ring: .9px; /* the eight stacked shadows compound (~2.4x): ~2.2px of outline */
+  filter:
+    drop-shadow(var(--ring) 0 0 #fff) drop-shadow(calc(var(--ring) * -1) 0 0 #fff)
+    drop-shadow(0 var(--ring) 0 #fff) drop-shadow(0 calc(var(--ring) * -1) 0 #fff)
+    drop-shadow(calc(var(--ring) * .7) calc(var(--ring) * .7) 0 #fff) drop-shadow(calc(var(--ring) * -.7) calc(var(--ring) * -.7) 0 #fff)
+    drop-shadow(calc(var(--ring) * .7) calc(var(--ring) * -.7) 0 #fff) drop-shadow(calc(var(--ring) * -.7) calc(var(--ring) * .7) 0 #fff);
+}
+@media (min-width: 768px) { .pc-card[data-theme="dark"] .pc-home .mh { --ring: 1.05px; } }
+/* The flying copies set their own --ring (sized for the shrink), which must win over the default above. */
+.pc-trav[data-ring] .mh { --ring: inherit; }
+
+/* ── After a scroll: a frosted band so the bar never merges with the page ── */
+.pc-band {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 49; pointer-events: none;
+  height: calc(env(safe-area-inset-top, 0px) + 92px);
+  opacity: var(--pc-scroll, 0); will-change: opacity;
+  background: color-mix(in oklab, var(--background) 58%, transparent);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 58%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 58%, transparent 100%);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .pc-band { background: color-mix(in oklab, var(--background) 90%, transparent); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .pc-band { -webkit-backdrop-filter: none; backdrop-filter: none; background: color-mix(in oklab, var(--background) 94%, transparent); }
+}
+/* Reading progress: a thin line above the band, drawn by the shell so the blur never smears it. */
+.pc-progress {
+  position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; height: 2px; z-index: 52; pointer-events: none;
+  background: var(--pc-progress-color, var(--primary)); transform-origin: 0 50%; transform: scaleX(var(--pc-progress, 0));
+}

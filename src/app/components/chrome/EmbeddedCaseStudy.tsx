@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { site, useSite } from '../../../lib/site';
 import { PAL } from '../hats/hatsData';
+import { pageScroll } from '../../../lib/pageScroll';
 
 // A finished case study page (public/case-studies/<slug>/index.html), shown
 // whole inside the portfolio. Same origin, so the portfolio can:
@@ -64,6 +65,15 @@ export function EmbeddedCaseStudy({ slug, title, skin = true }: { slug: string; 
       if (href.startsWith('/') && !href.startsWith('//')) { e.preventDefault(); navigate(href.replace(/[?&]v=tldr\b/, '')); }
       else if (/^https?:/.test(href)) a.target = '_blank';
     }, true);
+    // Scroll position → the shell (the header's frosted band and the progress line).
+    const report = () => {
+      const el = doc.scrollingElement ?? doc.documentElement;
+      const max = Math.max(1, el.scrollHeight - el.clientHeight);
+      pageScroll.set(el.scrollTop, Math.min(1, el.scrollTop / max));
+    };
+    win.addEventListener('scroll', report, { passive: true });
+    win.addEventListener('resize', report, { passive: true });
+    report();
     // Page → bar (its own "Read the full story" etc.).
     const sync = () => site.set({ tldr: READ_MODE(doc) === 'tldr' });
     new MutationObserver(sync).observe(doc.documentElement, { attributes: true, subtree: true, attributeFilter: ['data-mode', 'hidden'] });
