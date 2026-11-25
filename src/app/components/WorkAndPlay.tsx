@@ -4,14 +4,14 @@ import { trackEvent } from '../../lib/analytics';
 import './workplay.css';
 import { ProjectStacks } from './projects/ProjectStacks';
 import { FloatingDeck } from './projects/FloatingDeck';
-import type { ProjectGroup, ProjectGroupId } from './projects/types';
+import type { ProjectGroup, ProjectGroupId, Impact } from './projects/types';
 import { PROPS, type HatId } from './hats/props';
 
 // One page, two sides: corporate case studies and things built for fun (mostly
 // with AI). Phones: two stacks that fly open. md+: two columns, each with a
 // featured project and two smaller ones.
 
-export interface WorkItem { title: string; descriptor: string; number: string; bg: string; link: string; external?: boolean; thumbnail: ReactNode; tag?: string; system?: boolean }
+export interface WorkItem { impact?: Impact; title: string; descriptor: string; number: string; bg: string; link: string; external?: boolean; thumbnail: ReactNode; tag?: string; system?: boolean }
 export interface PlayItem { title: string; description: string; tag: string; color: string; image: string; link: string; cta?: string }
 
 // The headline: the sticky notes perch on Work, the propeller beanie on Play.
@@ -38,7 +38,7 @@ function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
     {
       id: 'work', label: 'Shipped at work', count: `${work.length} case studies`,
       heading: 'Shipped at work', sub: 'Product design at Rupyy and before.',
-      items: work.map(p => ({ title: p.title, descriptor: p.descriptor, link: p.link, external: p.external, bg: p.bg, thumbnail: p.thumbnail, tag: p.tag ?? `Case study ${p.number}` })),
+      items: work.map(p => ({ title: p.title, descriptor: p.descriptor, link: p.link, external: p.external, bg: p.bg, thumbnail: p.thumbnail, tag: p.tag ?? `Case study ${p.number}`, impact: p.impact })),
     },
     {
       id: 'fun', label: 'Built for fun, with AI', count: `${play.length} apps`,
@@ -68,7 +68,7 @@ function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
 
 // Laptops: two columns split by a hairline. Each: one featured project across
 // the column, two smaller ones beneath — all six visible, no scrolling.
-interface Entry { to: string; external?: boolean; side: 'work' | 'play'; thumb: ReactNode; eyebrow: string; title: string; desc: string; cta: string }
+interface Entry { impact?: Impact; to: string; external?: boolean; side: 'work' | 'play'; thumb: ReactNode; eyebrow: string; title: string; desc: string; cta: string }
 
 function EntryLink({ e, className, children }: { e: Entry; className: string; children: ReactNode }) {
   const onClick = () => trackEvent('project_open', { side: e.side, link: e.to });
@@ -87,7 +87,13 @@ function Column({ id, heading, entries, playful, after }: { id: string; heading:
         <span className="wpd-text">
           <span className="wpd-eyebrow">{main.eyebrow}</span>
           <span className="wpd-title">{main.title}</span>
-          <span className="wpd-desc">{main.desc}</span>
+          {main.impact
+            ? <>
+                <span className="wpd-big">{main.impact.big}</span>
+                <span className="wpd-sub">{main.impact.sub}</span>
+                {main.impact.note && <span className="wpd-note">{main.impact.note}</span>}
+              </>
+            : <span className="wpd-desc">{main.desc}</span>}
           <span className="wpd-cta">{main.cta} <span aria-hidden="true">→</span></span>
         </span>
       </EntryLink>
@@ -111,7 +117,11 @@ function SystemCard({ items }: { items: WorkItem[] }) {
     <div className="wpd-system">
       <Link to="/case-study/rupyy-design-system" className="wpd-sys-head" onClick={track('/case-study/rupyy-design-system')} draggable={false}>
         <span className="wpd-eyebrow">Case study · Rupyy · 3 tools</span>
-        <span className="wpd-title">The Rupyy design system</span>
+        <span className="wpd-sys-row">
+          <span className="wpd-title">The Rupyy design system</span>
+          <span className="wpd-big wpd-big-sm">3 tools · 1 kit</span>
+        </span>
+        <span className="wpd-sub">that ended the one-designer queue for six PMs</span>
         <span className="wpd-cta">See how they fit <span aria-hidden="true">→</span></span>
       </Link>
       <div className="wpd-sys-tools">
@@ -119,6 +129,7 @@ function SystemCard({ items }: { items: WorkItem[] }) {
           <Link key={p.link} to={p.link} className="wpd-small wpd-sys-tool" onClick={track(p.link)} draggable={false}>
             <span className="wpd-thumb"><span className="absolute inset-0" style={{ background: p.bg }}>{p.thumbnail}</span></span>
             <span className="wpd-title">{p.title}</span>
+            {p.impact?.short && <span className="wpd-short">{p.impact.short[0]}<span className="em">{p.impact.short[1]}</span>{p.impact.short[2]}</span>}
           </Link>
         ))}
       </div>
@@ -129,7 +140,7 @@ function SystemCard({ items }: { items: WorkItem[] }) {
 export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
   const system = work.filter(p => p.system);
   const workEntries: Entry[] = work.filter(p => !p.system).map(p => ({
-    to: p.link, external: p.external, side: 'work', eyebrow: p.tag ?? `Case study ${p.number}`, title: p.title, desc: p.descriptor, cta: 'Read case study',
+    to: p.link, impact: p.impact, external: p.external, side: 'work', eyebrow: p.tag ?? `Case study ${p.number}`, title: p.title, desc: p.descriptor, cta: 'Read case study',
     thumb: <span className="absolute inset-0" style={{ background: p.bg }}><span className="wp-thumb">{p.thumbnail}</span></span>,
   }));
   const playEntries: Entry[] = play.map(f => ({

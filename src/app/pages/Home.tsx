@@ -171,28 +171,32 @@ const MotionLink = motion.create(Link);
 
 // Work: the Sales Case Card on its own, then the Rupyy design system as one
 // story told in three case studies (each also opens on its own).
-const thumb = (slug: string) => <img src={`/case-studies/thumbs/${slug}.jpg`} alt="" loading="lazy" draggable={false} className="w-full h-full object-cover" />;
+const thumb = (slug: string) => <img src={`/case-studies/thumbs/${slug}.webp`} alt="" loading="lazy" draggable={false} className="w-full h-full object-cover" />;
 export const PROJECTS = [
   {
     title: 'Sales Case Card',
     descriptor: 'A case card that tells a business manager whose move it is. 6 of 6 BMs preferred it.',
     number: '01', tag: 'Case study · Rupyy', bg: '#EFEBE3', link: '/case-study/sales-case-card', external: false,
     thumbnail: thumb('sales-case-card'),
+    impact: { big: '98 → 12', sub: '“where is my case?” tickets a month', note: 'First full month after launch' },
   },
   {
     title: 'Journey Studio', descriptor: 'Any journey, proven before it’s built.',
     number: '02', tag: 'Design system · 1 of 3', system: true, bg: '#E3ECFD', link: '/case-study/journey-studio', external: false,
     thumbnail: thumb('journey-studio'),
+    impact: { big: '6 → 1.5 days', sub: 'to prototype a three-team journey', short: ['Prototyped in ', '1.5 days', ''] },
   },
   {
     title: 'Design Kit', descriptor: 'One design system, released like software.',
     number: '03', tag: 'Design system · 2 of 3', system: true, bg: '#DFF1E8', link: '/case-study/design-kit', external: false,
     thumbnail: thumb('design-kit'),
+    impact: { big: '½ day → 20 min', sub: 'to get one change into every studio', short: ['Any change in ', '20 min', ''] },
   },
   {
     title: 'Illustration Studio', descriptor: 'State illustrations, self-serve.',
-    number: '04', tag: 'Design system · 3 of 3', system: true, bg: '#FBF0D6', link: '/case-study/illustration-studio', external: false,
+    number: '04', tag: 'Design system · 3 of 3', system: true, bg: '#F8E4B2', link: '/case-study/illustration-studio', external: false,
     thumbnail: thumb('illustration-studio'),
+    impact: { big: '1 day → 10 min', sub: 'for a state graphic, made by the PM', short: ['A graphic in ', '10 min', ''] },
   },
 ];
 
