@@ -13,7 +13,40 @@ const DOT_X = 11, DOT_Y = 10; // dot pitch inside the pill
 interface Pos { row: number; col: number }
 export interface MapCell { label: string; hat: HatId }
 
-export function PageMap({ current, cells, open, onToggle, onPick, onHeight }: {
+const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
+const seg = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+// While the sheet rises, the bar's drag handle grows into the map's pill (same
+// spot, same size at progress 1), so PageMap can take over with no jump.
+export function HandleMorph({ progress: s, current }: { progress: number; current: Pos }) {
+  const g = easeInOut(seg(s, 0.3, 0.88)); // 40×4 bar → 44×26 pill
+  const l = seg(s, 0.86, 1);              // the lit dot comes last
+  return (
+    <span
+      className="pm-morph"
+      aria-hidden="true"
+      style={{
+        width: lerp(40, 44, g), height: lerp(4, 26, g), top: lerp(10, 12, g),
+        background: `color-mix(in oklab, var(--foreground) ${lerp(10, 6, g).toFixed(1)}%, transparent)`,
+      }}
+    >
+      <span className="pm-dots">
+        {Array.from({ length: 6 }, (_, i) => {
+          // Dots bloom outward from the page you'll land on.
+          const step = Math.abs((i % 3) - current.col) + Math.abs(Math.floor(i / 3) - current.row);
+          const t = easeOut(seg(s, 0.6 + step * 0.05, 0.82 + step * 0.05));
+          return <span key={i} style={{ opacity: t, transform: `scale(${t})` }} />;
+        })}
+      </span>
+      <span className="pm-lit" style={{ opacity: l, transform: `translate(${current.col * DOT_X}px, ${current.row * DOT_Y}px) scale(${lerp(0.3, 1, easeOut(l))})` }} />
+    </span>
+  );
+}
+
+export function PageMap({ current, cells, open, onToggle, onPick, onHeight, cue = false }: {
   current: Pos;
   cells: MapCell[][];
   open: boolean;
@@ -21,9 +54,20 @@ export function PageMap({ current, cells, open, onToggle, onPick, onHeight }: {
   onPick: (p: Pos) => void;
   /** Space the open map takes from the top of the sheet (0 when closed). */
   onHeight: (px: number) => void;
+  /** Just grew out of the handle: glow + stroke once, then show the page's name. */
+  cue?: boolean;
 }) {
   const [preview, setPreview] = useState<Pos | null>(null);
   const [flash, setFlash] = useState(false);
+  const [arrived, setArrived] = useState(false);
+  useEffect(() => {
+    if (!cue) return;
+    setArrived(true);
+    const a = setTimeout(() => setArrived(false), 950);
+    const b = setTimeout(() => setFlash(true), 380);
+    const c = setTimeout(() => setFlash(false), 1780);
+    return () => { clearTimeout(a); clearTimeout(b); clearTimeout(c); };
+  }, [cue]);
   const drag = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
   const litRef = useRef<HTMLSpanElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -107,7 +151,7 @@ export function PageMap({ current, cells, open, onToggle, onPick, onHeight }: {
         }}
         onPointerCancel={() => { drag.current = null; setPreview(null); }}
       >
-        <span className="pm-pill" aria-hidden="true">
+        <span className={`pm-pill${arrived ? ' arrived' : ''}`} aria-hidden="true">
           <span className="pm-dots">{Array.from({ length: 6 }, (_, i) => <span key={i} />)}</span>
           <span ref={litRef} className="pm-lit" style={{ transform: `translate(${shown.col * DOT_X}px, ${shown.row * DOT_Y}px)` }} />
         </span>

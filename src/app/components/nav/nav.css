@@ -24,6 +24,28 @@
 .pm.open .pm-pill { background: var(--foreground); }
 .pm.open .pm-dots span { background: color-mix(in oklab, var(--background) 40%, transparent); }
 
+/* The bar's handle, growing into the pill as the sheet rises (geometry matches .pm-pill at rest). */
+.pm-morph { position: absolute; left: 50%; z-index: 7; transform: translateX(-50%); border-radius: 999px; pointer-events: none; }
+.pm-morph .pm-dots { position: absolute; left: 8px; top: 5px; }
+.pm-morph .pm-lit { box-shadow: 0 0 0 1.5px color-mix(in oklab, var(--primary) 30%, transparent); }
+
+/* Arrival: a pop, a soft glow and a stroke ring that widens out, once. */
+.pm-pill::before, .pm-pill::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; }
+.pm-pill.arrived { animation: pm-pop .42s cubic-bezier(.3, 1.5, .5, 1); }
+.pm-pill.arrived::before { animation: pm-glow .9s cubic-bezier(.2, .7, .2, 1) both; }
+.pm-pill.arrived::after { animation: pm-stroke .75s cubic-bezier(.3, .6, .2, 1) both; }
+@keyframes pm-pop { 40% { transform: scale(1.08); } }
+@keyframes pm-glow {
+  0% { opacity: 0; box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 70%, transparent), 0 0 0 0 color-mix(in oklab, var(--primary) 40%, transparent); }
+  25% { opacity: 1; box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 45%, transparent), 0 0 18px 4px color-mix(in oklab, var(--primary) 45%, transparent); }
+  100% { opacity: 0; box-shadow: 0 0 0 10px transparent, 0 0 28px 10px transparent; }
+}
+@keyframes pm-stroke {
+  0% { opacity: 1; outline: 1.5px solid var(--primary); outline-offset: 0; }
+  60% { opacity: 1; }
+  100% { opacity: 0; outline: 1.5px solid var(--primary); outline-offset: 7px; }
+}
+
 /* The page's name drops out under the pill for a moment. */
 .pm-name {
   position: absolute; top: calc(100% - 4px); left: 50%; transform: translate(-50%, -6px) scale(.9); pointer-events: none;
@@ -74,4 +96,5 @@ body.fd-open .pm, body.fd-open .pm > * { opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   .pm-card, .pm.open .pm-card, .pm-name, .pm-pill, .sh-page-stage, .sh-map-scrim { transition: none; }
   .pm.open .pm-grid li { animation: none; }
+  .pm-pill.arrived, .pm-pill.arrived::before, .pm-pill.arrived::after { animation-duration: .01s; }
 }
