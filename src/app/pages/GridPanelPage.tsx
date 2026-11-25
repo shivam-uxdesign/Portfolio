@@ -8,7 +8,7 @@ const HAIRLINE  = '#D9D5CF';
 const PAGE_BG   = '#EDEAD5';
 const RED_DOT   = '#923426';
 const SANS      = "'DM Sans', -apple-system, sans-serif";
-const SERIF     = "'Playfair Display', Georgia, serif";
+const SERIF     = "'Plus Jakarta Sans', -apple-system, sans-serif";
 
 // ── Cell definitions ──────────────────────────────────────────────────────────
 type ContentType = 'gallery' | 'work' | 'fun' | 'about' | 'home' | 'contact' | 'interests' | 'resume' | 'stack';
