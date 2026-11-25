@@ -252,10 +252,12 @@
 @keyframes hh-nudge-hat { 0%, 100% { translate: 0 0; } 35% { translate: 6px 5px; } 55% { translate: 1px 1px; } 70% { translate: 4px 3px; } }
 @keyframes hh-nudge-specs { 0%, 100% { translate: 0 0; } 35% { translate: -6px -5px; } 55% { translate: -1px -1px; } 70% { translate: -4px -3px; } }
 
-/* Persistent premise line under the name. */
+/* Persistent premise line under the name. Spacing rhythm in the text block:
+   eyebrow 6px name 10px premise 10px tagline. */
 .hh-text .hh-wear {
-  margin: 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500;
-  font-size: clamp(1.05rem, 2.4vw, 1.3rem); line-height: 1.2; letter-spacing: -.005em;
+  margin: 10px 0 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500;
+  font-size: clamp(1.1rem, 2.6vw, 1.4rem); line-height: 1.15; letter-spacing: -.005em;
   color: color-mix(in srgb, var(--hh-accent) 72%, var(--foreground));
   transition: color .6s;
 }
+.hh-text .hh-tagline { margin-top: 10px; max-width: 30em; }

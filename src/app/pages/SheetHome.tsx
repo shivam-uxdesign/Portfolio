@@ -184,10 +184,10 @@ const HeroPane = memo(function HeroPane({ onEngine }: { onEngine: (e: HatsEngine
     <div className="hh-cell w-full h-full flex flex-col items-center justify-center gap-3 md:gap-4 select-text overflow-hidden">
       <div className="hh-text order-1 md:order-2 flex-shrink-0 flex flex-col items-center text-center w-full" style={{ '--hh-accent': PAL[hat].accent } as React.CSSProperties}>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
-          className="text-[11px] font-medium tracking-[0.09em] text-muted-foreground uppercase mb-1">
+          className="text-[11px] font-medium tracking-[0.09em] text-muted-foreground uppercase mb-1.5">
           Hey, I am
         </motion.div>
-        <div className="overflow-hidden">
+        <div className="overflow-hidden pb-0.5">
           <motion.h1
             initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
             className="font-medium leading-[0.92] cursor-default relative"
@@ -200,14 +200,14 @@ const HeroPane = memo(function HeroPane({ onEngine }: { onEngine: (e: HatsEngine
         {/* Always on: the premise of the hero. The line below changes per hat. */}
         <motion.p
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }}
-          className="hh-wear mt-1.5"
+          className="hh-wear"
         >
           I wear multiple hats
         </motion.p>
         <motion.p
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}
           aria-live="polite"
-          className={`hh-tagline text-[13px] md:text-[14px] leading-snug text-muted-foreground mt-2 max-w-[34em] min-h-[2.9em]${swapping ? ' swap' : ''}`}
+          className={`hh-tagline text-[13px] md:text-[14px] leading-snug text-muted-foreground max-w-[34em] min-h-[2.9em]${swapping ? ' swap' : ''}`}
         >
           {info ? <><em>{info.name}.</em> {info.line}</> : <>A product designer who works from <em>strategy</em> to pixel.</>}
         </motion.p>
