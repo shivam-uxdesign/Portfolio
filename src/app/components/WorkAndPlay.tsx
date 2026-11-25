@@ -5,6 +5,7 @@ import './workplay.css';
 import { ProjectStacks } from './projects/ProjectStacks';
 import { FloatingDeck } from './projects/FloatingDeck';
 import type { ProjectGroup, ProjectGroupId } from './projects/types';
+import { PROPS, type HatId } from './hats/props';
 
 // One page, two sides: corporate case studies and things built for fun (mostly
 // with AI). Phones: two stacks that fly open. md+: two columns, each with a
@@ -12,6 +13,24 @@ import type { ProjectGroup, ProjectGroupId } from './projects/types';
 
 export interface WorkItem { title: string; descriptor: string; number: string; bg: string; link: string; external?: boolean; thumbnail: ReactNode; tag?: string; system?: boolean }
 export interface PlayItem { title: string; description: string; tag: string; color: string; image: string; link: string }
+
+// The two hats the page offers: sticky notes for Work, the propeller beanie for
+// Play. Part of the page's top strip, so it shows on the resting bar.
+function HatIcon({ id }: { id: HatId }) {
+  return <svg viewBox={PROPS[id].vb} aria-hidden="true" dangerouslySetInnerHTML={{ __html: PROPS[id].svg(true) }} />;
+}
+function HatChips({ workCount, playCount }: { workCount: number; playCount: number }) {
+  return (
+    <div className="wp-hats" aria-hidden="true">
+      <div className="wp-hat" style={{ '--hat': '#FFE27A' } as React.CSSProperties}>
+        <HatIcon id="notes" /><div><b>Work</b><span>{workCount} case studies</span></div>
+      </div>
+      <div className="wp-hat" style={{ '--hat': '#9FE8D3' } as React.CSSProperties}>
+        <HatIcon id="propeller" /><div><b>Play</b><span>{playCount} apps<span className="wp-hat-long"> built with AI</span></span></div>
+      </div>
+    </div>
+  );
+}
 
 // Phones: two decks — tap one and its projects fly out and float over the sheet.
 function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
@@ -39,8 +58,11 @@ function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
     <div className="md:hidden w-full min-h-full flex flex-col gap-5 pt-1 pb-4 px-1">
       {/* While a deck is out, its own title takes this heading's place. */}
       <div ref={headRef} className="transition-opacity duration-200" style={{ opacity: open ? 0 : 1 }}>
-        <p className="text-[11px] font-medium tracking-[0.09em] uppercase text-muted-foreground">Work &amp; Play</p>
-        <h2 className="mt-1 text-[1.35rem] font-medium leading-tight text-foreground" style={{ letterSpacing: '-0.03em' }}>Pick a stack</h2>
+        {/* The resting bar on a phone is ~20% of the screen, so the heading is a one-line label and the chips sit right under it. */}
+        <h2 className="text-[11px] font-medium tracking-[0.09em] uppercase text-muted-foreground">
+          <span className="sr-only">Work &amp; Play: </span>Two hats worth a look
+        </h2>
+        <HatChips workCount={work.length} playCount={play.length} />
       </div>
       <ProjectStacks groups={groups} onOpen={onOpen} layout="column" />
       {open && group && <FloatingDeck group={group} trigger={open.trigger} anchor={headRef.current} onClose={onClose} />}
@@ -124,10 +146,13 @@ export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[]
       <PhoneStacks work={work} play={play} />
       <div className="wpd hidden md:flex">
         <header className="wpd-head">
-          <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase mb-3">Work &amp; Play</p>
-          <h2 className="wpd-h text-foreground">
-            Things I've <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>shipped</span>, and things I've played with.
-          </h2>
+          <div>
+            <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase mb-3">Work &amp; Play</p>
+            <h2 className="wpd-h text-foreground">
+              Two <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>hats</span> worth a look.
+            </h2>
+          </div>
+          <HatChips workCount={work.length} playCount={play.length} />
         </header>
         <div className="wpd-cols">
           <Column id="wp-work" heading="Shipped at work" entries={workEntries} after={system.length ? <SystemCard items={system} /> : undefined} />
