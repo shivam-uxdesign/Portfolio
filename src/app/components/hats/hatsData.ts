@@ -8,8 +8,7 @@ export interface HatInfo { id: HatId; name: string; hat: string; line: string }
 
 export const HATS: HatInfo[] = [
   { id: 'notes',     name: 'Product designer',   hat: 'sticky notes',     line: '3+ years turning messy hypotheses into small, testable products.' },
-  // TODO(Shivam): confirm this line.
-  { id: 'party',     name: 'Plan starter',       hat: 'party hat',        line: 'The friend who turns “we should hang out” into an actual plan.' },
+  { id: 'party',     name: 'The friend with a plan', hat: 'party hat',    line: '“We should hang out” lasts about five minutes before I put a date on it.' },
   { id: 'helmet',    name: 'Biker',              hat: 'helmet',           line: 'Long rides with friends. Getting outside is the whole point.' },
   { id: 'beret',     name: 'Artist',             hat: 'beret',            line: 'Fine arts at JJ School of Art. I drew everything on this page.' },
   { id: 'propeller', name: 'Motion & animation', hat: 'propeller beanie', line: 'Timing, easing, physics. Tap the propeller and watch it ease out.' },
