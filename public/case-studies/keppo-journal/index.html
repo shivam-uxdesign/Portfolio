@@ -6,6 +6,12 @@
 <title>Keppo Journal · case study</title>
 <meta name="description" content="A journal that opens on the camera. I wanted it, it didn't exist, so I made it, with AI as my engineering team.">
 <link rel="icon" href="media/keppo-journal-mark.svg">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Keppo Journal · case study">
+<meta property="og:description" content="A journal that opens on the camera. I wanted it, it didn't exist, so I made it, with AI as my engineering team.">
+<meta property="og:image" content="https://shivamdesign.in/case-studies/keppo-journal/media/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script>try{if(window.self!==window.top||/[?&]embed=1(&|$)/.test(location.search))document.documentElement.setAttribute("data-embedded","")}catch(e){document.documentElement.setAttribute("data-embedded","")}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -247,6 +253,16 @@ footer p{max-width:75ch}
 .review li{margin-bottom:6px}
 .review li a{color:var(--marigold)}
 .review button{float:right;background:none;border:1px solid #3A3A3F;color:var(--paper);border-radius:8px;font:inherit;cursor:pointer;padding:2px 8px}
+
+/* ---------- embedded in the portfolio ---------- */
+/* Its bar replaces this header and drives Full / TL;DR; draft markers stay out of the live site. */
+html[data-embedded] .top{display:none}
+html[data-embedded] .you{background:none;border:0;cursor:auto}
+html[data-embedded] .you::before{display:none}
+html[data-embedded] .hero{min-height:100vh}
+html[data-embedded] .hero .wrap{padding-top:72px}
+html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
+@media (max-width:860px){html[data-embedded] .hero{min-height:auto;padding-top:72px}html[data-embedded] .hero .wrap{padding-top:24px}}
 </style>
 </head>
 <body>
@@ -653,7 +669,9 @@ footer p{max-width:75ch}
   /* ---------- Full / TL;DR ---------- */
   function setMode(mode) {
     if (mode !== 'full' && mode !== 'tldr') return;
+    if (root.getAttribute('data-mode') === mode) return;
     root.setAttribute('data-mode', mode);
+    try { history.replaceState(null, '', mode === 'tldr' ? '#tldr' : location.pathname + location.search); } catch (_) {}
     document.querySelectorAll('.switch [data-tlm]').forEach(function (b) {
       b.setAttribute('aria-pressed', String(b.getAttribute('data-tlm') === mode));
     });
