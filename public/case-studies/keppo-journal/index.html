@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en" data-mode="full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keppo Journal · case study</title>
+<meta name="description" content="A journal that opens on the camera. I wanted it, it didn't exist, so I made it, with AI as my engineering team.">
+<link rel="icon" href="media/keppo-journal-mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--
+  Keppo Journal case study.
+
+  Portfolio conventions (as Portfolio/src/app/components/chrome/
+  EmbeddedCaseStudy.tsx and public/case-studies/skin.css do them):
+  - Full / TL;DR lives in this page: <html data-mode="full|tldr">, switched
+    by buttons with data-tlm="full|tldr" (the portfolio clicks these), by
+    ?view=tldr, or by the #tldr hash.
+  - The header carries .modebar, which skin.css hides when the portfolio
+    embeds the page (the portfolio's own bar does that job).
+  - Accent words are <mark>, which skin.css restyles in the theme colour.
+  - Draft markers: .you = drafted for Shivam to check; dashed frames = media
+    to come. ?review=1 lists every one in a panel; ?clean=1 hides markers.
+  - Screens are rebuilt from the app's code with a demo journal
+    (rebuild/screens.html, rendered by rebuild/build.mjs).
+-->
+<style>
+:root{
+  --paper:#F7F7F5; --surface:#FFFFFF; --surface2:#EFEFEC;
+  --line:#DCDCD8; --line2:#C6C6C1;
+  --ink:#0A0A0B; --text2:#2A2A2E; --dim:#55555C; --faint:#6B6B73;
+  --marigold:#F2B544; --marigold-ink:#2E1F00; --marigold-text:#8A5A00; --marigold-soft:#FBEBC8;
+  --display:"Bricolage Grotesque", system-ui, sans-serif;
+  --sans:"Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"Geist Mono", ui-monospace, Menlo, Consolas, monospace;
+  --gutter:clamp(16px, 4vw, 48px);
+  --max:1180px;
+  --r-card:24px; --r-thumb:16px; --r-chip:12px;
+  --phone-h:min(720px, calc(100vh - 120px));
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--sans);overflow-x:hidden}
+img,video,svg{display:block;max-width:100%}
+a{color:var(--marigold-text)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.05;margin:0}
+h2{font-size:clamp(34px,4.4vw,56px);font-weight:700}
+h3{font-size:clamp(22px,2.2vw,28px);font-weight:700;line-height:1.15}
+p{margin:0 0 1em}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.mono{font-family:var(--mono);font-size:13px;letter-spacing:.02em}
+.kicker{font-family:var(--mono);font-size:13px;color:var(--marigold-text);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--marigold);flex:none}
+.lede{font-size:clamp(18px,1.6vw,21px);color:var(--text2);max-width:62ch}
+section{padding:clamp(72px,10vw,128px) 0}
+section+section{border-top:1px solid var(--line)}
+
+/* ---------- draft markers ---------- */
+.you{background:linear-gradient(transparent 62%, var(--marigold-soft) 62%);border-bottom:1.5px dashed var(--marigold-text);cursor:help}
+.you::before{content:"YOU";font:500 10px/1 var(--mono);letter-spacing:.06em;color:var(--marigold-ink);background:var(--marigold);border-radius:4px;padding:2px 4px;margin-right:6px;vertical-align:2px}
+html[data-clean] .you{background:none;border:0}
+html[data-clean] .you::before{display:none}
+.ph{position:relative;border:2px dashed var(--line2);border-radius:var(--r-thumb);background:repeating-linear-gradient(-45deg,transparent 0 12px,rgba(0,0,0,.025) 12px 24px),var(--surface2);display:flex;align-items:center;justify-content:center;text-align:center;color:var(--dim);font:400 13px/1.45 var(--mono);padding:18px;overflow:hidden}
+.ph b{display:block;color:var(--ink);font:500 12px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.ph.dark{background:repeating-linear-gradient(-45deg,transparent 0 12px,rgba(255,255,255,.03) 12px 24px),#1C1C1F;border-color:#3A3A3F;color:#8B8B93}
+.ph.dark b{color:#F4F4F5}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:0;z-index:20;background:rgba(247,247,245,.86);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:24px;height:60px}
+.top .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none}
+.top .brand img{width:28px;height:28px;border-radius:7px}
+.top .brand span{font:600 15px/1 var(--sans);color:var(--ink)}
+.top nav{display:flex;gap:18px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a{font-size:14px;color:var(--dim);text-decoration:none;white-space:nowrap}
+.top nav a:hover{color:var(--ink)}
+html[data-mode="tldr"] .top nav{visibility:hidden}
+.switch{display:flex;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:3px;flex:none}
+.switch button{font:500 13px/1 var(--sans);border:0;background:none;color:var(--dim);padding:8px 14px;border-radius:999px;cursor:pointer;min-height:32px}
+.switch button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+@media (max-width:760px){.top nav{display:none}}
+
+/* ---------- mode ---------- */
+html[data-mode="tldr"] .full-only{display:none!important}
+html[data-mode="full"] .tldr-only{display:none!important}
+
+/* ---------- phone ---------- */
+.phone{height:var(--phone-h);aspect-ratio:9/19.5;border-radius:44px;background:#0A0A0B;padding:10px;box-shadow:0 30px 60px -30px rgba(46,31,0,.35),0 0 0 1px rgba(0,0,0,.08);position:relative;flex:none;max-width:100%}
+.phone .screen{position:relative;width:100%;height:100%;border-radius:35px;overflow:hidden;background:#141416}
+.phone .screen>*{position:absolute;inset:0;width:100%;height:100%;border-radius:0;border:0;object-fit:cover}
+.phone .screen .ph{border-radius:0}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:0;min-height:calc(100vh - 60px);display:flex;align-items:center;overflow:hidden;isolation:isolate}
+.hero-bg{position:absolute;inset:0;z-index:-1}
+.hero-bg .ph{position:absolute;inset:18px;border-radius:28px;align-items:flex-start;justify-content:flex-end;text-align:right;padding:22px 26px}
+.hero-bg .ph span{max-width:260px}
+.hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(247,247,245,.97) 0%,rgba(247,247,245,.88) 42%,rgba(247,247,245,.25) 75%,rgba(247,247,245,0) 100%)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) auto;gap:clamp(32px,5vw,72px);align-items:center;width:100%;padding-top:24px;padding-bottom:24px}
+.hero h1{font-size:clamp(46px,6.4vw,96px);font-weight:800;line-height:.98;margin-bottom:22px}
+mark{background:none;color:var(--marigold-text);font:inherit}
+.hero .facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.chip{font:500 13px/1 var(--mono);border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:9px 13px;color:var(--text2)}
+.hero .phone{--phone-h:min(640px, calc(100vh - 120px))}
+@media (max-width:860px){
+  .hero{min-height:auto;padding:48px 0 64px}
+  .hero .wrap{grid-template-columns:minmax(0,1fr)}
+  .hero .phone{--phone-h:min(560px,120vw);margin:0 auto}
+  .hero-bg::after{background:linear-gradient(180deg,rgba(247,247,245,.95) 0%,rgba(247,247,245,.85) 55%,rgba(247,247,245,.6) 100%)}
+}
+
+/* ---------- why ---------- */
+.reasons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:48px}
+.reason{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:28px}
+.reason .n{font:500 13px/1 var(--mono);color:var(--marigold-text);margin-bottom:22px;display:block}
+.reason h3{margin-bottom:12px}
+.reason p{color:var(--text2);font-size:16px}
+@media (max-width:900px){.reasons{grid-template-columns:minmax(0,1fr)}}
+
+.where{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px;align-items:center;margin-top:72px}
+.where svg{width:100%;height:auto}
+@media (max-width:900px){.where{grid-template-columns:minmax(0,1fr)}}
+
+.names{display:flex;align-items:stretch;gap:0;margin-top:64px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--surface);overflow:hidden}
+.names div{flex:1;padding:22px 24px;border-right:1px solid var(--line)}
+.names div:last-child{border-right:0;background:var(--marigold-soft)}
+.names .mono{color:var(--faint);display:block;margin-bottom:8px}
+.names strong{font:700 22px/1.1 var(--display);display:block;margin-bottom:6px}
+.names p{font-size:15px;color:var(--text2);margin:0}
+@media (max-width:760px){.names{flex-direction:column}.names div{border-right:0;border-bottom:1px solid var(--line)}}
+
+/* ---------- moment (sticky phone) ---------- */
+.moment-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(32px,6vw,96px);margin-top:56px}
+.stage{position:sticky;top:calc((100vh - var(--phone-h)) / 2 + 20px);height:calc(var(--phone-h) + 40px);display:flex;flex-direction:column;align-items:center;gap:12px}
+.stage .phone{--phone-h:min(660px, calc(100vh - 150px))}
+.stage .shot{opacity:0;transition:opacity .25s ease}
+.stage .shot.on{opacity:1}
+.stage .cap{font:400 13px/1.3 var(--mono);color:var(--dim);text-align:center;max-width:300px;min-height:2.6em}
+.steps{display:flex;flex-direction:column}
+.step{min-height:78vh;display:flex;flex-direction:column;justify-content:center;padding:24px 0;max-width:560px}
+.step:first-child{min-height:60vh}
+.step .label{font:500 13px/1 var(--mono);color:var(--marigold-text);margin-bottom:16px;display:flex;gap:10px;align-items:center}
+.step .label span{background:var(--marigold-soft);color:var(--marigold-ink);border-radius:6px;padding:4px 7px}
+.step h3{font-size:clamp(28px,3vw,40px);margin-bottom:16px}
+.step p{color:var(--text2)}
+.under{font:400 14px/1.55 var(--mono);color:var(--dim);border-left:2px solid var(--marigold);padding:4px 0 4px 14px;margin-top:10px}
+.under b{color:var(--ink);font-weight:500}
+.step .inline{display:none;margin-top:22px}
+@media (max-width:900px){
+  .moment-grid{grid-template-columns:minmax(0,1fr)}
+  .stage{display:none}
+  .step,.step:first-child{min-height:auto;padding:36px 0}
+  .step .inline{display:block}
+  .step .inline .phone{--phone-h:min(560px,130vw);margin:0 auto}
+}
+
+.idea{margin-top:40px;background:var(--ink);color:var(--paper);border-radius:var(--r-card);padding:clamp(28px,5vw,56px);display:grid;grid-template-columns:auto minmax(0,1fr);gap:32px;align-items:center}
+.idea .thumbdot{width:84px;height:84px;border-radius:16px;background:var(--surface2);border:3px solid var(--marigold);position:relative}
+.idea .thumbdot::after{content:"3";position:absolute;right:-10px;top:-10px;width:28px;height:28px;border-radius:50%;background:var(--marigold);color:var(--marigold-ink);font:600 14px/28px var(--sans);text-align:center}
+.idea blockquote{margin:0;font:700 clamp(24px,2.8vw,36px)/1.15 var(--display)}
+.idea p{color:#8B8B93;margin:14px 0 0;font-size:16px}
+@media (max-width:640px){.idea{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- fun bits ---------- */
+.bits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:48px}
+.bit{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;display:flex;flex-direction:column}
+.bit .media{aspect-ratio:4/3;padding:14px}
+.bit .media .ph{height:100%}
+.bit .media img,.problem .media img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:var(--r-thumb);background:#141416}
+.bit .body{padding:6px 28px 28px}
+.bit h3{margin-bottom:10px}
+.bit p{color:var(--text2);font-size:16px}
+.bit .tag{font:500 12px/1 var(--mono);color:var(--faint);text-transform:uppercase;letter-spacing:.06em;display:block;margin:16px 0 10px}
+.also{margin-top:20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.also .bit{flex-direction:row;align-items:center}
+.also .bit .media{aspect-ratio:1;width:38%;flex:none}
+.also .bit .body{padding:20px 24px 20px 4px}
+@media (max-width:860px){.bits,.also{grid-template-columns:minmax(0,1fr)}.also .bit{flex-direction:column}.also .bit .media{width:100%;aspect-ratio:4/3}.also .bit .body{padding:6px 28px 28px}}
+
+/* ---------- built ---------- */
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:48px}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:28px}
+.col h3{margin-bottom:16px;font-size:22px}
+.col ul{margin:0;padding-left:20px;color:var(--text2)}
+.col li{margin-bottom:8px}
+.col.ai{background:var(--surface2)}
+@media (max-width:760px){.split{grid-template-columns:minmax(0,1fr)}}
+.numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;margin-top:20px}
+.numbers div{background:var(--surface);padding:22px 24px}
+.numbers strong{font:300 clamp(30px,3.4vw,44px)/1 var(--sans);font-variant-numeric:tabular-nums;display:block;margin-bottom:8px;letter-spacing:-.02em}
+.numbers span{font-size:14px;color:var(--dim)}
+@media (max-width:760px){.numbers{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.problems{margin-top:64px;display:grid;gap:20px}
+.problem{border:1px solid var(--line);border-radius:var(--r-card);background:var(--surface);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);overflow:hidden}
+.problem .txt{padding:32px}
+.problem .txt h3{margin-bottom:18px}
+.problem dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 18px}
+.problem dt{font:500 12px/1.9 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--marigold-text)}
+.problem dd{margin:0;color:var(--text2);font-size:16px}
+.problem .media{padding:14px}
+.problem .media .ph{height:100%;min-height:240px}
+@media (max-width:860px){.problem{grid-template-columns:minmax(0,1fr)}.problem dl{grid-template-columns:minmax(0,1fr);gap:2px}.problem dd{margin-bottom:12px}}
+.lessons{margin-top:64px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.lessons div{border-top:2px solid var(--ink);padding-top:16px}
+.lessons strong{font:700 20px/1.2 var(--display);display:block;margin-bottom:8px}
+.lessons p{color:var(--text2);font-size:16px}
+@media (max-width:860px){.lessons{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- screens strip ---------- */
+.strip{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px var(--gutter) 28px;margin-top:40px;scrollbar-width:thin}
+.strip figure{margin:0;flex:none;scroll-snap-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.strip .phone{--phone-h:min(520px, calc(100vh - 200px));border-radius:36px;padding:8px}
+.strip .phone .screen{border-radius:29px}
+.strip figcaption{font:400 13px/1.3 var(--mono);color:var(--dim)}
+@media (min-width:1400px){.strip{padding-left:calc((100vw - var(--max)) / 2 + var(--gutter))}}
+
+/* ---------- tldr ---------- */
+.tldr{padding:clamp(56px,8vw,96px) 0}
+.tldr h1{font-size:clamp(44px,6vw,84px);font-weight:800;line-height:1;margin-bottom:20px}
+.tldr-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:56px;align-items:start;margin-top:40px}
+.tldr ol{list-style:none;margin:0;padding:0;counter-reset:t}
+.tldr li{counter-increment:t;display:grid;grid-template-columns:44px minmax(0,1fr);padding:18px 0;border-top:1px solid var(--line)}
+.tldr li::before{content:"0" counter(t);font:500 13px/1.9 var(--mono);color:var(--marigold-text)}
+.tldr li strong{display:block;font:700 20px/1.25 var(--display);margin-bottom:4px}
+.tldr li span{color:var(--text2);font-size:16px}
+.tldr .phones{display:flex;gap:16px}
+.tldr .phones .phone{--phone-h:min(460px,calc(100vh - 220px));border-radius:34px;padding:8px}
+.tldr .phones .phone .screen{border-radius:27px}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--marigold);color:var(--marigold-ink);font:600 15px/1 var(--sans);text-decoration:none;border-radius:999px;padding:14px 20px;margin-top:28px;border:0;cursor:pointer}
+.btn.ghost{background:none;border:1px solid var(--line2);color:var(--ink)}
+@media (max-width:900px){.tldr-grid{grid-template-columns:minmax(0,1fr)}.tldr .phones{justify-content:center}.tldr .phones .phone{--phone-h:min(420px,100vw)}}
+@media (max-width:520px){.tldr .phones .phone:nth-child(2){display:none}}
+
+/* ---------- closing ---------- */
+.closing{text-align:center}
+.closing h2{font-size:clamp(40px,5.4vw,72px);font-weight:800}
+footer{padding:40px 0 56px;border-top:1px solid var(--line);color:var(--faint);font-size:14px}
+footer p{max-width:75ch}
+
+/* ---------- review panel ---------- */
+.review{position:fixed;right:16px;bottom:16px;z-index:50;width:min(380px,calc(100vw - 32px));max-height:60vh;overflow:auto;background:var(--ink);color:var(--paper);border-radius:18px;padding:18px 20px;font:400 13px/1.45 var(--mono);box-shadow:0 20px 40px -10px rgba(0,0,0,.4)}
+.review h4{margin:0 0 10px;font:600 14px/1 var(--sans)}
+.review ol{margin:0;padding-left:20px}
+.review li{margin-bottom:6px}
+.review li a{color:var(--marigold)}
+.review button{float:right;background:none;border:1px solid #3A3A3F;color:var(--paper);border-radius:8px;font:inherit;cursor:pointer;padding:2px 8px}
+</style>
+</head>
+<body>
+
+<header class="top modebar">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Keppo Journal, top of the page">
+      <img src="media/keppo-journal-mark.svg" alt="">
+      <span>Keppo Journal</span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#why">Why I made it</a>
+      <a href="#moment">One moment</a>
+      <a href="#fun">The fun bits</a>
+      <a href="#built">Built with AI</a>
+      <a href="#screens">Screens</a>
+    </nav>
+    <div class="switch" role="group" aria-label="Reading length">
+      <button type="button" data-tlm="full" aria-pressed="true">Full</button>
+      <button type="button" data-tlm="tldr" aria-pressed="false">TL;DR</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- =================================================== TL;DR -->
+<section class="tldr tldr-only" id="tldr" aria-label="The one-minute version">
+  <div class="wrap">
+    <div class="kicker">Case study · Android · Sep–Nov 2026 · one-minute version</div>
+    <h1>A journal that opens on <mark>the camera.</mark></h1>
+    <p class="lede">I wanted to catch a moment first and write about it later, and keep all of it on my phone. Nothing did both, so I made it, with AI as my engineering team.</p>
+    <div class="tldr-grid">
+      <ol>
+        <li><div><strong>Camera first, words later.</strong><span>The app opens on the camera. What you shoot waits in a tray (the bottom-left thumbnail) until you file it into an entry.</span></div></li>
+        <li><div><strong>Yours, not a cloud's.</strong><span>No account, no login. Everything lives on the phone; backup is opt-in, to your own Google Drive.</span></div></li>
+        <li><div><strong>Things I made because I wanted them.</strong><span>Stickers from real things, front and back camera in one photo, capture over the lock screen, and every Keppo Moto ride arriving as an entry.</span></div></li>
+        <li><div><strong>Built by a designer, with AI.</strong><span>I designed it, decided what to build and tested it on my phone; the AI wrote the code. 218 automated tests keep it standing.</span></div></li>
+      </ol>
+      <div class="phones">
+        <div class="phone"><div class="screen"><img src="media/screens/camera.webp" alt="The camera, as the app opens" decoding="async"></div></div>
+        <div class="phone"><div class="screen"><img src="media/screens/entry.webp" alt="A filed entry: Chai, after the rain" decoding="async"></div></div>
+      </div>
+    </div>
+    <button type="button" class="btn" data-tlm="full">Read the whole story · 5 min</button>
+  </div>
+</section>
+
+<!-- =================================================== HERO -->
+<section class="hero full-only" aria-label="Introduction">
+  <div class="hero-bg" aria-hidden="true">
+    <!-- Replace with: <video autoplay muted loop playsinline poster="media/hero-poster.webp"><source src="media/hero.mp4" type="video/mp4"></video> -->
+    <div class="ph" data-need="Hero video: you using the app, 10–20 s, muted loop + poster"><span><b>Hero video, coming</b>You shooting a moment with the app. 10–20 s, muted loop.</span></div>
+  </div>
+  <div class="wrap">
+    <div>
+      <div class="kicker">Case study · Android · Sep–Nov 2026</div>
+      <h1>A journal that opens on <mark>the camera.</mark></h1>
+      <p class="lede"><span class="you" title="Drafted from the design docs and git history, not from you: check it">I wanted to catch a moment first and write about it later, and keep all of it on my own phone. Nothing out there did both, so I made it.</span> I'm a designer, not a programmer; AI was my engineering team.</p>
+      <div class="facts" aria-label="Facts">
+        <span class="chip">Android</span>
+        <span class="chip">Works offline</span>
+        <span class="chip">No account</span>
+        <span class="chip">Your own Drive, if you want</span>
+      </div>
+    </div>
+    <div class="phone" aria-label="The camera screen">
+      <div class="screen">
+        <img src="media/screens/camera.webp" alt="The camera screen: the app opens here" decoding="async">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================== WHY -->
+<section id="why" class="full-only">
+  <div class="wrap">
+    <div class="kicker">01 · Why I made it</div>
+    <h2>I wanted it. It didn't exist.</h2>
+    <p class="lede" style="margin-top:22px"><span class="you" title="Drafted from the design docs and git history, not from you: check it">I take photos of small things: a chai stall, a sign I like, the sea at the end of a walk. They sank into my gallery between screenshots. Every journal app I tried opened on a blank page and asked me to write first, and by the evening I’d forgotten why the photo mattered.</span></p>
+
+    <div class="reasons">
+      <article class="reason">
+        <span class="n">a · moment first</span>
+        <h3>Catch it now, write later.</h3>
+        <p>Journal apps open on a blank page and wait for you to have something to say. The moment is usually gone by then. I wanted the app to open on the camera, so keeping a moment takes one tap, and the words can come in the evening.</p>
+        <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">Snapchat had the camera I wanted: open it, shoot, done. But everything in it is made to be sent to someone. I wanted that speed with nobody on the other end.</span></p>
+      </article>
+      <article class="reason">
+        <span class="n">b · mine</span>
+        <h3>My diary isn't anyone's data.</h3>
+        <p>No sign-up, no login, no server of mine to keep it on. Entries, photos and voice notes live on the phone. Backup is something you turn on, and it goes to your own Google Drive.</p>
+        <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">A diary is the most personal thing on my phone. I didn’t want an account or a company between me and it, and I didn’t want to run a server either.</span></p>
+      </article>
+      <article class="reason">
+        <span class="n">c · feels like mine</span>
+        <h3>A page I'd actually keep.</h3>
+        <p>Drawing and writing on photos, stickers of real things, you and what you're looking at in one picture. Small things that make a page feel like a scrapbook, not a form.</p>
+        <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">A journal I’d keep looks more like a scrapbook than a form: a doodle on a photo, a ticket stuck on the page, my face in the corner of what I was looking at.</span></p>
+      </article>
+    </div>
+
+    <div class="where">
+      <div>
+        <div class="kicker">Where your journal lives</div>
+        <h3 style="font-size:clamp(26px,2.6vw,34px);margin-bottom:14px">On the phone. That's the whole map.</h3>
+        <p style="color:var(--text2)">There's no Keppo server in this picture, because there isn't one. The only two things that ever reach the internet are both off until you turn them on: a backup to your own Google Drive, and the map's tiles.</p>
+        <p class="under"><b>Underneath:</b> one SQLite database and the photos and videos as files on the phone. The backup copies a snapshot of the database plus any media not already in your Drive, and never deletes anything there. The app's Drive permission only sees files it made.</p>
+      </div>
+      <figure style="margin:0">
+        <svg viewBox="0 0 560 360" role="img" aria-labelledby="whereT whereD">
+          <title id="whereT">Where Keppo Journal keeps your data</title>
+          <desc id="whereD">Everything stays on the phone. Two optional connections: a backup to your own Google Drive and map tiles. There is no Keppo server.</desc>
+          <rect x="40" y="40" width="170" height="280" rx="28" fill="#0A0A0B"/>
+          <rect x="50" y="50" width="150" height="260" rx="20" fill="#F7F7F5"/>
+          <text x="125" y="96" text-anchor="middle" font-family="Geist, sans-serif" font-size="14" font-weight="600" fill="#0A0A0B">Your phone</text>
+          <g font-family="Geist Mono, monospace" font-size="12" fill="#2A2A2E">
+            <rect x="66" y="116" width="118" height="34" rx="10" fill="#FBEBC8"/><text x="125" y="138" text-anchor="middle">entries</text>
+            <rect x="66" y="158" width="118" height="34" rx="10" fill="#FBEBC8"/><text x="125" y="180" text-anchor="middle">photos · videos</text>
+            <rect x="66" y="200" width="118" height="34" rx="10" fill="#FBEBC8"/><text x="125" y="222" text-anchor="middle">voice notes</text>
+            <rect x="66" y="242" width="118" height="34" rx="10" fill="#FBEBC8"/><text x="125" y="264" text-anchor="middle">stickers</text>
+          </g>
+          <g fill="none" stroke="#8A5A00" stroke-width="2" stroke-dasharray="6 6">
+            <path d="M212 130 C300 110, 330 90, 380 90"/>
+            <path d="M212 230 C300 250, 330 270, 380 270"/>
+          </g>
+          <g font-family="Geist, sans-serif">
+            <rect x="380" y="58" width="150" height="64" rx="16" fill="#FFFFFF" stroke="#DCDCD8"/>
+            <text x="455" y="86" text-anchor="middle" font-size="14" font-weight="600" fill="#0A0A0B">Your Google Drive</text>
+            <text x="455" y="106" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#55555C">off until you turn it on</text>
+            <rect x="380" y="238" width="150" height="64" rx="16" fill="#FFFFFF" stroke="#DCDCD8"/>
+            <text x="455" y="266" text-anchor="middle" font-size="14" font-weight="600" fill="#0A0A0B">Map tiles</text>
+            <text x="455" y="286" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#55555C">off until you open the map</text>
+            <rect x="380" y="150" width="150" height="58" rx="16" fill="none" stroke="#C6C6C1" stroke-dasharray="4 5"/>
+            <text x="455" y="176" text-anchor="middle" font-size="14" font-weight="600" fill="#6B6B73" text-decoration="line-through">A Keppo server</text>
+            <text x="455" y="195" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#6B6B73">doesn't exist</text>
+          </g>
+        </svg>
+      </figure>
+    </div>
+
+    <div class="names" aria-label="The app's names">
+      <div><span class="mono">first name</span><strong>Dear Diary</strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">The working name. Too plain to find in an app store, and it sounded like a children’s diary.</span></p></div>
+      <div><span class="mono">then</span><strong>Notica</strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">An invented word, so it could be searched for and trademarked, with a bit of “notice” in it.</span></p></div>
+      <div><span class="mono">since 1 Oct 2026</span><strong>Keppo Journal</strong><p>The second app in the Keppo family, after Keppo Moto. <span class="you" title="Drafted from the design docs and git history, not from you: check it">Keppo Moto already kept my rides; a journal that keeps my days belongs next to it.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================== ONE MOMENT -->
+<section id="moment" class="full-only">
+  <div class="wrap">
+    <div class="kicker">02 · One moment, start to finish</div>
+    <h2>Shoot first. It becomes a page later.</h2>
+    <p class="lede" style="margin-top:22px">One moment, followed through the app. <span class="you" title="Drafted from the design docs and git history, not from you: check it">An evening chai at a stall on Lantern Street, just after the rain. (A demo moment, staged for this page.)</span></p>
+
+    <div class="moment-grid">
+      <div class="steps">
+        <article class="step" data-shot="0">
+          <div class="label"><span>1</span> Open</div>
+          <h3>It opens on the camera.</h3>
+          <p>There's no home screen to get past. Open the app and you're looking through the camera, even with the phone locked: the Quick Settings tile opens it over the lock screen, and the rest of the journal stays locked.</p>
+          <p class="under"><b>Underneath:</b> over the lock screen the app shows only its capture deck (the camera, a note and the unsaved tray). Anything already saved waits until you unlock.</p>
+          <div class="inline"><div class="phone"><div class="screen"><img src="media/screens/qs.webp" alt="Quick Settings with the Keppo capture tile, phone locked" loading="lazy" decoding="async"></div></div></div>
+        </article>
+        <article class="step" data-shot="1">
+          <div class="label"><span>2</span> Shoot</div>
+          <h3>Tap for a photo. Hold for a video.</h3>
+          <p>While holding, slide up to zoom; slide left to keep recording hands-free. One button in the top bar puts you and what you're looking at in the same photo.</p>
+          <p class="under"><b>Underneath:</b> the journal's own camera, built on Android's CameraX. One camera does photos, video, both cameras at once and stickers, so switching between them doesn't go black.</p>
+          <div class="inline"><div class="phone"><div class="screen"><img src="media/screens/camera-rec.webp" alt="Holding the shutter to film: slide up to zoom, left to keep recording" loading="lazy" decoding="async"></div></div></div>
+        </article>
+        <article class="step" data-shot="2">
+          <div class="label"><span>3</span> The tray</div>
+          <h3>Not filed yet, and that's fine.</h3>
+          <p>Each capture drops into the thumbnail in the bottom-left corner. It waits there, unsaved, as long as you like: shoot five things and decide later what they belong to.</p>
+          <p class="under"><b>Underneath:</b> the tray survives the app being closed. It's the only place the app holds things you haven't committed to.</p>
+          <div class="inline"><div class="phone"><div class="screen"><img src="media/screens/camera-shot.webp" alt="Three shots waiting in the tray, bottom left" loading="lazy" decoding="async"></div></div></div>
+        </article>
+        <article class="step" data-shot="3">
+          <div class="label"><span>4</span> Make it yours</div>
+          <h3>Draw on it. Write on it.</h3>
+          <p>Open the tray and every photo can take a doodle, a few words, a filter, a crop, or a sticker you made from something real.</p>
+          <p class="under"><b>Underneath:</b> drawings and text stay editable on top of the photo, never burnt in, so you can change them a year later.</p>
+          <div class="inline"><div class="phone"><div class="screen"><img src="media/screens/editor.webp" alt="The tray review: a doodle and words on the photo" loading="lazy" decoding="async"></div></div></div>
+        </article>
+        <article class="step" data-shot="4">
+          <div class="label"><span>5</span> It's an entry</div>
+          <h3>File it. Everything comes along.</h3>
+          <p>Filing turns the tray into an entry: the photos, the video, a few lines you type. Everything comes along unless you take it out. Each piece keeps its own time and place, so a page written over a day still tells you where each bit happened.</p>
+          <p class="under"><b>Underneath:</b> every block carries its own time and place. A small chip shows only where it changes, and blocks written far away get their own pin on the map.</p>
+          <div class="inline"><div class="phone"><div class="screen"><img src="media/screens/entry.webp" alt="The filed entry, with a time-and-place chip under a later piece" loading="lazy" decoding="async"></div></div></div>
+        </article>
+      </div>
+      <div class="stage" aria-hidden="true">
+        <div class="phone">
+          <div class="screen">
+            <img class="shot on" src="media/screens/qs.webp" alt="">
+            <img class="shot" src="media/screens/camera-rec.webp" alt="" loading="lazy">
+            <img class="shot" src="media/screens/camera-shot.webp" alt="" loading="lazy">
+            <img class="shot" src="media/screens/editor.webp" alt="" loading="lazy">
+            <img class="shot" src="media/screens/entry.webp" alt="" loading="lazy">
+          </div>
+        </div>
+        <div class="cap" id="stageCap">Open · the tile, with the phone still locked</div>
+      </div>
+    </div>
+
+    <div class="idea">
+      <div class="thumbdot" aria-hidden="true"></div>
+      <div>
+        <blockquote>The bottom-left thumbnail always means: captured, not filed yet.</blockquote>
+        <p>Most journals ask you to compose first. This one keeps first and composes later. The tray is what makes that safe: nothing you shoot is lost, and nothing is filed until you say so.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================== FUN BITS -->
+<section id="fun" class="full-only">
+  <div class="wrap">
+    <div class="kicker">03 · The fun bits</div>
+    <h2>Things I made because I wanted them.</h2>
+    <p class="lede" style="margin-top:22px">None of these were on a roadmap. Each one started as "it would be nice if…". <span class="you" title="Drafted from the design docs and git history, not from you: check it">Four of them, and the reason each one exists.</span></p>
+
+    <div class="bits">
+      <article class="bit">
+        <div class="media"><img src="media/screens/sticker.webp" alt="Sticker mode: the sign is found and its outline turns marigold" loading="lazy" decoding="async"></div>
+        <div class="body">
+          <span class="tag">Stickers</span>
+          <h3>Stickers from real things.</h3>
+          <p>Swipe up on the camera and it starts looking for shapes: a sign, a poster, a sticker on a laptop. Steady for a moment and the outline turns marigold; take it, and it's a sticker for your pages or a WhatsApp pack.</p>
+          <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">Signs and stickers I liked kept ending up as photos I never opened again. As stickers they go on my pages, and into WhatsApp.</span></p>
+        </div>
+      </article>
+      <article class="bit">
+        <div class="media"><img src="media/screens/camera-dual.webp" alt="Front and back at once: the front camera in the corner bubble" loading="lazy" decoding="async"></div>
+        <div class="body">
+          <span class="tag">Front + back</span>
+          <h3>You and what you're looking at.</h3>
+          <p>One press takes both cameras (on phones that can run both at once; others take one, then the other). Tap the little bubble to swap which one is big. Each photo keeps its own doodles and text, even after a swap.</p>
+          <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">A photo of a view never shows who was there. One press, and it’s both.</span></p>
+        </div>
+      </article>
+      <article class="bit">
+        <div class="media"><img src="media/screens/qs.webp" alt="The Keppo capture tile in Quick Settings" loading="lazy" decoding="async"></div>
+        <div class="body">
+          <span class="tag">Lock screen</span>
+          <h3>Capture without unlocking.</h3>
+          <p>The moment doesn't wait for a fingerprint. Over the lock screen you get the camera, a quick note and the unsaved tray, with the same screens as usual. Everything you already kept stays behind the lock.</p>
+          <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">By the time I’d unlocked the phone, the moment had moved on.</span></p>
+        </div>
+      </article>
+      <article class="bit">
+        <div class="media"><img src="media/screens/ride.webp" alt="A Keppo Moto ride, arrived as an entry" loading="lazy" decoding="async"></div>
+        <div class="body">
+          <span class="tag">Keppo Moto</span>
+          <h3>Rides write themselves in.</h3>
+          <p>Keppo Moto, my riding app, records the ride; the journal turns it into an entry with the route and the moments it filmed, by itself. Rename the ride in Moto and the entry follows, unless you renamed it yourself.</p>
+          <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">I record every ride already. Typing it up again in a journal was never going to happen.</span></p>
+        </div>
+      </article>
+    </div>
+
+    <div class="also">
+      <article class="bit">
+        <div class="media"><img src="media/screens/widgets.webp" alt="Home screen with three widgets: Capture, Today’s question and Photo wall" loading="lazy" decoding="async"></div>
+        <div class="body">
+          <span class="tag">Widgets</span>
+          <h3>13 widgets, every size.</h3>
+          <p>A quick note, today's question, on this day, a photo wall. Each one lays itself out for the size you give it.</p>
+        </div>
+      </article>
+      <article class="bit">
+        <div class="media"><img src="media/screens/camera-focus.webp" alt="Tap to focus: the ring, and the sun to drag for brightness; Night on" loading="lazy" decoding="async"></div>
+        <div class="body">
+          <span class="tag">The camera</span>
+          <h3>A camera of its own.</h3>
+          <p>Tap to focus, drag the sun for brighter or darker, Night and HDR where the phone offers them. Built in five steps, and the app got 6.1 MB smaller.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================== BUILT WITH AI -->
+<section id="built" class="full-only">
+  <div class="wrap">
+    <div class="kicker">04 · Built with AI</div>
+    <h2>A designer, an AI, and my phone.</h2>
+    <p class="lede" style="margin-top:22px">I don't write code. I designed every screen, decided what to build and what to cut, and tested each build on my own phone. The AI wrote the code and explained each problem to me in plain words, so I could make the call.</p>
+
+    <div class="split">
+      <div class="col">
+        <h3>What I did</h3>
+        <ul>
+          <li>Designed the screens and the flow</li>
+          <li>Decided what to build, and what to cut</li>
+          <li>Tested every build on my phone</li>
+          <li><span class="you" title="Drafted from the design docs and git history, not from you: check it">Wrote the spec and the decisions log before any code, and kept them current</span></li>
+        </ul>
+      </div>
+      <div class="col ai">
+        <h3>What the AI did</h3>
+        <ul>
+          <li>Wrote the app: TypeScript, plus Kotlin for the native parts</li>
+          <li>Wrote the 218 automated tests that keep it standing</li>
+          <li>Explained problems in plain language and gave options</li>
+          <li>Kept the project notes current, so each session started where the last ended</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="numbers" aria-label="Facts from the project">
+      <div><strong>Sep–Nov</strong><span>2026, building on and off</span></div>
+      <div><strong>218</strong><span>automated tests</span></div>
+      <div><strong>13</strong><span>screens, 13 widgets</span></div>
+      <div><strong>4</strong><span>native parts I'd never have written alone</span></div>
+    </div>
+
+    <div class="problems">
+      <article class="problem">
+        <div class="txt">
+          <div class="kicker">Hard problem · the camera</div>
+          <h3>Every switch went black.</h3>
+          <dl>
+            <dt>What broke</dt><dd>The app used three separate cameras: one for photos and video, one for front + back, one for stickers. Moving between them meant one had to let go before the next could start, so the screen went black for a moment, every time.</dd>
+            <dt>What we tried</dt><dd>Shorter hand-overs, a fade to hide the gap, and remembering phones that couldn't run both cameras at once. It got better, never good.</dd>
+            <dt>What shipped</dt><dd>The journal's own camera, built in five steps: photos and video, then front + back, then stickers, then focus and Night/HDR, then removing the old ones. One camera, no hand-over. The app got 6.1 MB smaller too.</dd>
+          </dl>
+        </div>
+        <div class="media"><div class="ph" data-need="Loop: before (black gap switching to Sticker mode) vs after"><span><b>Before / after, coming</b>Switching to Sticker mode: the black gap, then none</span></div></div>
+      </article>
+      <article class="problem">
+        <div class="txt">
+          <div class="kicker">Hard problem · the lock screen</div>
+          <h3>"Open the camera" kept asking for my fingerprint.</h3>
+          <dl>
+            <dt>What broke</dt><dd>I wanted a double-press of the power button to open the journal's camera, like a phone's own camera app. My phone's double-press always asks for an unlock before opening any app, and its "Camera" option only opens the phone maker's camera.</dd>
+            <dt>What we tried</dt><dd>A special front door for the app that Android allows over the lock screen, and offering the journal as a camera app. A background listener for the power button was possible, but it meant always running in the background, so I said no.</dd>
+            <dt>What shipped</dt><dd>The Quick Settings tile opens the camera over the lock screen, and the app icon works locked too. The journal shows only its capture deck there; everything already saved waits for the unlock.</dd>
+          </dl>
+        </div>
+        <div class="media"><img src="media/screens/qs.webp" alt="The Keppo capture tile, with the phone locked" loading="lazy" decoding="async"></div>
+      </article>
+    </div>
+    <p class="mono" style="color:var(--faint);margin-top:14px"><span class="you" title="Drafted from the design docs and git history, not from you: check it">The two I picked. Others, just as real: widgets showing old states over new ones, and a Drive restore that can never lose the journal.</span></p>
+
+    <div class="lessons">
+      <div><strong><span class="you" title="Drafted from the design docs and git history, not from you: check it">Say what, not how.</span></strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">I never told the AI how to build anything. I described what I wanted to happen on the screen, and what was wrong when it didn’t. That was enough.</span></p></div>
+      <div><strong><span class="you" title="Drafted from the design docs and git history, not from you: check it">The phone is the only real test.</span></strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">Tests catch logic. Only my own phone caught a black camera preview, a drag that died after a centimetre, a widget showing yesterday.</span></p></div>
+      <div><strong><span class="you" title="Drafted from the design docs and git history, not from you: check it">Write the decisions down.</span></strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">Every session starts from zero. A handoff note and a log of why each call was made meant nothing got decided twice.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================== SCREENS -->
+<section id="screens" class="full-only" style="padding-bottom:64px">
+  <div class="wrap">
+    <div class="kicker">05 · Screens</div>
+    <h2>The app, screen by screen.</h2>
+    <p class="lede" style="margin-top:22px">Captured from a demo journal. Scroll sideways.</p>
+  </div>
+  <div class="strip" tabindex="0" aria-label="Screens, scroll sideways">
+    <figure><div class="phone"><div class="screen"><img src="media/screens/camera.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Camera</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/sticker.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Sticker mode</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/camera-shot.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>The tray</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/editor.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Editor</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/compose.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Writing an entry</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/entry.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>An entry</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/note.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Quick note</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/journal.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Journal · cards</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/deck.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Journal · deck</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/calendar.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Calendar</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/folders.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Folders</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/map.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Map</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/recaps.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Recaps</figcaption></figure>
+    <figure><div class="phone"><div class="screen"><img src="media/screens/settings.webp" alt="" loading="lazy" decoding="async"></div></div><figcaption>Settings · backup</figcaption></figure>
+  </div>
+</section>
+
+<!-- =================================================== CLOSING -->
+<section class="closing full-only">
+  <div class="wrap">
+    <h2>Every day, <mark>kept.</mark></h2>
+    <p class="lede" style="margin:18px auto 0"><span class="you" title="Drafted from the design docs and git history, not from you: check it">If the thing you want doesn’t exist, describe it clearly enough and it can be built. That part is still design.</span></p>
+    <button type="button" class="btn ghost" data-tlm="tldr">The one-minute version</button>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Screens are rebuilt from the app’s own code (its colours, sizes, icons and words) and filled with a demo journal made for this page. Photos are illustrations in the style of the app’s sample pictures; places, entries and the map are made up. Facts and numbers come from the app’s code and its history, counted in November 2026.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var params = new URLSearchParams(location.search);
+
+  /* ---------- Full / TL;DR ---------- */
+  function setMode(mode) {
+    if (mode !== 'full' && mode !== 'tldr') return;
+    root.setAttribute('data-mode', mode);
+    document.querySelectorAll('.switch [data-tlm]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-tlm') === mode));
+    });
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-tlm]');
+    if (b) setMode(b.getAttribute('data-tlm'));
+  });
+  if (params.get('view') === 'tldr' || location.hash === '#tldr') setMode('tldr');
+
+  /* the portfolio's fallback when it finds no button: the hash */
+  window.addEventListener('hashchange', function () { setMode(location.hash === '#tldr' ? 'tldr' : 'full'); });
+
+  /* ---------- the phone that stays while the steps scroll ---------- */
+  var shots = document.querySelectorAll('.stage .shot');
+  var cap = document.getElementById('stageCap');
+  var caps = [
+    'Open · the tile, with the phone still locked',
+    'Shoot · tap for a photo, hold to film',
+    'The tray · captured, not filed yet',
+    'Make it yours · a doodle and a few words',
+    'It’s an entry · each piece keeps its time and place'
+  ];
+  if ('IntersectionObserver' in window && shots.length) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var i = +en.target.getAttribute('data-shot');
+        shots.forEach(function (s, j) { s.classList.toggle('on', i === j); });
+        if (cap) cap.textContent = caps[i] || '';
+      });
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    document.querySelectorAll('.step[data-shot]').forEach(function (s) { io.observe(s); });
+  }
+
+  /* ---------- videos: only play when allowed and in view ---------- */
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll('video[autoplay]').forEach(function (v) {
+    if (still.matches) { v.removeAttribute('autoplay'); v.pause(); }
+  });
+
+  /* ---------- draft review: ?review=1 lists everything still needed ---------- */
+  if (params.get('clean') === '1') root.setAttribute('data-clean', '');
+  if (params.get('review') === '1') {
+    var items = [];
+    document.querySelectorAll('[data-need]').forEach(function (el) { items.push(['media', el.getAttribute('data-need'), el]); });
+    document.querySelectorAll('.you').forEach(function (el) { items.push(['words', el.textContent.trim().slice(0, 90), el]); });
+    var box = document.createElement('aside');
+    box.className = 'review';
+    box.innerHTML = '<button type="button" aria-label="Close">×</button><h4>Still needed: ' + items.length + '</h4><ol></ol>';
+    var ol = box.querySelector('ol');
+    items.forEach(function (it, i) {
+      it[2].id = it[2].id || 'need-' + i;
+      var li = document.createElement('li');
+      li.innerHTML = '<a href="#' + it[2].id + '">' + it[0] + '</a> · ';
+      li.appendChild(document.createTextNode(it[1]));
+      ol.appendChild(li);
+    });
+    box.querySelector('button').onclick = function () { box.remove(); };
+    document.body.appendChild(box);
+  }
+})();
+</script>
+</body>
+</html>
