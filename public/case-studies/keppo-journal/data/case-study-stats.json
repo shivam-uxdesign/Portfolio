@@ -1,0 +1,28 @@
+{
+  "_about": "Every number on the case study page, and where it came from. Re-check before publishing; the code wins over old docs.",
+  "counted_on": "2026-11-25",
+  "branch": "claude/bold-dirac-swjs4g @ 871f3e6",
+  "stats": {
+    "first_commit": { "value": "2026-08-03 (Mon)", "source": "git log --reverse (one commit: the project skeleton)" },
+    "building_started": { "value": "2026-09-23 (Wed)", "source": "git log: first app commits ('Phase A: blank app running on device')", "note": "Confirmed by Shivam (26 Nov 2026) as the start date to use on the page. The 3 Aug commit is only the empty skeleton." },
+    "latest_work": { "value": "2026-11-22 (Sun)", "source": "git log -1" },
+    "commits_total": { "value": 111, "source": "git rev-list --count HEAD" },
+    "commits_since_building_started": { "value": 110, "source": "111 minus the one 2026-08-03 commit" },
+    "days_with_commits": { "value": 16, "source": "distinct commit dates from 2026-09-23", "note": "commits are large batches; don't lead with these" },
+    "automated_tests": { "value": 218, "source": "npm test (23 test files in __tests__/)" },
+    "screens": { "value": 13, "source": "src/screens/*.tsx, minus the unused TrayScreen" },
+    "widgets": { "value": 13, "source": "AppWidgetProvider receivers in modules/keppo-launch and modules/keppo-sticker manifests" },
+    "native_modules": { "value": 4, "source": "modules/: keppo-camera, keppo-launch, keppo-sticker, keppo-ride-receiver" },
+    "camera_build_phases": { "value": 5, "source": "git log 2026-11-22: 'Own camera, phase 1' … 'Camera phase 5'" },
+    "apk_size_drop_mb": { "value": 6.1, "source": "release APK 71,793,880 → 65,649,315 bytes after camera phase 5" },
+    "rebrand_to_keppo_journal": { "value": "2026-10-01 (Thu)", "source": "git log: 'Rebrand identity and theme to Keppo Journal'" },
+    "moto_rides_arrive": { "value": "2026-10-02 (Fri)", "source": "git log: 'Bring Keppo Moto rides into the journal'" }
+  },
+  "from_the_phone_later": {
+    "_note": "Read on the local machine with adb run-as (debug build). Never uninstall or clear data.",
+    "entries": null,
+    "photos": null,
+    "days_journaled": null,
+    "places": null
+  }
+}

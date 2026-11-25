@@ -14,7 +14,7 @@ import type { HatsEngine } from '../components/hats/hatsEngine';
 import { HeroBridgeContext, createHeroBridge, useHeroBridge, useHeroBridgeStore } from '../components/hats/heroBridge';
 import { PROJECTS, AboutCell, ContactCell, ResumeCell, InterestsCell } from './Home';
 import { StackPanel } from '../components/cells/StackPanel';
-import { PageMap, type MapCell } from '../components/nav/PageMap';
+import { PageMap, HandleMorph, type MapCell } from '../components/nav/PageMap';
 import { WorkAndPlay } from '../components/WorkAndPlay';
 import { FUN_PROJECTS } from '../components/FunProjects';
 import './sheet.css';
@@ -225,7 +225,6 @@ const HeroPane = memo(function HeroPane({ onEngine }: { onEngine: (e: HatsEngine
 const BarButton = memo(function BarButton({ onOpen }: { onOpen: () => void }) {
   return (
     <button type="button" className="sh-bar" onClick={onOpen} aria-label={`Open my work: ${PROJECTS.length} case studies and ${FUN_PROJECTS.length} side projects`}>
-      <span className="sh-handle" aria-hidden="true" />
       <span className="sh-bar-arrow" aria-hidden="true">↑</span>
     </button>
   );
@@ -342,6 +341,14 @@ export function SheetHome() {
   const actual: Pos = { row: pos.row, col: mod(pos.col, 3) };
   const cellId = GRID[actual.row][actual.col].id;
   const isOpen = s >= 1;
+  // Opened by the user (not mounted open): the pill cues its arrival once.
+  const wasOpen = useRef(isOpen);
+  const [mapCue, setMapCue] = useState(false);
+  useEffect(() => {
+    if (isOpen && !wasOpen.current) setMapCue(true);
+    else if (!isOpen) setMapCue(false);
+    wasOpen.current = isOpen;
+  }, [isOpen]);
 
   // ── Bridge for the hats ──
   const [bridge] = useState(() => createHeroBridge({ settled: true, heroActive: !deepLink, hat: site.get().hat }));
@@ -782,8 +789,10 @@ export function SheetHome() {
             </div>
           </div>
 
+          {!isOpen && <HandleMorph progress={s} current={actual} />}
           {isOpen && (
             <PageMap
+              cue={mapCue}
               current={actual}
               cells={MAP_CELLS}
               open={mapOpen}

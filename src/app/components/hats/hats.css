@@ -270,6 +270,12 @@
 }
 .hh-text .hh-name { font-size: clamp(2.4rem, 7vw, 4rem); }
 .hh-text .hh-tagline { margin-top: 12px; max-width: 30em; }
+/* Phones: every hat's line wraps to exactly two lines (the short helmet line
+   used to fit on one and shift everything below it). 24em fits the longest
+   line in two and is narrower than the shortest one. */
+@media (max-width: 767px) {
+  .hh-text .hh-tagline { max-width: 24em; min-height: calc(2em * 1.375); margin-inline: auto; }
+}
 
 /* Desktop/tablet: the portrait's own bottom margin (below the card) is empty,
    so the text block tucks up into it instead of leaving a big gap. */
