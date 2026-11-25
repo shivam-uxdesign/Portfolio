@@ -131,6 +131,16 @@ export function RootLayout() {
       { transform: `translateY(${P}px)`, opacity: 1, offset: at(440, OUT_MS), easing: EASE_IN_OUT },
       { transform: 'translateY(0px)', opacity: 1 },
     ], o));
+    // A dark page: the lifting sheet darkens as it settles, so the hand-over to the page is not a white-to-black cut.
+    if (t.dark) {
+      const light = getComputedStyle(ghost).backgroundColor;
+      anims.push(ghost.animate([
+        { backgroundColor: light, borderTopColor: 'transparent' },
+        { backgroundColor: light, borderTopColor: 'transparent', offset: at(300, OUT_MS) },
+        { backgroundColor: '#0A0A0B', borderTopColor: 'transparent', offset: at(560, OUT_MS) },
+        { backgroundColor: '#0A0A0B', borderTopColor: 'transparent' },
+      ], o));
+    }
 
     // His path: duck at the sheet → (hidden) to just under the page's edge in the corner → yanked up, overshoot, settle.
     const flight: Keyframe[] = [
@@ -259,7 +269,7 @@ export function RootLayout() {
         <div className="pc-behind" aria-hidden="true">
           <div className={`sh-glow${hat !== 'me' ? ' on' : ''}`} style={hat !== 'me' ? { '--sh-halo': PAL[hat].halo } as React.CSSProperties : undefined} />
         </div>
-        <div ref={cardRef} className="pc-card" style={themeVars(hat)}>
+        <div ref={cardRef} className="pc-card" data-theme={meta?.theme} style={meta?.theme === 'dark' ? (hat === 'me' ? undefined : { '--primary': PAL[hat].accent, '--accent': PAL[hat].accent } as React.CSSProperties) : themeVars(hat)}>
           <div ref={contentRef} className="pc-content">
             {showTldr ? <TldrView meta={meta!} /> : <Outlet />}
           </div>

@@ -22,7 +22,7 @@ function setMode(doc: Document, m: 'full' | 'tldr') {
   doc.defaultView?.scrollTo(0, 0);
 }
 
-export function EmbeddedCaseStudy({ slug, title }: { slug: string; title: string }) {
+export function EmbeddedCaseStudy({ slug, title, skin = true }: { slug: string; title: string; skin?: boolean }) {
   const ref = useRef<HTMLIFrameElement>(null);
   const navigate = useNavigate();
   const tldr = useSite(s => s.tldr);
@@ -46,9 +46,12 @@ export function EmbeddedCaseStudy({ slug, title }: { slug: string; title: string
   const onLoad = () => {
     const frame = ref.current, doc = frame?.contentDocument, win = frame?.contentWindow;
     if (!frame || !doc || !win) return;
-    const link = doc.createElement('link');
-    link.rel = 'stylesheet'; link.href = '/case-studies/skin.css';
-    doc.head.appendChild(link);
+    // A page with its own identity (skin = false) keeps its own type, colours and sections; the shell still drives its mode and links.
+    if (skin) {
+      const link = doc.createElement('link');
+      link.rel = 'stylesheet'; link.href = '/case-studies/skin.css';
+      doc.head.appendChild(link);
+    }
     const cs = getComputedStyle(frame);
     doc.documentElement.style.setProperty('--site-bg', cs.getPropertyValue('--background').trim() || '#fff');
     const h = site.get().hat;
@@ -71,7 +74,7 @@ export function EmbeddedCaseStudy({ slug, title }: { slug: string; title: string
     <iframe
       ref={ref}
       className="pc-frame"
-      src={`/case-studies/${slug}/index.html`}
+      src={`/case-studies/${slug}/index.html?embed=1`}
       title={title}
       onLoad={onLoad}
     />

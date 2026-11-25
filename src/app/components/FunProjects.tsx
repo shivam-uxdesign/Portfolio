@@ -5,14 +5,13 @@ import { useNavigate } from 'react-router';
 const funProjects = [
   {
     // The highlight: first in the list, so it is the featured card. A finished case
-    // study that lives as a standalone page (public/case-studies/keppo-moto/).
+    // study; its page is public/case-studies/keppo-moto/, shown inside the portfolio.
     title: 'Keppo Moto',
     description: 'A motorcycle app that keeps every ride, built with AI.',
     tag: 'Case study · Built with AI',
     color: '#0A0A0B',
     image: '/case-studies/keppo-moto/img/og.jpg',
-    link: '/case-studies/keppo-moto/',
-    plain: true,
+    link: '/case-study/keppo-moto',
     cta: 'Read case study',
   },
   {
@@ -55,7 +54,7 @@ export function FunProjects() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
             whileHover={{ scale: 1.02, y: -4 }}
-            onClick={() => { if (!project.link) return; if ('plain' in project && project.plain) window.location.assign(project.link); else navigate(project.link); }}
+            onClick={() => project.link && navigate(project.link)}
           >
             {/* Full-bleed image */}
             <img
