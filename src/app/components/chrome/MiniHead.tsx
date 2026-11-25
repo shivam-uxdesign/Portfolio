@@ -1,4 +1,4 @@
-import { memo, useId, useMemo } from 'react';
+import { memo, useId, useMemo, type CSSProperties } from 'react';
 import { prefixedPortrait } from '../hats/portrait';
 import { PROPS } from '../hats/props';
 import type { WearableId } from '../hats/hatsData';
@@ -7,6 +7,8 @@ import type { WearableId } from '../hats/hatsData';
 // inner pages' home button and the trip there. Boxes measured with getBBox in
 // the portrait's 800×1000 space.
 const HEAD = [178, 130, 636, 628];
+/** Outline width in portrait units: ~2px at the bar's head height (46–52px for a ~514-unit box). */
+const RING = 22;
 export const PROP_BOX: Record<Exclude<WearableId, 'me'>, number[]> = {
   notes: [261, 147, 539, 308], party: [333, -22, 545, 223], helmet: [180, 164, 620, 688],
   beret: [214, 83, 583, 350], propeller: [244, 77, 556, 254], ninja: [232, 266, 692, 372], cat: [234, 66, 584, 334],
@@ -27,9 +29,17 @@ export const MiniHead = memo(function MiniHead({ hat, face, className = '' }: { 
   const html = useMemo(() => {
     const prefix = `mh${raw}-`;
     const props = hat === 'me' ? '' : PROPS[hat].svg(false);
-    return prefixedPortrait(prefix).replace(`<g id="${prefix}props" data-part="props"></g>`, `<g id="${prefix}props" data-part="props">${props}</g>`);
+    const art = prefixedPortrait(prefix).replace(`<g id="${prefix}props" data-part="props"></g>`, `<g id="${prefix}props" data-part="props">${props}</g>`);
+    // Sticker outline (dark pages): the silhouette grown evenly by RING units, filled white, under the art.
+    // In the head's own units, so it scales with the head (the flying copies land at the bar's width).
+    const ring = `<filter id="${prefix}ring" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">`
+      + `<feMorphology in="SourceAlpha" operator="dilate" radius="${RING}" result="d"/>`
+      + `<feFlood flood-color="#fff"/><feComposite in2="d" operator="in"/>`
+      + `<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+    return `<defs>${ring}</defs><g class="mh-art">${art}</g>`;
   }, [hat, raw]);
   const [x, y, w, h] = headBox(hat);
+  const ringUrl = `url(#mh${raw}-ring)`;
   return (
     <svg
       className={`mh ${className}`}
@@ -39,6 +49,7 @@ export const MiniHead = memo(function MiniHead({ hat, face, className = '' }: { 
       data-mouth={face?.mouth ?? 'grin'}
       data-brows={face?.brows ?? 'none'}
       aria-hidden="true"
+      style={{ '--mh-ring': ringUrl } as CSSProperties}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

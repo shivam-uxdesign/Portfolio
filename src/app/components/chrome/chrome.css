@@ -99,19 +99,10 @@
 .pc-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: var(--background); }
 
 
-/* ── Sticker outline on his head: dark pages only, the whole silhouette (hat included) ── */
-.pc-card[data-theme="dark"] .pc-home .mh,
-.pc-trav[data-ring] .mh {
-  --ring: .9px; /* the eight stacked shadows compound (~2.4x): ~2.2px of outline */
-  filter:
-    drop-shadow(var(--ring) 0 0 #fff) drop-shadow(calc(var(--ring) * -1) 0 0 #fff)
-    drop-shadow(0 var(--ring) 0 #fff) drop-shadow(0 calc(var(--ring) * -1) 0 #fff)
-    drop-shadow(calc(var(--ring) * .7) calc(var(--ring) * .7) 0 #fff) drop-shadow(calc(var(--ring) * -.7) calc(var(--ring) * -.7) 0 #fff)
-    drop-shadow(calc(var(--ring) * .7) calc(var(--ring) * -.7) 0 #fff) drop-shadow(calc(var(--ring) * -.7) calc(var(--ring) * .7) 0 #fff);
-}
-@media (min-width: 768px) { .pc-card[data-theme="dark"] .pc-home .mh { --ring: 1.05px; } }
-/* The flying copies set their own --ring (sized for the shrink), which must win over the default above. */
-.pc-trav[data-ring] .mh { --ring: inherit; }
+/* ── Sticker outline on his head: dark pages only, the whole silhouette (hat included) ──
+   One SVG filter (MiniHead: grow the shape evenly, fill white, art on top), so the edge is the same width all round. */
+.pc-card[data-theme="dark"] .pc-home .mh > .mh-art,
+.pc-trav[data-ring] .mh > .mh-art { filter: var(--mh-ring); }
 
 /* ── After a scroll: a frosted band so the bar never merges with the page ── */
 .pc-band {
