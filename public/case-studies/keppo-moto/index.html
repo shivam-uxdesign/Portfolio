@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Keppo Moto case study</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Keppo Moto, a motorcycle app that keeps every ride: the hard problems, the decisions and the work running underneath, designed and shipped by one designer with AI as the engineering team.">
@@ -143,6 +144,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .stNums b{display:block;font:300 clamp(30px,4vw,44px)/1 var(--sans);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .stNums span{display:block;margin-top:8px;color:var(--muted);font-size:13px;line-height:1.35}
 #studio .split{margin-top:56px}
+/* video phones take the video's own shape (9:16), so nothing is cropped */
+.phone.reelVid{aspect-ratio:478/850;border-radius:30px}
+.reelHero .phone.reelVid{max-width:min(320px,calc(var(--fitH) * 478 / 850))}
+.reelVid video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block}
+.soundBtn{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);border:0;border-radius:999px;padding:9px 16px;background:rgba(10,10,11,.72);backdrop-filter:blur(8px);color:var(--text, #F4F4F5);font:600 13px/1 var(--sans);white-space:nowrap;cursor:pointer}
+.soundBtn[aria-pressed="true"]{background:var(--teal);color:#04292A}
+.ideaRide{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:36px;align-items:center;margin-top:40px}
+.ideaRide .phone{max-width:min(240px,calc(var(--fitH) * 478 / 850));border-width:6px;border-radius:24px}
+@media (max-width:700px){.ideaRide{grid-template-columns:1fr}.ideaRide .phone{margin-inline:0}}
 @media (max-width:900px){.reelHero{grid-template-columns:1fr}.stNums{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* Audit before / after */
@@ -633,8 +643,11 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
         </div>
       </div>
       <div>
-        <div class="phone"><img src="media/screens/reel-share.webp" alt="A Reel Studio made from one of my rides, ready to share: preview, title, where it posts, cover and caption" loading="lazy"></div>
-        <p class="cap">A Reel Studio made from one of my rides, ready to share. Redesigned screen.</p>
+        <div class="phone reelVid">
+          <video id="reelVid" src="media/S1-studio-reel.mp4" poster="media/S1-studio-reel-poster.webp" autoplay muted loop playsinline preload="metadata" aria-label="A Reel Studio made by itself from a night ride: my speed in the corner and captions from what I said"></video>
+          <button type="button" class="soundBtn" id="reelSound" aria-pressed="false">Tap for sound</button>
+        </div>
+        <p class="cap">Made by Studio from one night ride, nothing edited by hand. The words are mine, the speed is live. Sound on to hear the engine.</p>
       </div>
     </div>
 
@@ -1113,6 +1126,20 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
       <div class="panel"><span class="label">I did</span><p style="color:var(--body)">The idea and scope · every flow and screen · the design system · prototypes · what to build and in what order · every trade-off on cost, privacy and safety · testing every build on my own bike in Delhi traffic.</p></div>
       <div class="panel"><span class="label">The AI did</span><p style="color:var(--body)">Kotlin and Compose · research into Google's terms, pricing and Android's rules · 622 tests · lint · signed test builds · a numbered log of every question, bug and decision, so any session could pick up where the last stopped.</p></div>
     </div>
+    <div class="ideaRide rise">
+      <div class="phone sm reelVid">
+        <video src="media/S2-ideas-on-the-ride.mp4" poster="media/S2-ideas-on-the-ride-poster.webp" muted loop playsinline preload="none" aria-label="Me on the bike, saying an idea for the app out loud, with Studio's captions"></video>
+        <button type="button" class="soundBtn" aria-pressed="false">Tap for sound</button>
+      </div>
+      <div class="stack" style="gap:12px">
+        <span class="label" style="color:var(--teal)">Testing on the go</span>
+        <h3>The best feedback happens at 25 km/h.</h3>
+        <p style="color:var(--body)">I test every build on my own bike, and when something feels wrong I say it out loud while riding. Keppo films it like any other moment, and Studio captions it, Hinglish and all. This one is me thinking through what a screen should do. The app records its own bug reports.</p>
+        <!-- QUOTE: fill in from Shivam's transcription. The idea in his words (translated if Hinglish), plus the date, plus what it became if it shipped:
+        <blockquote class="quote" style="margin:0">“…”<cite>Said on the bike, <date>. Shipped as <change>.</cite></blockquote>
+        -->
+      </div>
+    </div>
     <div class="loop" role="group" aria-label="Steps of the loop">
       <button type="button" aria-pressed="true" data-step="0"><span class="who">ME</span><span class="what">Ask</span></button>
       <button type="button" aria-pressed="false" data-step="1"><span class="who">ME + AI</span><span class="what">Discuss</span></button>
@@ -1357,6 +1384,22 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
     ['Me', 'Ride it', 'I install the build and ride Delhi traffic. The road is where the real bugs are.', 'The direction I selected was different from what it shows here.', '24 Nov, a screenshot from a ride'],
     ['Me', 'Feed it back', 'Screenshots, crash logs and a sentence. Then the loop starts again, often the same day.', 'Only half a map is blue, rest is less opacity? Is this normal?', '25 Nov']
   ];
+  // Studio videos: sound toggle; the ideas clip plays only while on screen.
+  document.querySelectorAll('.soundBtn').forEach(function (b) {
+    var v = b.parentElement.querySelector('video');
+    b.addEventListener('click', function () {
+      v.muted = !v.muted;
+      if (!v.muted) { v.currentTime = v.currentTime; v.play().catch(function () {}); }
+      b.setAttribute('aria-pressed', String(!v.muted));
+      b.textContent = v.muted ? 'Tap for sound' : 'Sound on';
+    });
+    if (reduce) { v.removeAttribute('autoplay'); v.pause(); }
+  });
+  var ideaVid = document.querySelector('.ideaRide video');
+  if (ideaVid && hasIO && !reduce) {
+    new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) ideaVid.play().catch(function () {}); else ideaVid.pause(); }); }, { threshold: 0.4 }).observe(ideaVid);
+  }
+
   var lbs = document.querySelectorAll('.loop button');
   lbs.forEach(function (b) { b.addEventListener('click', function () { var i = +b.dataset.step;
     lbs.forEach(function (x, k) { x.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
