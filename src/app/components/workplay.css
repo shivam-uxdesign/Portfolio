@@ -118,3 +118,12 @@
 @media (min-width: 768px) and (max-height: 700px) { .wpd-short { display: none; } }
 
 .wpd-sys-label { margin: 0; }
+
+
+/* ThumbImg: three shapes of one thumbnail; the slot's own aspect ratio picks which one shows. */
+.th-box { position: relative; display: block; width: 100%; height: 100%; container-type: size; }
+.th-box img.th-m, .th-box img.th-s, .th-box img.th-w { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.th-box img.th-s, .th-box img.th-w { display: none; }
+.th-box img.th-m { display: block; }
+@container (min-aspect-ratio: 7/4) { .th-box img.th-m { display: none; } .th-box img.th-w { display: block; } }
+@container (max-aspect-ratio: 23/20) { .th-box img.th-m { display: none; } .th-box img.th-s { display: block; } }

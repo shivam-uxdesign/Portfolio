@@ -4,6 +4,7 @@ import { trackEvent } from '../../lib/analytics';
 import './workplay.css';
 import { ProjectStacks } from './projects/ProjectStacks';
 import { FloatingDeck } from './projects/FloatingDeck';
+import { ThumbImg } from './ThumbImg';
 import type { ProjectGroup, ProjectGroupId, Impact } from './projects/types';
 import { PROPS, type HatId } from './hats/props';
 
@@ -137,7 +138,7 @@ export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[]
   }));
   const playEntries: Entry[] = play.map(f => ({
     to: f.link, side: 'play', eyebrow: f.tag, title: f.title, desc: f.description, cta: f.cta ?? 'Try it',
-    thumb: <span className="absolute inset-0" style={{ background: f.color }}><img src={f.image} alt="" loading="lazy" draggable={false} className="w-full h-full object-cover" onError={e => { e.currentTarget.style.visibility = 'hidden'; }} /></span>,
+    thumb: <span className="absolute inset-0" style={{ background: f.color }}><ThumbImg src={f.image} /></span>,
   }));
   return (
     <>

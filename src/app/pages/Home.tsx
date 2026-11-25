@@ -8,6 +8,7 @@ import { OffFigmaPanel } from '../components/cells/OffFigmaPanel';
 import { ResumePanel } from '../components/cells/ResumePanel';
 import { AboutBlock } from '../components/AboutBlock';
 import { FunProjects } from '../components/FunProjects';
+import { ThumbImg } from '../components/ThumbImg';
 import { CTACard } from '../components/CTACard';
 import { StackContent } from './StackPage';
 import { trackEvent } from '../../lib/analytics';
@@ -171,7 +172,7 @@ const MotionLink = motion.create(Link);
 
 // Work: the Sales Case Card on its own, then the Rupyy design system as one
 // story told in three case studies (each also opens on its own).
-const thumb = (slug: string) => <img src={`/case-studies/thumbs/${slug}.webp`} alt="" loading="lazy" draggable={false} className="w-full h-full object-cover" />;
+const thumb = (slug: string) => <ThumbImg src={`/case-studies/thumbs/${slug}.webp`} />;
 export const PROJECTS = [
   {
     title: 'Sales Case Card',
