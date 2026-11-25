@@ -116,3 +116,5 @@
 .wpd-sys-row .wpd-big { margin-top: 0; flex: none; }
 /* Very short screens: only the big figures; the tile lines would be cut by the bottom edge. */
 @media (min-width: 768px) and (max-height: 700px) { .wpd-short { display: none; } }
+
+.wpd-sys-label { margin: 0; }

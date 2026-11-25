@@ -115,15 +115,7 @@ function SystemCard({ items }: { items: WorkItem[] }) {
   const track = (to: string) => () => trackEvent('project_open', { side: 'work', link: to });
   return (
     <div className="wpd-system">
-      <Link to="/case-study/rupyy-design-system" className="wpd-sys-head" onClick={track('/case-study/rupyy-design-system')} draggable={false}>
-        <span className="wpd-eyebrow">Case study · Rupyy · 3 tools</span>
-        <span className="wpd-sys-row">
-          <span className="wpd-title">The Rupyy design system</span>
-          <span className="wpd-big wpd-big-sm">3 tools · 1 kit</span>
-        </span>
-        <span className="wpd-sub">that ended the one-designer queue for six PMs</span>
-        <span className="wpd-cta">See how they fit <span aria-hidden="true">→</span></span>
-      </Link>
+      <p className="wpd-eyebrow wpd-sys-label">Rupyy design system · 3 tools</p>
       <div className="wpd-sys-tools">
         {items.map(p => (
           <Link key={p.link} to={p.link} className="wpd-small wpd-sys-tool" onClick={track(p.link)} draggable={false}>
