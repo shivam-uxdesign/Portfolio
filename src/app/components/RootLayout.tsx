@@ -5,6 +5,7 @@ import { site, trips, useSite, type Travel } from '../../lib/site';
 import { themeVars } from '../../lib/theme';
 import { pageMeta } from '../../lib/pages';
 import { PAL, type WearableId } from './hats/hatsData';
+import { pageScroll } from '../../lib/pageScroll';
 import { MiniHead, headBox, type Face } from './chrome/MiniHead';
 import { setNavSlot, NavSegments } from './chrome/NavRight';
 import { TldrView } from './chrome/TldrView';
@@ -119,6 +120,8 @@ export function RootLayout() {
     const from = t.from, E = t.edgeY, N = navHeadRect(t.hat), P = N.y + N.h + 22, H = window.innerHeight;
     const s = N.w / from.w, dx = N.x - from.x;
     const ty = (y: number) => y - from.y; // a top-left y → translateY for A/B
+    // Sticker outline (dark pages): sized in the head's own space so it lands at the bar's width after the shrink.
+    for (const el of [A, B]) { el.toggleAttribute('data-ring', !!t.dark); el.style.setProperty('--ring', `${0.95 / s}px`); }
     const anims: Animation[] = [];
     const o = { duration: OUT_MS, fill: 'forwards' as FillMode };
 
@@ -200,6 +203,7 @@ export function RootLayout() {
       { transform: `translateY(${P}px)`, offset: at(250, HOME_MS), easing: EASE_IN_OUT },
       { transform: `translateY(${E}px)` },
     ];
+    for (const el of [A, B]) { el.toggleAttribute('data-ring', meta?.theme === 'dark'); el.style.setProperty('--ring', window.innerWidth >= 768 ? '1.05px' : '.9px'); }
     card.classList.add('pc-card-moving');
     anims.push(card.animate(sink, o));
     // The ghost rides with the page and fades in over it, becoming an empty
@@ -241,6 +245,7 @@ export function RootLayout() {
     if (isHome) { settleHome(); return; }
     site.set({ tldr: false });
     window.scrollTo(0, 0);
+    pageScroll.set(0, 0);
     if (trip.current?.dir === 'out') {
       // The page mounts hidden under the ghost; it's revealed once the ghost is all the way up.
       if (cardRef.current) cardRef.current.style.visibility = 'hidden';
@@ -248,6 +253,28 @@ export function RootLayout() {
       settleOut();
     }
   }, [path, isHome, settleOut, settleHome]);
+
+  // Scroll → the header's frosted band (--pc-scroll, 0..1) and the progress line (--pc-progress), set straight on the card so nothing re-renders.
+  // Embedded pages report from their iframe (EmbeddedCaseStudy); pages that scroll the window report from here.
+  const embedded = !!meta?.tldr?.embedded;
+  useEffect(() => {
+    const paint = ({ y, p }: { y: number; p: number }) => {
+      const card = cardRef.current;
+      if (!card) return;
+      card.style.setProperty('--pc-scroll', String(Math.max(0, Math.min(1, (y - 24) / 72))));
+      card.style.setProperty('--pc-progress', p.toFixed(4));
+    };
+    paint(pageScroll.get());
+    const off = pageScroll.subscribe(paint);
+    if (isHome || embedded) return off;
+    const onScroll = () => {
+      const el = document.scrollingElement ?? document.documentElement;
+      pageScroll.set(el.scrollTop, Math.min(1, el.scrollTop / Math.max(1, el.scrollHeight - el.clientHeight)));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => { off(); window.removeEventListener('scroll', onScroll); };
+  }, [isHome, embedded, path]);
 
   const overlays = (
     <>
@@ -273,6 +300,9 @@ export function RootLayout() {
           <div ref={contentRef} className="pc-content">
             {showTldr ? <TldrView meta={meta!} /> : <Outlet />}
           </div>
+          {/* After a scroll, a frosted band keeps the bar readable over the page (opacity follows --pc-scroll). */}
+          <div className="pc-band" aria-hidden="true" />
+          {meta?.progress && <div className="pc-progress" aria-hidden="true" style={{ '--pc-progress-color': meta.progress } as React.CSSProperties} />}
           {/* The bar: no background, no border. Just his head and the page's controls. */}
           <header className="pc-bar">
             <button
