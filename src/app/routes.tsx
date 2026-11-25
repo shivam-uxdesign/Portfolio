@@ -13,7 +13,6 @@ import { BooksPage } from './pages/BooksPage';
 import { StackPage } from './pages/StackPage';
 import { WhatiswrongwithinPage } from './pages/WhatiswrongwithinPage';
 import { WhatshouldieatPage } from './pages/WhatshouldieatPage';
-import { NightmareRiderPage } from './pages/NightmareRiderPage';
 
 export const router = createBrowserRouter([
   {
@@ -83,10 +82,6 @@ export const router = createBrowserRouter([
       {
         path: '/play/whatshouldieat',
         Component: WhatshouldieatPage,
-      },
-      {
-        path: '/play/nightmare-rider',
-        Component: NightmareRiderPage,
       },
       {
         path: '*',

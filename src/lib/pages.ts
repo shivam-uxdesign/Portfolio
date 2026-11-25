@@ -17,7 +17,6 @@ export const PAGES: Record<string, PageMeta> = {
   '/case-study/illustration-studio': { cell: 'work', name: 'Illustration Studio', tldr: { kind: 'Case study', embedded: true } },
   '/play/whatiswrongwithin': { cell: 'work', name: 'What is wrong within', tldr: { kind: 'Fun project', title: ['What is wrong within, in ', 'one', ' minute.'] } },
   '/play/whatshouldieat': { cell: 'work', name: 'What should I eat', tldr: { kind: 'Fun project', title: ['What should I eat, in ', 'one', ' minute.'] } },
-  '/play/nightmare-rider': { cell: 'work', name: 'Nightmare Rider', tldr: { kind: 'Fun project', title: ['Nightmare Rider, in ', 'one', ' minute.'] } },
   '/comics': { cell: 'interests', name: 'Comics' },
   '/drawings': { cell: 'interests', name: 'Drawings' },
   '/music': { cell: 'interests', name: 'Music' },
