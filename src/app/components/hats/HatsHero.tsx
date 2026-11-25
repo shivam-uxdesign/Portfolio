@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { PORTRAIT_INNER, PORTRAIT_VIEWBOX } from './portrait';
 import { PROPS, type HatId } from './props';
 import { HATS, type WearableId } from './hatsData';
@@ -44,9 +44,43 @@ const Stage = memo(function Stage() {
           <span className="tag" aria-hidden="true">{h.name}</span>
         </button>
       ))}
+      <button type="button" className="hh-takeoff">Take hat off</button>
     </div>
   );
 });
+
+// ─── First-load coach marks ──────────────────────────────────────────────────
+// Two hand-lettered labels with arrows (desktop) or one line (phones) that
+// point at what is interactive. They show once per browser, fade on the first
+// touch of anything, and give up on their own after a while.
+const HINTS_KEY = 'hasSeenHeroHints';
+const seenHints = () => { try { return !!localStorage.getItem(HINTS_KEY); } catch { return true; } };
+const markHintsSeen = () => { try { localStorage.setItem(HINTS_KEY, '1'); } catch { /* storage blocked */ } };
+
+const Arrow = ({ flip }: { flip?: boolean }) => (
+  <svg className={`hh-arrow${flip ? ' flip' : ''}`} viewBox="0 0 72 44" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path className="hh-arrow-line" pathLength="1" d="M3 5 C 30 2, 58 12, 66 36" />
+    <path className="hh-arrow-head" d="M57 33 L66 37 L69 27" />
+  </svg>
+);
+
+function HeroHints({ show, away }: { show: boolean; away: boolean }) {
+  return (
+    <div className="hh-hints" aria-hidden="true" data-show={show && !away ? 'true' : 'false'}>
+      <div className="hh-hint hh-hint--hat" style={{ '--d': '1.4s' } as React.CSSProperties}>
+        <span className="hh-hint-text">Try a hat on him</span>
+        <Arrow />
+      </div>
+      <div className="hh-hint hh-hint--specs" style={{ '--d': '2.1s' } as React.CSSProperties}>
+        <span className="hh-hint-text">Don’t touch the specs</span>
+        <Arrow flip />
+      </div>
+      <div className="hh-hint-line" style={{ '--d': '1.4s' } as React.CSSProperties}>
+        Try a hat on him. Don’t touch the specs.
+      </div>
+    </div>
+  );
+}
 
 export function HatsHero({ isActive, overviewProgress, deferEntrance = false, onHatChange, onWear, onEngine }: HatsHeroProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -55,6 +89,18 @@ export function HatsHero({ isActive, overviewProgress, deferEntrance = false, on
   const cbRef = useRef({ onHatChange, onWear, onEngine });
   cbRef.current = { onHatChange, onWear, onEngine };
 
+  // Coach marks: pending until the hero first settles, then shown until the
+  // visitor touches something (or ~14s pass). Never again after that.
+  const [hint, setHint] = useState<'pending' | 'show' | 'gone'>(() => (seenHints() ? 'gone' : 'pending'));
+  const hintRef = useRef(hint);
+  hintRef.current = hint;
+  useEffect(() => {
+    if (isActive && hint === 'pending') { setHint('show'); markHintsSeen(); }
+    if (hint !== 'show') return;
+    const t = setTimeout(() => setHint('gone'), 14000);
+    return () => clearTimeout(t);
+  }, [isActive, hint]);
+
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -62,6 +108,7 @@ export function HatsHero({ isActive, overviewProgress, deferEntrance = false, on
       reducedMotion: prefersReducedMotion(),
       deferEntrance,
       onWear: hat => cbRef.current.onWear?.(hat),
+      onInteract: () => { if (hintRef.current !== 'gone') { markHintsSeen(); setHint('gone'); } },
     });
     const off = engine.onHatChange(hat => cbRef.current.onHatChange?.(hat));
     engineRef.current = engine;
@@ -83,6 +130,7 @@ export function HatsHero({ isActive, overviewProgress, deferEntrance = false, on
   return (
     <div ref={rootRef} className="hats-hero paused">
       <Stage />
+      {hint !== 'gone' && <HeroHints show={hint === 'show'} away={!isActive} />}
     </div>
   );
 }

@@ -16,6 +16,8 @@ export interface HatsEngineOptions {
   deferEntrance?: boolean;
   /** Fired when the visitor puts a hat on (not for the initial 'me' state). */
   onWear?: (hat: HatId) => void;
+  /** Fired once, the first time the visitor touches anything (hat, face, specs). */
+  onInteract?: () => void;
 }
 
 export interface HatsEngine {
@@ -402,6 +404,27 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
     gAnim = glasses.animate(frames, o); gState = to;
   }
 
+  // ── Taking the hat off ────────────────────────────────────────────────────
+  // The worn hat goes back to its slot on the orbit: it pops off his head
+  // (big, then shrinking as it springs home) and he is bare-headed again.
+  function takeOffOwn() {
+    if (destroyed || current === 'me') return;
+    interacted();
+    const p = hats.find(x => x.id === current);
+    putBack(); relayout(); apply('me', false);
+    if (p && !reduce) { p.sc = 2.4; p.vy = -16; }
+    if (!reduce) setFace({ eyes: 'open', mouth: 'o', brows: 'up' }, 900);
+    if (!raf && active) raf = requestAnimationFrame(tick);
+  }
+  const takeOffBtn = root.querySelector<HTMLButtonElement>('.hh-takeoff');
+  if (takeOffBtn) on(takeOffBtn, 'click', () => takeOffOwn());
+
+  // Mouse / pen: grab the worn hat and drag it off. It turns back into the
+  // hat's own draggable button under the pointer, so dropping it near his head
+  // puts it back on and anywhere else sends it home. Touch keeps the button:
+  // a touch drag on the portrait is a swipe to the next cell.
+  let pull: { id: number; x: number; y: number } | null = null;
+
   // ── Face pokes ────────────────────────────────────────────────────────────
   function pt(clientX: number, clientY: number) {
     const m = me.getScreenCTM();
@@ -473,18 +496,42 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
     if (!e.isPrimary || !active || overview > 0) { tap = null; return; }
     tap = { id: e.pointerId, x: e.clientX, y: e.clientY };
     look(e.clientX, e.clientY);
+    pull = null;
+    if (current !== 'me' && e.pointerType !== 'touch' && !reduce) {
+      const q2 = pt(e.clientX, e.clientY);
+      if (zone(q2.x, q2.y) === 'prop') {
+        pull = { id: e.pointerId, x: e.clientX, y: e.clientY };
+        e.stopPropagation();
+        try { me.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+      }
+    }
+  });
+  on(me, 'pointermove', e => {
+    if (!pull || e.pointerId !== pull.id || Math.hypot(e.clientX - pull.x, e.clientY - pull.y) < 12) return;
+    const h = hats.find(x => x.id === current);
+    pull = null; tap = null;
+    try { me.releasePointerCapture(e.pointerId); } catch { /* already released */ }
+    if (!h) return;
+    putBack(); relayout(); apply('me', false);
+    const lp = local(e.clientX, e.clientY);
+    h.drag = true; h.moved = 99; h.sx = e.clientX; h.sy = e.clientY; h.pointerId = e.pointerId;
+    h.ox = 0; h.oy = 0; h.tx = lp.x; h.ty = lp.y;
+    try { h.el.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+    stage.classList.add('dragging'); interacted();
+    if (!raf && active) raf = requestAnimationFrame(tick);
   });
   on(me, 'pointerup', e => {
-    const t = tap; tap = null;
+    const t = tap; tap = null; pull = null;
     if (!t || t.id !== e.pointerId || !active || overview > 0) return;
     if (Math.hypot(e.clientX - t.x, e.clientY - t.y) > 10) return;
     poke(e.clientX, e.clientY);
   });
-  on(me, 'pointercancel', () => { tap = null; });
+  on(me, 'pointercancel', () => { tap = null; pull = null; });
 
   // ── Idle hint: one hat drifts toward the head until the visitor interacts ───
-  function interacted() { touched = true; }
-  const nudge = () => { if (!touched && !reduce && active && !hats.some(h => h.drag)) { hintHat = hats[2]; hintStart = performance.now(); } };
+  function interacted() { if (!touched) { touched = true; opts.onInteract?.(); } }
+  // The party hat is the one the first-load coach mark points at, so it is the one that drifts.
+  const nudge = () => { if (!touched && !reduce && active && !hats.some(h => h.drag)) { hintHat = hats.find(h => h.id === 'party') ?? hats[2]; hintStart = performance.now(); } };
   later(nudge, 2600);
   const hintInterval = setInterval(nudge, 7000);
 
