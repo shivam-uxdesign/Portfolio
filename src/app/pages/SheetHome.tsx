@@ -190,8 +190,8 @@ const HeroPane = memo(function HeroPane({ onEngine }: { onEngine: (e: HatsEngine
         <div className="overflow-hidden pb-0.5">
           <motion.h1
             initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="font-medium leading-[0.92] cursor-default relative"
-            style={{ fontSize: 'clamp(2.4rem, 7vw, 4rem)', color: 'var(--foreground)', letterSpacing: isNameHovered ? '0.01em' : '-0.04em', transition: 'letter-spacing 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
+            className="hh-name font-medium leading-[0.92] cursor-default relative"
+            style={{ color: 'var(--foreground)', letterSpacing: isNameHovered ? '0.01em' : '-0.04em', transition: 'letter-spacing 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
             onMouseEnter={() => setIsNameHovered(true)} onMouseLeave={() => setIsNameHovered(false)}
           >
             Shivam
