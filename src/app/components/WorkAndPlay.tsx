@@ -127,7 +127,6 @@ function SystemCard({ items }: { items: WorkItem[] }) {
 }
 
 export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
-  const SERIF = "'Playfair Display', Georgia, serif";
   const system = work.filter(p => p.system);
   const workEntries: Entry[] = work.filter(p => !p.system).map(p => ({
     to: p.link, external: p.external, side: 'work', eyebrow: p.tag ?? `Case study ${p.number}`, title: p.title, desc: p.descriptor, cta: 'Read case study',

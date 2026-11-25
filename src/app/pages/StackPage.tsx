@@ -104,7 +104,6 @@ export const tools = [
 ];
 
 const GRID_GAP = 12; // px — single fixed gap so the JS size calc and CSS stay in sync
-const SERIF = "'Playfair Display', Georgia, serif";
 
 export function StackPage() {
   return (
@@ -171,7 +170,7 @@ export function StackContent({ standalone = false }: { standalone?: boolean }) {
             <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase">Tools &amp; Stack</p>
           </div>
           <h1 className="text-[30px] md:text-[38px] leading-[1.05] mb-2 text-foreground" style={{ letterSpacing: '-0.02em' }}>
-            What I <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>build</span> with
+            What I <span className="em">build</span> with
           </h1>
           <p className="text-[14px] leading-[1.5] max-w-xl text-muted-foreground">
             The tools that actually get used, day to day — from first sketch to shipped screen.

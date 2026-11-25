@@ -138,8 +138,8 @@
 .hh-text .hh-tagline { transition: opacity .2s, transform .2s; text-wrap: balance; }
 .hh-text .hh-tagline.swap { opacity: 0; transform: translateY(5px); }
 .hh-text .hh-tagline em {
-  font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500;
-  color: var(--hh-accent); transition: color .6s;
+  font-style: normal; font-weight: 700; font-variant-numeric: lining-nums;
+  color: var(--hh-ink, var(--em)); transition: color .6s;
 }
 
 /* ── Work peek ──────────────────────────────────────────────────────────── */
@@ -215,7 +215,7 @@
   opacity: 0; visibility: hidden; transition: opacity .45s, visibility 0s .45s;
 }
 .hats-hero .hh-hints[data-show="true"] { opacity: 1; visibility: visible; transition: opacity .01s; }
-.hh-hint, .hh-hint-line { color: var(--foreground); font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; }
+.hh-hint, .hh-hint-line { color: var(--foreground); font-weight: 700; letter-spacing: -.005em; }
 .hh-hint { display: none; position: absolute; width: 0; height: 0; }
 .hh-hint-text { position: absolute; white-space: nowrap; font-size: 16px; line-height: 1.2; }
 .hh-hint .hh-arrow { position: absolute; width: 72px; height: 44px; overflow: visible; color: var(--hh-accent); }

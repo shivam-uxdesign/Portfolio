@@ -4,7 +4,6 @@ import './resume.css';
 
 // Resume: the short version. Facts in the same list style as About, and the
 // four things I do best — all visible at a glance, nothing to tap or wait for.
-const SERIF = "'Playfair Display', Georgia, serif";
 
 // `short` is what phones show; laptops get the full line.
 const FACTS = [
@@ -39,7 +38,7 @@ export function ResumePanel() {
       <div className="rs-body">
         <div className="rs-text">
           <h2 className="rs-title text-foreground">
-            The <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>short</span> version.
+            The <span className="em">short</span> version.
           </h2>
           <dl className="rs-facts">
             {FACTS.map(f => (

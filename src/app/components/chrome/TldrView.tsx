@@ -1,6 +1,5 @@
 import type { PageMeta } from '../../../lib/pages';
 
-const SERIF = "'Playfair Display', Georgia, serif";
 
 // The summary side of a project page. Placeholder rows until the real
 // summaries come in: same rows on every project, so they read alike.
@@ -18,7 +17,7 @@ export function TldrView({ meta }: { meta: PageMeta }) {
     <main className="pc-tldr">
       <p className="pc-tldr-label">{t.kind} · TL;DR</p>
       <h1 className="pc-tldr-title">
-        {title[0]}<span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>{title[1]}</span>{title[2]}
+        {title[0]}<span className="em">{title[1]}</span>{title[2]}
       </h1>
       <dl className="pc-tldr-facts">
         {ROWS.map(([k, v]) => (

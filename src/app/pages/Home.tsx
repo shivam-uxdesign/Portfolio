@@ -235,7 +235,7 @@ function HeroCell({ onNavigateDir }: { onNavigateDir: (dir: NavDir) => void }) {
       {/* ── Text: above the stage on phones, below it from md up ── */}
       <div
         className="hh-text order-1 md:order-2 flex-shrink-0 flex flex-col items-center text-center w-full"
-        style={{ '--hh-accent': PAL[hat].accent } as React.CSSProperties}
+        style={{ '--hh-accent': PAL[hat].accent, '--hh-ink': PAL[hat].ink } as React.CSSProperties}
       >
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -390,7 +390,6 @@ export function FunCell() {
 }
 
 export function ContactCell() {
-  const SERIF = "'Playfair Display', Georgia, serif";
 
   return (
     // Phones: the ask at the top, the compose card fills the rest down to the navigator.
@@ -410,7 +409,7 @@ export function ContactCell() {
             Got a project, a role,<br className="hidden md:inline" />{' '}
             or just want to{' '}
             <span className="whitespace-nowrap">
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>talk shop</span>?
+              <span className="em">talk shop</span>?
             </span>
           </h2>
 
@@ -420,7 +419,7 @@ export function ContactCell() {
 
           <p
             className="ct-sig hidden md:block text-[13px] text-muted-foreground/70 border-l-2 border-border pl-3 leading-snug"
-            style={{ fontFamily: SERIF, fontStyle: 'italic' }}
+            style={{ fontWeight: 500 }}
           >
             Let's build something worth shipping. — Shivam
           </p>

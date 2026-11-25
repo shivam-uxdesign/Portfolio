@@ -36,6 +36,7 @@ export function EmbeddedCaseStudy({ slug, title, skin = true }: { slug: string; 
     const root = getComputedStyle(ref.current!);
     doc.documentElement.style.setProperty('--site-bg', root.getPropertyValue('--background').trim() || '#fff');
     doc.documentElement.style.setProperty('--site-primary', hat === 'me' ? '' : PAL[hat].accent);
+    doc.documentElement.style.setProperty('--site-ink', PAL[hat].ink);
   }, [hat]);
 
   // Bar → page.
@@ -57,6 +58,7 @@ export function EmbeddedCaseStudy({ slug, title, skin = true }: { slug: string; 
     doc.documentElement.style.setProperty('--site-bg', cs.getPropertyValue('--background').trim() || '#fff');
     const h = site.get().hat;
     if (h !== 'me') doc.documentElement.style.setProperty('--site-primary', PAL[h].accent);
+    doc.documentElement.style.setProperty('--site-ink', PAL[h].ink);
     // Links: other pages of this site navigate the app; outside links open a tab.
     doc.addEventListener('click', e => {
       const a = (e.target as Element).closest?.('a[href]') as HTMLAnchorElement | null;

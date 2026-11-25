@@ -7,6 +7,7 @@
   --popover: #FFFFFF;
   --popover-foreground: #1C1C1A;
   --primary: #8A9E7B;
+  --em: #4F6A3F; /* emphasis in text: bold + this colour (6.1:1 on white) */
   --primary-foreground: #FFFFFF;
   --secondary: #F2F1EF;
   --secondary-foreground: #1C1C1A;
@@ -175,3 +176,8 @@
   background-size: 250% 100%;
   animation: shimmer-sweep 1.8s ease-in-out infinite;
 }
+
+
+/* Emphasis: the highlighted word in a headline or line. Bold, in the deeper accent, same face as the text.
+   (Replaces the serif italic. The colour follows the hat that is worn: themeVars sets --em.) */
+.em { font-style: normal; font-weight: 700; color: var(--em); font-variant-numeric: lining-nums; }

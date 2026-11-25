@@ -8,6 +8,7 @@ export function themeVars(hat: WearableId): React.CSSProperties | undefined {
   return {
     '--primary': p.accent,
     '--accent': p.accent,
+    '--em': p.ink,
     '--background': `color-mix(in oklab, ${p.card} 4%, #fff)`,
   } as React.CSSProperties;
 }
