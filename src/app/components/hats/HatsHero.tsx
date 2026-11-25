@@ -67,15 +67,15 @@ const Arrow = ({ flip }: { flip?: boolean }) => (
 function HeroHints({ show, away }: { show: boolean; away: boolean }) {
   return (
     <div className="hh-hints" aria-hidden="true" data-show={show && !away ? 'true' : 'false'}>
-      <div className="hh-hint hh-hint--hat" style={{ '--d': '1.4s' } as React.CSSProperties}>
+      <div className="hh-hint hh-hint--hat" style={{ '--d': '.8s' } as React.CSSProperties}>
         <span className="hh-hint-text">Try a hat on him</span>
         <Arrow />
       </div>
-      <div className="hh-hint hh-hint--specs" style={{ '--d': '2.1s' } as React.CSSProperties}>
+      <div className="hh-hint hh-hint--specs" style={{ '--d': '1.25s' } as React.CSSProperties}>
         <span className="hh-hint-text">Don’t touch the specs</span>
         <Arrow flip />
       </div>
-      <div className="hh-hint-line" style={{ '--d': '1.4s' } as React.CSSProperties}>
+      <div className="hh-hint-line" style={{ '--d': '.8s' } as React.CSSProperties}>
         Try a hat on him. Don’t touch the specs.
       </div>
     </div>
