@@ -116,13 +116,15 @@
 /* ── After a scroll: a frosted band so the bar never merges with the page ── */
 .pc-band {
   position: fixed; top: 0; left: 0; right: 0; z-index: 49; pointer-events: none;
-  height: calc(env(safe-area-inset-top, 0px) + 92px);
+  /* Just past the controls (head bottom: ~56px phone, ~68px desktop), then a short fade. */
+  height: calc(env(safe-area-inset-top, 0px) + 66px);
   opacity: var(--pc-scroll, 0); will-change: opacity;
-  background: color-mix(in oklab, var(--background) 58%, transparent);
+  background: color-mix(in oklab, var(--background) 38%, transparent);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 58%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0, #000 58%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
 }
+@media (min-width: 768px) { .pc-band { height: calc(env(safe-area-inset-top, 0px) + 80px); } }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .pc-band { background: color-mix(in oklab, var(--background) 90%, transparent); }
 }
