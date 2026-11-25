@@ -44,7 +44,7 @@ const Stage = memo(function Stage() {
           <span className="tag" aria-hidden="true">{h.name}</span>
         </button>
       ))}
-      <button type="button" className="hh-takeoff">Take hat off</button>
+      <button type="button" className="hh-takeoff" aria-label="Take the hat off"><span aria-hidden="true">✕</span> Take hat off</button>
     </div>
   );
 });

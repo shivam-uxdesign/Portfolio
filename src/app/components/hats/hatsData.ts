@@ -51,4 +51,4 @@ export const FACE: Record<WearableId, Face> = {
   cat: { eyes: 'happy', mouth: 'soft' },
 };
 
-export const DEFAULT_TAGLINE_HTML = 'A product designer who works from <em>strategy</em> to pixel. I wear a lot of hats.';
+export const DEFAULT_TAGLINE_HTML = 'A product designer who works from <em>strategy</em> to pixel.';

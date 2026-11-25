@@ -424,6 +424,7 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
   // puts it back on and anywhere else sends it home. Touch keeps the button:
   // a touch drag on the portrait is a swipe to the next cell.
   let pull: { id: number; x: number; y: number } | null = null;
+  let lastHatTap = 0;
 
   // ── Face pokes ────────────────────────────────────────────────────────────
   function pt(clientX: number, clientY: number) {
@@ -524,6 +525,12 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
     const t = tap; tap = null; pull = null;
     if (!t || t.id !== e.pointerId || !active || overview > 0) return;
     if (Math.hypot(e.clientX - t.x, e.clientY - t.y) > 10) return;
+    // Double-tap the worn hat: take it off (the first tap still pokes it).
+    const hit = pt(e.clientX, e.clientY);
+    const onHat = current !== 'me' && zone(hit.x, hit.y) === 'prop';
+    const now = performance.now();
+    if (onHat && now - lastHatTap < 400) { lastHatTap = 0; takeOffOwn(); return; }
+    lastHatTap = onHat ? now : 0;
     poke(e.clientX, e.clientY);
   });
   on(me, 'pointercancel', () => { tap = null; pull = null; });

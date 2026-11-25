@@ -196,10 +196,10 @@
    present while a hat is on his head. */
 .hats-hero .hh-takeoff {
   display: none; position: absolute; left: 50%; bottom: 1%; transform: translateX(-50%); z-index: 6;
-  align-items: center; padding: 6px 14px; border-radius: 999px; cursor: pointer;
-  font-family: inherit; font-size: 11px; font-weight: 500; line-height: 1; letter-spacing: .04em; white-space: nowrap;
+  align-items: center; gap: 6px; padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  font-family: inherit; font-size: 12px; font-weight: 600; line-height: 1; letter-spacing: .03em; white-space: nowrap;
   color: var(--foreground); background: color-mix(in srgb, var(--background) 88%, transparent);
-  border: 1px solid color-mix(in srgb, var(--hh-accent) 55%, transparent);
+  border: 1.5px solid var(--hh-accent);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   transition: background-color .2s, border-color .2s;
 }
@@ -251,3 +251,11 @@
 /* tip direction differs: the specs arrow is mirrored, so it nudges up-left */
 @keyframes hh-nudge-hat { 0%, 100% { translate: 0 0; } 35% { translate: 6px 5px; } 55% { translate: 1px 1px; } 70% { translate: 4px 3px; } }
 @keyframes hh-nudge-specs { 0%, 100% { translate: 0 0; } 35% { translate: -6px -5px; } 55% { translate: -1px -1px; } 70% { translate: -4px -3px; } }
+
+/* Persistent premise line under the name. */
+.hh-text .hh-wear {
+  margin: 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500;
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem); line-height: 1.2; letter-spacing: -.005em;
+  color: color-mix(in srgb, var(--hh-accent) 72%, var(--foreground));
+  transition: color .6s;
+}

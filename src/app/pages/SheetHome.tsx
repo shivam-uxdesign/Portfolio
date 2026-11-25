@@ -197,12 +197,19 @@ const HeroPane = memo(function HeroPane({ onEngine }: { onEngine: (e: HatsEngine
             Shivam
           </motion.h1>
         </div>
+        {/* Always on: the premise of the hero. The line below changes per hat. */}
+        <motion.p
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }}
+          className="hh-wear mt-1.5"
+        >
+          I wear multiple hats
+        </motion.p>
         <motion.p
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}
           aria-live="polite"
           className={`hh-tagline text-[13px] md:text-[14px] leading-snug text-muted-foreground mt-2 max-w-[34em] min-h-[2.9em]${swapping ? ' swap' : ''}`}
         >
-          {info ? <><em>{info.name}.</em> {info.line}</> : <>A product designer who works from <em>strategy</em> to pixel. I wear a lot of hats.</>}
+          {info ? <><em>{info.name}.</em> {info.line}</> : <>A product designer who works from <em>strategy</em> to pixel.</>}
         </motion.p>
       </div>
       <div className="hh-stage-wrap order-2 md:order-1 w-full">
