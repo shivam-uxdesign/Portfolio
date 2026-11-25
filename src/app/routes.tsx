@@ -3,7 +3,7 @@ import { RootLayout } from './components/RootLayout';
 import { ErrorPage } from './pages/ErrorPage';
 import { SheetHome as Home } from './pages/SheetHome';
 import { GridPanelPage } from './pages/GridPanelPage';
-import { SalesCaseCardPage, JourneyStudioPage, DesignKitPage, IllustrationStudioPage, KeppoMotoPage, RupyySystemPage } from './pages/WorkCaseStudies';
+import { SalesCaseCardPage, JourneyStudioPage, DesignKitPage, IllustrationStudioPage, KeppoMotoPage, KeppoJournalPage, RupyySystemPage } from './pages/WorkCaseStudies';
 import { ComicsPage } from './pages/ComicsPage';
 import { DrawingsPage } from './pages/DrawingsPage';
 import { CoolStuffPage } from './pages/CoolStuffPage';
@@ -12,7 +12,6 @@ import { MoviesPage } from './pages/MoviesPage';
 import { BooksPage } from './pages/BooksPage';
 import { StackPage } from './pages/StackPage';
 import { WhatiswrongwithinPage } from './pages/WhatiswrongwithinPage';
-import { WhatshouldieatPage } from './pages/WhatshouldieatPage';
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +47,7 @@ export const router = createBrowserRouter([
       { path: '/case-study/design-kit', Component: DesignKitPage },
       { path: '/case-study/illustration-studio', Component: IllustrationStudioPage },
       { path: '/case-study/keppo-moto', Component: KeppoMotoPage },
+      { path: '/case-study/keppo-journal', Component: KeppoJournalPage },
       {
         path: '/comics',
         Component: ComicsPage,
@@ -81,8 +81,9 @@ export const router = createBrowserRouter([
         Component: WhatiswrongwithinPage,
       },
       {
+        // Replaced by Keppo Journal.
         path: '/play/whatshouldieat',
-        Component: WhatshouldieatPage,
+        element: <Navigate to="/case-study/keppo-journal" replace />,
       },
       {
         path: '*',
