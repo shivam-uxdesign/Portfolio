@@ -16,6 +16,8 @@ export interface Travel {
   /** The card edge he hides behind (the sheet's top), in screen px. */
   edgeY: number;
   hat: WearableId;
+  /** The page it travels to has its own dark look, so the lifting sheet darkens on the way. */
+  dark?: boolean;
 }
 
 export interface SiteState {

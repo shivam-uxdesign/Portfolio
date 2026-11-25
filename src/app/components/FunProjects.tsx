@@ -4,20 +4,23 @@ import { useNavigate } from 'react-router';
 
 const funProjects = [
   {
+    // The highlight: first in the list, so it is the featured card. A finished case
+    // study; its page is public/case-studies/keppo-moto/, shown inside the portfolio.
+    title: 'Keppo Moto',
+    description: 'A motorcycle app that keeps every ride, built with AI.',
+    tag: 'Case study · Built with AI',
+    color: '#0A0A0B',
+    image: '/case-studies/keppo-moto/img/og.jpg',
+    link: '/case-study/keppo-moto',
+    cta: 'Read case study',
+  },
+  {
     title: 'Whatiswrongwith.in',
     description: 'AI that roasts your text with brutal honesty',
     tag: 'Vibe Coded',
     color: '#DDE8F5',
     image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&h=300&fit=crop',
     link: '/play/whatiswrongwithin',
-  },
-  {
-    title: 'Nightmare Rider',
-    description: 'A game born from a recurring dream',
-    tag: 'Vibe Coded',
-    color: '#1A1A1A',
-    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&h=300&fit=crop',
-    link: '/play/nightmare-rider',
   },
   {
     title: 'Whatshouldieat.in',

@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500;600&display=swap">
+<script>try{if(window.self!==window.top||/[?&]embed=1(&|$)/.test(location.search))document.documentElement.setAttribute("data-embedded","")}catch(e){document.documentElement.setAttribute("data-embedded","")}</script>
 <style>
 /* Instrument cluster at night: Keppo Moto's own tokens, a reading column beside a sticky phone, mono for what the machine does. */
 :root{
@@ -337,6 +338,39 @@ footer h2{font-size:clamp(40px,7vw,84px)}
   @keyframes swap{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
 }
 @media (prefers-reduced-motion:reduce){.phone .layer{transition:none}}
+
+/* TL;DR view: the same document, shown instead of the full story (data-mode="tldr"). Scoped so it cannot touch the full page. */
+html[data-mode="tldr"] #top{display:none}
+#tldr[hidden]{display:none}
+#tldr .wrap{max-width:1040px;margin:0 auto;padding-top:56px;padding-bottom:72px}
+#tldr h1{font:700 clamp(34px,5.4vw,60px)/1 var(--display);letter-spacing:-.035em;margin:14px 0 18px;text-wrap:balance}
+#tldr h1 em{font-style:normal;color:var(--teal)}
+#tldr .lede{font-size:18px;color:#d4d4d8;max-width:60ch;margin:0}
+#tldr .grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px;margin-top:40px;align-items:start}
+#tldr .nums{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#tldr .num{background:var(--surface);border-radius:20px;padding:18px}
+#tldr .num b{display:block;font:300 40px/1 var(--sans);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+#tldr .num span{display:block;margin-top:8px;color:var(--muted);font-size:13px;line-height:1.4}
+#tldr ul{list-style:none;padding:0;margin:28px 0 0;display:flex;flex-direction:column;gap:14px}
+#tldr li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px}
+#tldr li i{font:500 12px/24px var(--mono);color:var(--teal);font-style:normal}
+#tldr li b{font-weight:600}
+#tldr li p{margin:2px 0 0;color:#c9c9cf;font-size:15px}
+#tldr .phones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#tldr .phones img{width:100%;aspect-ratio:390/844;object-fit:cover;object-position:top;border-radius:22px;border:5px solid #1a1a1d;display:block;background:#000}
+#tldr .cta{margin-top:40px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+#tldr .btn{display:inline-flex;align-items:center;height:48px;padding:0 22px;border-radius:999px;background:var(--text);color:var(--bg);text-decoration:none;font-weight:600}
+#tldr .btn.ghost{background:var(--raised);color:var(--text)}
+@media (max-width:820px){#tldr .grid{grid-template-columns:1fr}}
+
+/* Embedded in the portfolio: its bar replaces this header, and Full / TL;DR is driven from there. */
+html[data-embedded] .top{display:none}
+html[data-embedded] footer a[href^="https://www.shivamdesign.in"],html[data-embedded] #tldr a[href^="https://www.shivamdesign.in"]{display:none}
+html[data-embedded] .progress{top:0}
+html[data-embedded] .rideSticky,html[data-embedded] .sticky{top:68px}
+html[data-embedded] .hud{margin-top:76px}
+html[data-embedded] #tldr .wrap{padding-top:84px}
+@media (max-width:900px){html[data-embedded] .sticky{position:static}}
 </style>
 
 <header class="top">
@@ -353,7 +387,7 @@ footer h2{font-size:clamp(40px,7vw,84px)}
       <a href="#decisions">Decisions</a>
       <a href="#economics">Business</a>
       <a href="#built">How it got built</a>
-      <a class="keep" href="tldr.html">TL;DR</a>
+      <a class="keep" href="#tldr" data-tlm="tldr">TL;DR</a>
     </nav>
   </div>
 </header>
@@ -1106,9 +1140,43 @@ footer h2{font-size:clamp(40px,7vw,84px)}
     <h2>Every ride, kept.</h2>
     <p class="lede">I take products from an idea to something people can use, and test them where they're used. Let's talk.</p>
     <p class="mono" style="color:var(--muted)"><a href="mailto:shivam.uxd@gmail.com">shivam.uxd@gmail.com</a> · <a href="https://www.shivamdesign.in">shivamdesign.in</a></p>
-    <p style="color:var(--muted);font-size:14px">Screens marked redesigned are rebuilt from a screen recording of the app, with my own rides and clips; contacts' phone numbers are made up. Other screens are rendered from the app's code with sample data, or captured on a demo ride, which runs on a simulated route. Ride numbers are from my own bike. Dashed frames are still to come. <a href="tldr.html">The one-minute version.</a></p>
+    <p style="color:var(--muted);font-size:14px">Screens marked redesigned are rebuilt from a screen recording of the app, with my own rides and clips; contacts' phone numbers are made up. Other screens are rendered from the app's code with sample data, or captured on a demo ride, which runs on a simulated route. Ride numbers are from my own bike. Dashed frames are still to come. <a href="#tldr" data-tlm="tldr">The one-minute version.</a></p>
   </div>
 </footer>
+</main>
+
+<main id="tldr" hidden>
+<div class="wrap">
+  <span class="label">TL;DR · one minute</span>
+  <h1>Every ride, <em>kept.</em></h1>
+  <p class="lede">Keppo Moto turns the phone on a motorcycle's handlebar into a riding crew: it records every ride and lean angle, films the good bits by itself, texts your people if you crash, steers around Delhi traffic and turns your clips and your own words into Reels. 12 systems, 30+ screens, works offline, and in beta with 4 riders. I designed it end to end and shipped it in two months, with AI as my engineering team.</p>
+
+  <div class="grid">
+    <div>
+      <div class="nums">
+        <div class="num"><b>2 mo</b><span>first commit to a full app, 30 working days</span></div>
+        <div class="num"><b>477</b><span>commits</span></div>
+        <div class="num"><b>622</b><span>automated tests on every commit</span></div>
+        <div class="num"><b>4</b><span>beta riders testing it on real roads</span></div>
+      </div>
+      <ul>
+        <li><i>01</i><div><b>Lean from a phone.</b><p>In a steady turn the accelerometer says the bike is upright. The gyroscope is corrected with the physics of a turn instead, and the mount is learned while riding.</p></div></li>
+        <li><i>02</i><div><b>A pothole isn't a crash.</b><p>A crash is a sequence: a hard impact or a 60° slide while riding, then the bike stays down. 30 s to say I'm OK, then an SMS that works without internet.</p></div></li>
+        <li><i>03</i><div><b>Evidence before rules.</b><p>243 false starts in one ride made the voice-filming rules stricter. Test builds log every slice of sound so new rules are replayed on real rides first.</p></div></li>
+        <li><i>04</i><div><b>Cost and safety as design inputs.</b><p>Free on-phone work first, a ₹1.3 route request last, no paid server. Nothing behind a tap, no voice, no vibration. Safety is never behind the paywall.</p></div></li>
+      </ul>
+    </div>
+    <div class="phones">
+      <img src="img/hud.webp" alt="Ride HUD with speed, lean, gear, revs and three mic bars">
+      <img src="img/crash-countdown.webp" alt="Crash alert counting down before an SMS goes to two contacts">
+    </div>
+  </div>
+
+  <div class="cta">
+    <a class="btn" href="./" data-tlm="full">Read the full case study · 10 min</a>
+    <span class="label" style="text-transform:none;letter-spacing:0;font-size:14px"><a href="mailto:shivam.uxd@gmail.com">shivam.uxd@gmail.com</a> · <a href="https://www.shivamdesign.in">shivamdesign.in</a></span>
+  </div>
+</div>
 </main>
 
 <script>
@@ -1294,5 +1362,34 @@ footer h2{font-size:clamp(40px,7vw,84px)}
     lbs.forEach(function (x, k) { x.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
     $('loopWho').textContent = loop[i][0]; $('loopTitle').textContent = loop[i][1]; $('loopText').textContent = loop[i][2];
     var q = $('loopQuote'); q.textContent = '“' + loop[i][3] + '”'; var c = document.createElement('cite'); c.textContent = loop[i][4]; q.appendChild(c); }); });
+})();
+</script>
+
+<script>
+// Full story / TL;DR: one document, two views. The portfolio's bar drives this with [data-tlm] (see EmbeddedCaseStudy); standalone, the header link and the buttons do.
+(function () {
+  var root = document.documentElement, full = document.getElementById('top'), tl = document.getElementById('tldr');
+  var fullTitle = document.title, cur = null;
+  function setMode(m) {
+    if (m === cur) return false;
+    cur = m;
+    var t = m === 'tldr';
+    root.setAttribute('data-mode', t ? 'tldr' : 'full');
+    full.hidden = t; tl.hidden = !t;
+    document.title = t ? 'Keppo Moto TL;DR' : fullTitle;
+    document.querySelectorAll('[data-tlm]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-tlm') === m)); });
+    return true;
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-tlm]');
+    if (!b) return;
+    e.preventDefault();
+    var m = b.getAttribute('data-tlm');
+    if (setMode(m)) window.scrollTo(0, 0);
+    try { history.replaceState(null, '', m === 'tldr' ? '#tldr' : location.pathname + location.search); } catch (_) {}
+  });
+  function fromHash() { return setMode(location.hash === '#tldr' ? 'tldr' : 'full'); }
+  addEventListener('hashchange', function () { if (fromHash()) window.scrollTo(0, 0); });
+  fromHash();
 })();
 </script>

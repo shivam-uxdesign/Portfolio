@@ -8,6 +8,8 @@ export const SalesCaseCardPage = () => <EmbeddedCaseStudy slug="sales-case-card"
 export const JourneyStudioPage = () => <EmbeddedCaseStudy slug="journey-studio" title="Journey Studio case study" />;
 export const DesignKitPage = () => <EmbeddedCaseStudy slug="design-kit" title="Design Kit case study" />;
 export const IllustrationStudioPage = () => <EmbeddedCaseStudy slug="illustration-studio" title="Illustration Studio case study" />;
+// Keppo Moto has its own dark look, so it opts out of the shared skin.
+export const KeppoMotoPage = () => <EmbeddedCaseStudy slug="keppo-moto" title="Keppo Moto case study" skin={false} />;
 
 const SERIF = "'Playfair Display', Georgia, serif";
 const Accent = ({ children }: { children: string }) => (

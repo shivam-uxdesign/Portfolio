@@ -684,7 +684,7 @@ export function SheetHome() {
     if (!m || edge == null || !open || !trips.out || reduce) { routerNavigate(to); return; }
     leaving.current = true;
     const [bx, by, bw, bh] = headBox(w);
-    trips.out({ hat: w, edgeY: edge, from: { x: m.a * bx + m.e, y: m.d * by + m.f, w: m.a * bw, h: m.d * bh } });
+    trips.out({ hat: w, dark: pageMeta(to)?.theme === 'dark', edgeY: edge, from: { x: m.a * bx + m.e, y: m.d * by + m.f, w: m.a * bw, h: m.d * bh } });
     rootRef.current?.classList.add('sh-leaving');
     requestAnimationFrame(() => requestAnimationFrame(() => routerNavigate(to)));
   };

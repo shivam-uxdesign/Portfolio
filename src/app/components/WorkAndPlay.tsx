@@ -12,7 +12,7 @@ import { PROPS, type HatId } from './hats/props';
 // featured project and two smaller ones.
 
 export interface WorkItem { title: string; descriptor: string; number: string; bg: string; link: string; external?: boolean; thumbnail: ReactNode; tag?: string; system?: boolean }
-export interface PlayItem { title: string; description: string; tag: string; color: string; image: string; link: string }
+export interface PlayItem { title: string; description: string; tag: string; color: string; image: string; link: string; cta?: string }
 
 // The headline: the sticky notes perch on Work, the propeller beanie on Play.
 // Part of the page itself, so it simply stays when the sheet is open.
@@ -43,7 +43,7 @@ function PhoneStacks({ work, play }: { work: WorkItem[]; play: PlayItem[] }) {
     {
       id: 'fun', label: 'Built for fun, with AI', count: `${play.length} apps`,
       heading: 'Built for fun, with AI', sub: 'Small apps I made to play with ideas and AI tools.',
-      items: play.map(f => ({ title: f.title, descriptor: f.description, link: f.link, bg: f.color, image: f.image, tag: f.tag })),
+      items: play.map(f => ({ title: f.title, descriptor: f.description, link: f.link, bg: f.color, image: f.image, tag: f.tag, cta: f.cta })),
     },
   ], [work, play]);
   const [open, setOpen] = useState<{ id: ProjectGroupId; from: DOMRect; trigger: HTMLElement } | null>(null);
@@ -134,7 +134,7 @@ export function WorkAndPlay({ work, play }: { work: WorkItem[]; play: PlayItem[]
     thumb: <span className="absolute inset-0" style={{ background: p.bg }}><span className="wp-thumb">{p.thumbnail}</span></span>,
   }));
   const playEntries: Entry[] = play.map(f => ({
-    to: f.link, side: 'play', eyebrow: f.tag, title: f.title, desc: f.description, cta: 'Try it',
+    to: f.link, side: 'play', eyebrow: f.tag, title: f.title, desc: f.description, cta: f.cta ?? 'Try it',
     thumb: <span className="absolute inset-0" style={{ background: f.color }}><img src={f.image} alt="" loading="lazy" draggable={false} className="w-full h-full object-cover" onError={e => { e.currentTarget.style.visibility = 'hidden'; }} /></span>,
   }));
   return (

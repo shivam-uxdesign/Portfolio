@@ -3,7 +3,7 @@ import { RootLayout } from './components/RootLayout';
 import { ErrorPage } from './pages/ErrorPage';
 import { SheetHome as Home } from './pages/SheetHome';
 import { GridPanelPage } from './pages/GridPanelPage';
-import { SalesCaseCardPage, JourneyStudioPage, DesignKitPage, IllustrationStudioPage, RupyySystemPage } from './pages/WorkCaseStudies';
+import { SalesCaseCardPage, JourneyStudioPage, DesignKitPage, IllustrationStudioPage, KeppoMotoPage, RupyySystemPage } from './pages/WorkCaseStudies';
 import { ComicsPage } from './pages/ComicsPage';
 import { DrawingsPage } from './pages/DrawingsPage';
 import { CoolStuffPage } from './pages/CoolStuffPage';
@@ -13,7 +13,6 @@ import { BooksPage } from './pages/BooksPage';
 import { StackPage } from './pages/StackPage';
 import { WhatiswrongwithinPage } from './pages/WhatiswrongwithinPage';
 import { WhatshouldieatPage } from './pages/WhatshouldieatPage';
-import { NightmareRiderPage } from './pages/NightmareRiderPage';
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +47,7 @@ export const router = createBrowserRouter([
       { path: '/case-study/journey-studio', Component: JourneyStudioPage },
       { path: '/case-study/design-kit', Component: DesignKitPage },
       { path: '/case-study/illustration-studio', Component: IllustrationStudioPage },
+      { path: '/case-study/keppo-moto', Component: KeppoMotoPage },
       {
         path: '/comics',
         Component: ComicsPage,
@@ -83,10 +83,6 @@ export const router = createBrowserRouter([
       {
         path: '/play/whatshouldieat',
         Component: WhatshouldieatPage,
-      },
-      {
-        path: '/play/nightmare-rider',
-        Component: NightmareRiderPage,
       },
       {
         path: '*',

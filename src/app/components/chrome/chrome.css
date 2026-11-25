@@ -8,6 +8,11 @@
   border-top: 1px solid var(--border); box-shadow: 0 -24px 48px -28px rgba(20, 20, 18, .35);
 }
 .pc-content { min-height: inherit; }
+/* A page with its own dark look (registry: theme 'dark'): the card and the bar's pills turn dark; the area behind a rising card stays the hero's. */
+.pc-card[data-theme="dark"] {
+  --background: #0A0A0B; --foreground: #F4F4F5; --card: #141416; --border: rgba(255, 255, 255, .14);
+  --muted-foreground: #8B8B93; --ring: #69C8CB; color-scheme: dark;
+}
 
 /* The bar: invisible. His head on the left, the page's controls on the right. */
 .pc-bar {
