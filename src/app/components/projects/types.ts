@@ -5,6 +5,10 @@ export interface ProjectItem {
   descriptor: string;
   link: string;
   external?: boolean;
+  /** A standalone page served as a file (not a router route): open it with a plain same-tab link. */
+  plain?: boolean;
+  /** Overrides the default call to action. */
+  cta?: string;
   /** Card background behind the thumbnail. */
   bg: string;
   /** Either a drawn thumbnail component or an image URL. */
