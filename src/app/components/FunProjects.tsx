@@ -23,12 +23,14 @@ const funProjects = [
     link: '/play/whatiswrongwithin',
   },
   {
-    title: 'Whatshouldieat.in',
-    description: 'Tell it your goals. It tells you what to eat.',
-    tag: 'Vibe Coded',
-    color: '#F5E8DD',
-    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&h=300&fit=crop',
-    link: '/play/whatshouldieat',
+    // Keppo Moto's sibling; its page is public/case-studies/keppo-journal/, shown inside the portfolio.
+    title: 'Keppo Journal',
+    description: 'A journal that opens on the camera, built with AI.',
+    tag: 'Case study · Built with AI',
+    color: '#F7F7F5',
+    image: '/case-studies/keppo-journal/media/og.jpg',
+    link: '/case-study/keppo-journal',
+    cta: 'Read case study',
   },
 ];
 
