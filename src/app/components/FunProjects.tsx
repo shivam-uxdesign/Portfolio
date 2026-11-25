@@ -19,7 +19,7 @@ const funProjects = [
     description: 'AI that roasts your text with brutal honesty',
     tag: 'Vibe Coded',
     color: '#DDE8F5',
-    image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&h=300&fit=crop',
+    image: '/case-studies/thumbs/whatiswrongwith.jpg',
     link: '/play/whatiswrongwithin',
   },
   {

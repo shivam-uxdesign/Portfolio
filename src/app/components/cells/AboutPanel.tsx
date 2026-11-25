@@ -91,7 +91,7 @@ export function AboutPanel() {
       </div>
       <div className="ab-media">
         <PrintStack />
-        <p className="ab-hint">Process and practice · tap to shuffle</p>
+        <p className="ab-hint">Off the clock · tap to shuffle</p>
       </div>
     </div>
   );
