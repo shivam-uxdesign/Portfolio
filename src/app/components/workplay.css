@@ -68,22 +68,32 @@
 .wpd-sys-tools { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .wpd-sys-tool .wpd-title { font-size: 13.5px; }
 
-/* ── Two hats: Work and Play chips in the page's top strip ─────────────────── */
-.wpd-head { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.wp-hats { display: flex; gap: 10px; margin-top: 8px; }
+/* ── Headline: Work & Play, with a hat on each word ─────────────────────────
+   The resting bar only shows ~110px of the page, so type, hats and subline are
+   sized from the screen height, and the hats get their own headroom (the scroll
+   container clips anything above it). */
+.wp-title {
+  --hat: clamp(22px, 4vh, 30px);
+  margin: 0; padding-top: calc(var(--hat) * .72);
+  font-size: clamp(24px, 4.8vh, 32px); font-weight: 500; letter-spacing: -0.035em; line-height: 1.05;
+}
+.wp-word { position: relative; display: inline-block; }
 .wp-hat {
-  flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 16px;
-  border: 1.5px solid var(--border); background: color-mix(in srgb, var(--hat) 20%, var(--background));
+  position: absolute; width: var(--hat); height: var(--hat); top: calc(var(--hat) * -.72);
+  pointer-events: none; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .2)); transform-origin: 50% 100%;
 }
-.wp-hat svg { width: 30px; height: 30px; flex: none; overflow: visible; }
-.wp-hat b { display: block; font-size: 14px; line-height: 1.1; font-weight: 600; color: var(--foreground); }
-.wp-hat span { display: block; font-size: 11px; line-height: 1.3; color: var(--muted-foreground); }
-.wp-hat-long { display: none !important; }
+.wp-hat svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.wp-hat-a { left: calc(var(--hat) * .06); transform: rotate(-12deg); }
+.wp-hat-b { right: calc(var(--hat) * -.3); transform: rotate(10deg); }
+.wp-sub { margin: 6px 0 0; font-size: clamp(12px, 2.1vh, 13px); line-height: 1.3; color: var(--muted-foreground); }
 @media (min-width: 768px) {
-  .wp-hats { flex: none; gap: 14px; margin: 0 56px 0 auto; }
-  .wp-hat { flex: none; gap: 12px; padding: 10px 18px 10px 10px; border-radius: 20px; box-shadow: 0 8px 18px -12px rgba(0, 0, 0, .25); }
-  .wp-hat svg { width: 44px; height: 44px; }
-  .wp-hat b { font-size: 17px; }
-  .wp-hat span { font-size: 12px; }
-  .wp-hat-long { display: inline !important; }
+  .wp-title { --hat: clamp(28px, 4.2vh, 38px); font-size: min(clamp(30px, 5.2vh, 46px), 6vw); }
+  .wp-sub { margin-top: 4px; font-size: clamp(13px, 2vh, 15px); }
 }
+@media (min-width: 768px) and (max-height: 700px) { .wp-sub { display: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .wp-hat-a { animation: wp-sway-a 5s ease-in-out infinite; }
+  .wp-hat-b { animation: wp-sway-b 6s ease-in-out infinite .6s; }
+}
+@keyframes wp-sway-a { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(-8deg) translateY(-1px); } }
+@keyframes wp-sway-b { 0%, 100% { transform: rotate(10deg); } 50% { transform: rotate(6deg) translateY(-1px); } }
