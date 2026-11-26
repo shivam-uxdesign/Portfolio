@@ -121,7 +121,7 @@ export function RootLayout() {
     const s = N.w / from.w, dx = N.x - from.x;
     const ty = (y: number) => y - from.y; // a top-left y → translateY for A/B
     // Sticker outline (dark pages): sized in the head's own space so it lands at the bar's width after the shrink.
-    for (const el of [A, B]) { el.toggleAttribute('data-ring', !!t.dark); el.style.setProperty('--ring', `${0.95 / s}px`); }
+    for (const el of [A, B]) { el.toggleAttribute('data-ring', !!t.dark); }
     const anims: Animation[] = [];
     const o = { duration: OUT_MS, fill: 'forwards' as FillMode };
 
@@ -203,7 +203,7 @@ export function RootLayout() {
       { transform: `translateY(${P}px)`, offset: at(250, HOME_MS), easing: EASE_IN_OUT },
       { transform: `translateY(${E}px)` },
     ];
-    for (const el of [A, B]) { el.toggleAttribute('data-ring', meta?.theme === 'dark'); el.style.setProperty('--ring', window.innerWidth >= 768 ? '1.05px' : '.9px'); }
+    for (const el of [A, B]) { el.toggleAttribute('data-ring', meta?.theme === 'dark'); }
     card.classList.add('pc-card-moving');
     anims.push(card.animate(sink, o));
     // The ghost rides with the page and fades in over it, becoming an empty

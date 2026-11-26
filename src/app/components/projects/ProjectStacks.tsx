@@ -1,3 +1,4 @@
+import { ThumbImg } from '../ThumbImg';
 import { useRef } from 'react';
 import type { ProjectGroup, ProjectGroupId, ProjectItem } from './types';
 import './projects.css';
@@ -6,7 +7,7 @@ function CardFace({ item }: { item: ProjectItem }) {
   return (
     <div className="ps-face" style={{ background: item.bg }}>
       {item.image
-        ? <img src={item.image} alt="" loading="lazy" draggable={false} onError={e => { e.currentTarget.style.visibility = 'hidden'; }} />
+        ? <ThumbImg src={item.image} />
         : item.thumbnail ? <div className="ps-thumb">{item.thumbnail}</div> : null}
     </div>
   );

@@ -1,7 +1,7 @@
 
-  # Portfolio Website Design
+  # shivamdesign.in
 
-  This is a code bundle for Portfolio Website Design. The original project is available at https://www.figma.com/design/dR3ATvRmqBK6qfGoxdFJLh/Portfolio-Website-Design.
+  Shivam Sehgal's portfolio. The original project is available at https://www.figma.com/design/dR3ATvRmqBK6qfGoxdFJLh/Portfolio-Website-Design.
 
   Deployed on Vercel.
 

@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
 
+/** short = [before, highlighted, after] */
+export interface Impact { big: string; sub: string; note?: string; short?: [string, string, string] }
+
 export interface ProjectItem {
   title: string;
   descriptor: string;
@@ -13,6 +16,8 @@ export interface ProjectItem {
   thumbnail?: ReactNode;
   image?: string;
   tag?: string;
+  /** The result, for the first glance: a big figure, what it measures, and a short line for small tiles. */
+  impact?: Impact;
 }
 
 export type ProjectGroupId = 'work' | 'fun';

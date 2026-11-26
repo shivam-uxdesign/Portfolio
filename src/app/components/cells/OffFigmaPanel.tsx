@@ -4,7 +4,6 @@ import './offfigma.css';
 
 // Off Figma: six cover cards in two rows — things I make, things I'm into.
 // Each card previews its page with a simple emblem (not the page's content).
-const SERIF = "'Playfair Display', Georgia, serif";
 
 interface Interest { label: string; line: string; to: string; color: string; tint: string; emblem: ReactNode }
 
@@ -49,7 +48,7 @@ export function OffFigmaPanel() {
       <header className="of-head">
         <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase mb-3">Off Figma</p>
         <h2 className="of-title text-foreground">
-          What I <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>make</span>, and what I'm into.
+          What I <span className="em">make</span>, and what I'm into.
         </h2>
       </header>
       {ROWS.map(row => (

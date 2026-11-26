@@ -128,7 +128,8 @@ function CellContent({ id }: { id: SheetCellId }) {
     );
     case 'interests': return <ScrollCell><section className="sh-page sh-page-fixed"><InterestsCell /></section></ScrollCell>;
     case 'stack': return <ScrollCell><section className="sh-page sh-page-fixed"><StackPanel /></section></ScrollCell>;
-    case 'resume': return <ScrollCell><section className="sh-page sh-page-fixed"><ResumeCell /></section></ScrollCell>;
+    // Resume grows with its content and scrolls when the window is short, instead of squeezing the cards.
+    case 'resume': return <ScrollCell><section className="sh-page"><ResumeCell /></section></ScrollCell>;
     case 'contact': return <ScrollCell><section className="sh-page"><ContactCell /></section></ScrollCell>;
   }
 }
@@ -182,7 +183,7 @@ const HeroPane = memo(function HeroPane({ onEngine }: { onEngine: (e: HatsEngine
 
   return (
     <div className="hh-cell w-full h-full flex flex-col items-center justify-center gap-3 md:gap-4 select-text overflow-hidden">
-      <div className="hh-text order-1 md:order-2 flex-shrink-0 flex flex-col items-center text-center w-full" style={{ '--hh-accent': PAL[hat].accent } as React.CSSProperties}>
+      <div className="hh-text order-1 md:order-2 flex-shrink-0 flex flex-col items-center text-center w-full" style={{ '--hh-accent': PAL[hat].accent, '--hh-ink': PAL[hat].ink } as React.CSSProperties}>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
           className="text-[11px] font-medium tracking-[0.09em] text-muted-foreground uppercase mb-1.5">
           Hey, I am

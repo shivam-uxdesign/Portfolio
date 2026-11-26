@@ -6,13 +6,14 @@
   --card-foreground: #1C1C1A;
   --popover: #FFFFFF;
   --popover-foreground: #1C1C1A;
-  --primary: #8A9E7B;
+  --primary: #3F63CF;
+  --em: #3F63CF; /* emphasis in text: bold + this colour (5.4:1 on white) */
   --primary-foreground: #FFFFFF;
   --secondary: #F2F1EF;
   --secondary-foreground: #1C1C1A;
   --muted: #E8E7E4;
   --muted-foreground: #5A5A56;
-  --accent: #8A9E7B;
+  --accent: #3F63CF;
   --accent-foreground: #FAF9F6;
   --destructive: #d4183d;
   --destructive-foreground: #ffffff;
@@ -22,7 +23,7 @@
   --switch-background: #cbced4;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #8A9E7B;
+  --ring: #3F63CF;
   --accent-blue: #5B8FBF;
   --accent-tan: #B8865C;
   --chart-1: oklch(0.646 0.222 41.116);
@@ -175,3 +176,8 @@
   background-size: 250% 100%;
   animation: shimmer-sweep 1.8s ease-in-out infinite;
 }
+
+
+/* Emphasis: the highlighted word in a headline or line. Bold, in the deeper accent, same face as the text.
+   (Replaces the serif italic. The colour follows the hat that is worn: themeVars sets --em.) */
+.em { font-style: normal; font-weight: 700; color: var(--em); font-variant-numeric: lining-nums; }

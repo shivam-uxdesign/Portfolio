@@ -145,7 +145,9 @@ export function FloatingDeck({ group, trigger, anchor, onClose }: { group: Proje
                 <span className="fd-meta">
                   <span className="fd-tag">{item.tag}</span>
                   <span className="fd-title">{item.title}</span>
-                  <span className="fd-desc">{item.descriptor}</span>
+                  {item.impact
+                    ? <><span className="fd-big">{item.impact.big}</span><span className="fd-sub">{item.impact.sub}</span></>
+                    : <span className="fd-desc">{item.descriptor}</span>}
                   <span className="fd-cta">{item.cta ?? (group.id === 'work' ? 'Read case study' : 'Try it')} <span aria-hidden="true">→</span></span>
                 </span>
               </span>

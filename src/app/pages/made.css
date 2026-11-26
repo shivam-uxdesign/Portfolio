@@ -1,0 +1,25 @@
+/* Cool stuff: things made by hand, one short section per craft, photos in justified rows. */
+.md { max-width: 1180px; margin: 0 auto; padding: 84px 24px 80px; color: var(--foreground); }
+@media (min-width: 768px) { .md { padding: 96px 48px 96px; } }
+.md-label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); margin: 0 0 14px; }
+.md-title { font-size: clamp(34px, 6vw, 60px); line-height: 1.04; letter-spacing: -.03em; font-weight: 500; margin: 0; }
+.md-title em, .md-h2 em { font-style: normal; font-weight: 700; color: var(--em); }
+.md-lede { margin: 18px 0 0; font-size: 16px; line-height: 1.6; color: var(--muted-foreground); max-width: 56ch; }
+
+.md-sec { margin-top: 56px; }
+.md-h2 { margin: 0; font-size: clamp(22px, 3vw, 28px); letter-spacing: -.02em; font-weight: 500; }
+.md-sub { margin: 4px 0 0; font-size: 14px; color: var(--muted-foreground); }
+.md-grid { list-style: none; padding: 0; margin: 18px 0 0; display: flex; flex-wrap: wrap; gap: 12px; --row: 228px; }
+@media (max-width: 760px) { .md-grid { --row: 150px; } }
+/* Justified rows: width and growth both follow the photo's ratio, so every photo in a row ends up the same height. The spacer keeps a short last row from stretching. */
+.md-grid li { flex: var(--r) 1 calc(var(--r) * var(--row)); min-width: 0; }
+.md-grid::after { content: ""; flex: 999 1 0; }
+.md-tile { display: block; width: 100%; padding: 0; border: 0; border-radius: 12px; overflow: hidden; cursor: zoom-in; background: var(--muted, #f2f2f0); aspect-ratio: var(--r); }
+.md-tile img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+@media (hover: hover) { .md-tile:hover img { transform: scale(1.03); } }
+.md-tile:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+
+.md-view { position: fixed; inset: 0; z-index: 80; background: rgba(20,18,14,.88); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+.md-view img { max-width: min(92vw, 1100px); max-height: 86vh; object-fit: contain; border-radius: 8px; }
+.md-view p { position: absolute; left: 0; right: 0; bottom: 18px; text-align: center; color: #EDEAE3; font-size: 14px; margin: 0; }
+.md-close { position: absolute; top: 16px; right: 16px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #fff; font-size: 22px; cursor: pointer; }

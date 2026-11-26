@@ -4,7 +4,6 @@ import './about.css';
 
 // About: one sentence, a small stack of prints, three facts.
 // Nothing moves on its own; tap the stack to shuffle the top print to the back.
-const SERIF = "'Playfair Display', Georgia, serif";
 
 const FACTS = [
   { k: 'Trained', v: 'B.FA, JJ School of Art · M.Des, NIFT Delhi' },
@@ -62,7 +61,7 @@ function PrintStack() {
             <span className="ab-photo">
               <img src={img.src} alt="" loading={depth < 2 ? 'eager' : 'lazy'} draggable={false} onError={e => { e.currentTarget.style.visibility = 'hidden'; }} />
             </span>
-            <figcaption style={{ fontFamily: SERIF }}>{img.title}</figcaption>
+            <figcaption>{img.title}</figcaption>
           </figure>
         );
       })}
@@ -77,7 +76,7 @@ export function AboutPanel() {
         <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase mb-3">About</p>
         <h2 className="ab-title text-foreground">
           Designer by{' '}
-          <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>training</span>,
+          <span className="em">training</span>,
           {' '}problem solver by instinct, cat lover by default.
         </h2>
         <dl className="ab-facts">
@@ -91,7 +90,7 @@ export function AboutPanel() {
       </div>
       <div className="ab-media">
         <PrintStack />
-        <p className="ab-hint">Process and practice · tap to shuffle</p>
+        <p className="ab-hint">Off the clock · tap to shuffle</p>
       </div>
     </div>
   );

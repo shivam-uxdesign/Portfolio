@@ -1,0 +1,17 @@
+/* Books: the honest reading list. Real covers, one true line each. */
+.bk { max-width: 1080px; margin: 0 auto; padding: 84px 24px 80px; color: var(--foreground); }
+@media (min-width: 768px) { .bk { padding: 96px 48px 96px; } }
+.bk-label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); margin: 0 0 14px; }
+.bk-title { font-size: clamp(34px, 6vw, 60px); line-height: 1.04; letter-spacing: -.03em; font-weight: 500; margin: 0; }
+.bk-title em { font-style: normal; font-weight: 700; color: var(--em); }
+.bk-lede { margin: 18px 0 0; font-size: 16px; line-height: 1.6; color: var(--muted-foreground); max-width: 52ch; }
+
+.bk-shelf { list-style: none; padding: 0; margin: 48px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); gap: 40px 48px; }
+.bk-book { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 20px; align-items: start; }
+.bk-cover { width: 120px; aspect-ratio: 322 / 500; object-fit: cover; border-radius: 2px 6px 6px 2px; transform: rotate(-2deg);
+  box-shadow: inset 4px 0 6px -4px rgba(0,0,0,.35), 0 18px 28px -18px rgba(0,0,0,.45), 0 2px 4px rgba(0,0,0,.12); }
+.bk-name { margin: 4px 0 0; font-size: 18px; font-weight: 600; letter-spacing: -.01em; line-height: 1.25; }
+.bk-by { margin: 4px 0 0; font-size: 13px; color: var(--muted-foreground); }
+.bk-status { display: inline-block; margin-top: 12px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--primary);
+  border: 1px solid color-mix(in oklab, var(--primary) 40%, transparent); border-radius: 99px; padding: 4px 10px; }
+.bk-line { margin: 12px 0 0; font-style: italic; font-size: 16px; line-height: 1.5; color: var(--foreground); }
