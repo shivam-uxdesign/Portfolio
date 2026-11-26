@@ -381,6 +381,22 @@ html[data-embedded] .rideSticky,html[data-embedded] .sticky{top:68px}
 html[data-embedded] .hud{margin-top:76px}
 html[data-embedded] #tldr .wrap{padding-top:84px}
 @media (max-width:900px){html[data-embedded] .sticky{position:static}}
+/* in testing */
+.testing{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:999px;background:#1B1740;color:#A5A1FF;font:600 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;vertical-align:middle;white-space:nowrap}
+.testing::before{content:"";width:6px;height:6px;border-radius:50%;background:#A5A1FF}
+.next{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:36px}
+.nextCard{background:var(--surface);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.nextCard .testing{align-self:flex-start}
+.nextCard h3{font-size:20px}
+.nextCard p{color:var(--body);font-size:15px}
+.nextCard .phone{max-width:min(230px,calc(var(--fitH) * 390 / 844));border-width:6px;border-radius:30px;margin-top:auto}
+.nextCard .note{font:500 11px/1.3 var(--mono);color:var(--muted);text-align:center}
+@media (max-width:900px){.next{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.next{grid-template-columns:1fr}}
+.ui .chip{display:inline-block;padding:7px 10px;border-radius:999px;background:var(--raised);font-size:12px;font-weight:500}
+.ui .trk{display:flex;align-items:center;gap:6px;margin-top:6px}
+.ui .trk span{font:500 9px/1 var(--mono);color:var(--muted);width:44px;flex:none}
+.ui .trk i{height:14px;border-radius:4px;display:block}
 </style>
 
 <header class="top">
@@ -392,8 +408,10 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
     <nav aria-label="Sections">
       <a href="#ride">One ride</a>
       <a href="#studio">Studio</a>
-      <a href="#audit">Redesign</a>
       <a href="#problems">Hard problems</a>
+      <a href="#keep-moving">Keep moving</a>
+      <a href="#redesign">Redesign</a>
+      <a href="#testing">In testing</a>
       <a href="#decisions">Decisions</a>
       <a href="#economics">Business</a>
       <a href="#built">How it got built</a>
@@ -488,7 +506,7 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
             <li>Samples and events are written every 2 s, so a ride cut short by a crash or a killed app is offered back on Home.</li>
             <li>Battery forecast from the last 10 min of drain; warns once each at 30%, 15% and under 20 min left.</li>
           </ul></div>
-          <p class="why"><b>Decision:</b> no auto-start when you ride off. A false start costs battery and storage on every short errand, so starting stays one deliberate slide.</p>
+          <p class="why"><b>Decision:</b> no silent auto-start. A false start costs battery and storage on every short errand, so starting is one deliberate slide, or the engine turning on, with 3 seconds to cancel <span class="testing">In testing</span>.</p>
           <div class="chPhoneInline"><div class="phone sm"><img src="img/home-before-you-ride.webp" alt="Home: ready to ride, Moments, Film when I speak and Keep moving on" loading="lazy"></div></div>
         </article>
 
@@ -512,9 +530,8 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
           <div class="under"><span class="label">Underneath</span><ul>
             <li>The camera keeps the last seconds in memory; a 0.5 g brake, a lean past your own setting or your voice saves them plus what follows.</li>
             <li>Clips under 5 s apart are joined after the ride, so one moment isn't three files.</li>
-            <li>Tags written on the phone for free: "0–60 km/h in 4.8 s", and what's in frame (Road, Sky, Mountain) from three frames.</li>
           </ul></div>
-          <p class="why"><b>Decision:</b> scene labels come from Google's free on-phone labeller, not Gemini. A cloud description would cost a request per clip, and a long ride has 70 clips.</p>
+          <p class="why"><b>Decision:</b> a lean past your own setting counts too, so a great corner is kept like a hard stop. Each clip is tagged on the phone for free.</p>
           <div class="chPhoneInline"><div class="phone sm"><img src="img/share-hud.webp" alt="A moment shared with the HUD overlay" loading="lazy"></div></div>
         </article>
 
@@ -560,9 +577,7 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
           <h3>A break isn't a red light.</h3>
           <p>At the café the ride counts a break, not a stop at a signal. A routine you set up ends and saves the ride when you arrive, and the summary is ready: route, lean, braking, every moment on the map.</p>
           <div class="under"><span class="label">Underneath</span><ul>
-            <li>A stop becomes a break when the phone leaves its mount (tilted over 35° for 20 s) or the engine is off for a minute.</li>
-            <li>Riding again needs 4 m/s for 3 s and 100 m from where you stopped, so walking around with the phone doesn't count.</li>
-            <li>GPS fixes worse than 25 m never add distance; jumps faster than 90 m/s are thrown out.</li>
+            <li>A stop becomes a break when the phone leaves its mount or the engine is off for a minute.</li>
           </ul></div>
           <p class="why"><b>Decision:</b> auto-pause never ends a ride by itself. Losing the end of a ride is worse than a long one.</p>
           <div class="chPhoneInline"><div class="phone sm"><img src="media/04-ride-summary.webp" alt="Ride saved: the summary with distance, time, speeds, the route map and ride dynamics" loading="lazy"></div></div>
@@ -601,6 +616,7 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
             <li>An impact over 4 g while moving over 15 km/h, or a slide past 60° of lean; then the bike stays down or still.</li>
             <li>SMS, not internet: tried again every 30 s when there's no signal.</li>
             <li>No GPS fix yet? The last known place goes out, with how old it is.</li>
+            <li>Who gets the text, and your medical info, are set once in Safety.</li>
           </ul></div>
           <p class="why"><b>Decision:</b> free, on by default, no account. Safety is never behind the paywall.</p>
           <p class="why"><b>On my bike:</b> 49 rides and 536 km so far, and not one false alarm.</p>
@@ -662,11 +678,11 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
       <div class="stack" style="gap:26px">
         <div class="steps" id="stSteps">
           <button class="step" type="button" aria-current="true" data-shot="0"><span class="k">01 · After the ride</span><h3>Ideas are waiting when you park</h3><p>The ride ends, and Studio starts reading it if the battery is above half; otherwise it waits for Wi-Fi. Each card is one moment told a few ways, swipe up for the next. A long Reel of the whole ride always gets its own card.</p></button>
-          <button class="step" type="button" aria-current="false" data-shot="1"><span class="k">02 · Your words lead</span><h3>Built on what you said, Hinglish and all</h3><p>"Paani nahi piya" becomes the hook, not a stock "epic ride" caption. Long pauses, umms and false starts are cut so your voice runs on, and captions follow your words as you said them.</p></button>
-          <button class="step" type="button" aria-current="false" data-shot="2"><span class="k">03 · Ask across all rides</span><h3>"All my downshifts." "Every rainy bit from October."</h3><p>Ask in plain words. Only the ask goes to Gemini, which turns it into a filter; the phone searches its own notes on every clip and finds the moments itself. Themes that keep coming back, a phrase or the traffic police, become compilations.</p></button>
+          <button class="step" type="button" aria-current="false" data-shot="1"><span class="k">02 · Your words lead</span><h3>Built on what you said, Hinglish and all</h3><p>"Paani nahi piya" becomes the hook, not a stock "epic ride" caption. Long pauses, umms and false starts are cut so your voice runs on, and captions follow your words as you said them. Then Studio writes the script around your lines: the hook, the beats, the captions.</p></button>
+          <button class="step" type="button" aria-current="false" data-shot="2"><span class="k">03 · Ask across all rides <span class="testing">In testing</span></span><h3>"All my downshifts." "Every rainy bit from October."</h3><p>Ask in plain words. Only the ask goes to Gemini, which turns it into a filter; the phone searches its own notes on every clip and finds the moments itself. Themes that keep coming back, a phrase or the traffic police, become compilations.</p></button>
           <button class="step" type="button" aria-current="false" data-shot="3"><span class="k">04 · The engine is a soundtrack</span><h3>Downshifts found from the sound itself</h3><p>The engine's pitch tracks its revs, so downshifts are found on the phone from sound and speed, no OBD needed. Horns are notched out of the engine track without touching the engine around them, and the song dips when you talk.</p></button>
-          <button class="step" type="button" aria-current="false" data-shot="4"><span class="k">05 · A real editor</span><h3>Timeline, sound desk, styles, 4K</h3><p>Rows that never hide each other, speed ramps, freeze, reverse, reframe, transitions per cut, a fader per sound, and styles that carry a look, a font and the camera's moves. What the preview shows is what gets made.</p></button>
-          <button class="step" type="button" aria-current="false" data-shot="5"><span class="k">06 · Storyboard</span><h3>Plan the shots before the ride</h3><p>Chat an idea into a script and a shot list that knows your gear: which camera, which mount, where the tripod goes. The app checks the board itself (lines too long, shots your gear can't film) and puts "Tripod at the tunnel exit: shots 03, 11" on the ride screen.</p></button>
+          <button class="step" type="button" aria-current="false" data-shot="4"><span class="k">05 · A real editor <span class="testing">New toolbar in testing</span></span><h3>Timeline, sound desk, styles, 4K</h3><p>Rows that never hide each other, speed ramps, freeze, reverse, reframe, transitions per cut, a fader per sound, and styles that carry a look, a font and the camera's moves. What the preview shows is what gets made.</p></button>
+          <button class="step" type="button" aria-current="false" data-shot="5"><span class="k">06 · Storyboard <span class="testing">Revamp in testing</span></span><h3>Plan the shots before the ride</h3><p>Chat an idea into a script and a shot list that knows your gear: which camera, which mount, where the tripod goes. The app checks the board itself (lines too long, shots your gear can't film) and puts "Tripod at the tunnel exit: shots 03, 11" on the ride screen.</p></button>
           <button class="step" type="button" aria-current="false" data-shot="6"><span class="k">07 · Series and posting</span><h3>One post a day, and it learns what worked</h3><p>A series like "Delhi Commute Diaries" gets a brief, a look and episode numbers, and new rides are checked for moments that fit. Posts line up one a day at your usual time, the first 3 seconds get a hook check, and a day later: "How did it do?"</p></button>
         </div>
         <p class="why" style="font-size:15px"><b style="color:var(--teal)">Decision:</b> the AI listens, describes and plans; everything else happens on the phone. Cutting, colour, sound and the video itself are made there, downshifts and horns are found there, and nothing goes to Gemini without the rider's OK.</p>
@@ -677,8 +693,8 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
           <div class="layer" aria-hidden="true"><img src="media/screens/moment.webp" alt="A moment: the clip, voice and engine sound, telemetry, the cleaned transcript and tags" loading="lazy"></div>
           <div class="layer" aria-hidden="true"><img src="media/screens/studio-ask.webp" alt="Studio across all rides: a compilation of every time I said ho gaya, an older idea, and suggested asks" loading="lazy"></div>
           <div class="layer" aria-hidden="true"><img src="media/screens/moments.webp" alt="Moments settings: hard braking, acceleration, lean, voice, and revs and exhaust pops from the engine mic" loading="lazy"></div>
-          <div class="layer" aria-hidden="true"><div class="ph"><b>Editor</b><span>The timeline editor wasn't in the screen recording. Coming with the next one.</span></div></div>
-          <div class="layer" aria-hidden="true"><div class="ph"><b>Storyboard</b><span>Storyboard wasn't in the screen recording. Coming with the next one.</span></div></div>
+          <div class="layer" aria-hidden="true"><div class="ui" data-ui="editor"></div></div>
+          <div class="layer" aria-hidden="true"><div class="ui" data-ui="storyboard"></div></div>
           <div class="layer" aria-hidden="true"><img src="media/screens/your-reels.webp" alt="Your Reels: three ready to watch, the Testing series with its next episode, and every Reel marked ready or draft" loading="lazy"></div>
         </div>
         <p class="cap" id="stCap">Studio, redesigned. Rebuilt from the app with my own clips.</p>
@@ -797,25 +813,10 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
       <article class="mini rise">
         <span class="pnum">05 · Data honesty</span>
         <h3>Never show a 0 you don't know.</h3>
-        <p>A ride app that shows 0 km/h when GPS drops, or a 140 km/h top speed from one bad fix, loses the rider's trust in every number.</p>
-        <div class="under"><span class="label">What I decided</span><ul>
-          <li>Unknown values show as --, never 0.</li>
-          <li>Fixes worse than 25 m never add distance; low-accuracy fixes never become top speed.</li>
-          <li>Lean and g-force are labelled estimates; maxima only come from good readings while moving.</li>
-        </ul></div>
+        <p>Unknown values show as --, never 0. One bad GPS fix never becomes a top speed, and lean and g-force are labelled as estimates.</p>
       </article>
       <article class="mini rise">
-        <span class="pnum">06 · Cost per ride</span>
-        <h3>Every cloud call is a design decision.</h3>
-        <p>A free app with AI and live traffic can cost more per ride than it earns. I treated price as a design material, next to layout and copy.</p>
-        <div class="under"><span class="label">What I decided</span><ul>
-          <li>Free first: on-phone labels, on-phone voice detection, traffic warnings from data already on screen.</li>
-          <li>A route request (about ₹1.3) only when the rider didn't take the free turn.</li>
-          <li>No paid route server (₹1,500–3,000 a month) until rides prove Google misses side roads.</li>
-        </ul></div>
-      </article>
-      <article class="mini rise">
-        <span class="pnum">07 · A screen at 60 km/h</span>
+        <span class="pnum">06 · A screen at 60 km/h</span>
         <h3>Nothing behind a tap. No voice. No vibration.</h3>
         <p>A riding app is used in glances, with gloves, on a vibrating mount. Most mobile patterns assume the opposite: a free hand and full attention.</p>
         <div class="under"><span class="label">What I decided</span><ul>
@@ -825,19 +826,10 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
         </ul></div>
       </article>
       <article class="mini rise">
-        <span class="pnum">08 · Permissions as design</span>
-        <h3>The two most sensitive permissions are the most useful.</h3>
-        <p>Sending SMS (crash alerts) and reading SMS (fuel from card payments) are restricted on Google Play and need a declared, narrow purpose.</p>
-        <div class="under"><span class="label">What I decided</span><ul>
-          <li>Each asked for in context, at the moment it's needed, with why.</li>
-          <li>Only payment messages are read, on the phone; nothing about them leaves it.</li>
-          <li>The crash alert has a fallback when Android won't allow full-screen alerts.</li>
-        </ul></div>
-      </article>
-      <article class="mini rise">
-        <span class="pnum">09 · Rewards</span>
+        <span class="pnum">07 · Rewards</span>
         <h3>An app that never rewards riding faster.</h3>
         <p>Achievements drive habit, and the easy ones in a ride app are top speed and deepest lean. Those reward exactly the wrong thing.</p>
+        <div class="phone sm" style="max-width:200px;border-width:6px;border-radius:28px;margin:6px 0 0"><img src="media/screens/your-riding.webp" alt="Your riding: level, all-time numbers, this month, the riding year and the next badges" loading="lazy"></div>
         <div class="under"><span class="label">What I decided</span><ul>
           <li>Levels from Rookie to Legend.</li>
           <li>No speed or lean records, on purpose. Top speed stays on each ride as a fact, never a trophy.</li>
@@ -848,84 +840,39 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
   </div>
 </section>
 
-<!-- DECISION LOG -->
-<section id="decisions" aria-labelledby="dec-h">
-  <div class="wrap">
-    <span class="label">Decision log</span>
-    <h2 id="dec-h" style="margin-top:14px">What I chose, and what I said no to.</h2>
-    <p class="lede" style="margin-top:20px">From 149 numbered entries in my project log. Filter by what was at stake.</p>
-    <div class="chips" role="group" aria-label="Filter decisions" id="decChips">
-      <button type="button" data-f="all" aria-pressed="true">All</button>
-      <button type="button" data-f="safety" aria-pressed="false">Safety</button>
-      <button type="button" data-f="riding" aria-pressed="false">Riding UX</button>
-      <button type="button" data-f="cost" aria-pressed="false">Cost</button>
-      <button type="button" data-f="privacy" aria-pressed="false">Privacy</button>
-    </div>
-    <div class="decs" id="decs">
-      <article class="dec" data-c="cost"><span class="tag">COST · 25 Nov</span><h3>No paid route server</h3><div class="vs"><span>Own router, ₹1,500–3,000/mo</span><span class="won">Free first, prove the need</span></div><p>An on-phone router stays a plan, built only if test rides show Google misses side roads.</p><q>I don't really want to spend that much on a server.</q></article>
-      <article class="dec" data-c="riding"><span class="tag">RIDING UX · 25 Nov</span><h3>Nothing behind a tap</h3><div class="vs"><span>Tap to expand the HUD</span><span class="won">Everything at a glance</span></div><p>The directions dock shows status, three mics, speed, lean, gear, recording and the trip at once.</p><q>A tap is both risky and not a good UI for a riding app.</q></article>
-      <article class="dec" data-c="riding"><span class="tag">RIDING UX · 25 Nov</span><h3>Silent navigation</h3><div class="vs"><span>Spoken directions</span><span>Vibration</span><span class="won">Amber banner and edge</span></div><p>The phone is on a mount and the helmet mic is recording; voice and buzz both get in the way.</p><q>Phone will be on the mount, just subtle visual indications.</q></article>
-      <article class="dec" data-c="riding"><span class="tag">RIDING UX · 24 Nov</span><h3>Ride now, improve later</h3><div class="vs"><span>Wait 15 s for the best route</span><span class="won">Start, keep searching</span></div><p>No foot down's detour search runs in the background; the clearer road is offered when it's found.</p><q>Allow users to start riding while Google Maps looks for a perfect route.</q></article>
-      <article class="dec" data-c="cost"><span class="tag">COST · 24 Nov</span><h3>Free warning, paid switch last</h3><div class="vs"><span>Re-check every minute</span><span class="won">Warn, let me turn, then switch</span></div><p>Going off Google's route is free; asking for new routes isn't. The rider's own turn is the cheapest reroute.</p><q>5 second timer, no cooldown after that.</q></article>
-      <article class="dec" data-c="safety"><span class="tag">SAFETY</span><h3>Safety never behind the paywall</h3><div class="vs"><span>Crash alerts in Pro</span><span class="won">Free, on by default</span></div><p>Pro pays for Studio's AI; recording, crash alerts and the HUD stay free, with no account.</p></article>
-      <article class="dec" data-c="safety"><span class="tag">SAFETY · 20 Oct</span><h3>No speed or lean records</h3><div class="vs"><span>Top speed badges</span><span class="won">Levels, no records</span></div><p>Achievements were redesigned so nothing rewards riding faster or leaning harder.</p></article>
-      <article class="dec" data-c="cost"><span class="tag">COST · 20 Oct</span><h3>Labels on the phone, not in the cloud</h3><div class="vs"><span>Gemini describes each clip</span><span class="won">Free on-phone labeller</span></div><p>Sound keywords ride along with the transcript request already being made; no extra request per clip.</p></article>
-      <article class="dec" data-c="privacy"><span class="tag">PRIVACY</span><h3>AI only with consent</h3><div class="vs"><span>Transcribe by default</span><span class="won">"Write down what I say", opt-in</span></div><p>Rides stay on the phone; backup goes to the rider's own Google Drive, and only if they turn it on.</p></article>
-      <article class="dec" data-c="riding"><span class="tag">RIDING UX · 6 Nov</span><h3>My experience as a rule</h3><div class="vs"><span>Yellow is clear</span><span>Yellow is a jam</span><span class="won">Yellow ≈ a third of red</span></div><p>Then learned per rider, from their own rides.</p><q>When Google shows yellow there is a 20% chance it is jammed.</q></article>
-    </div>
-  </div>
-</section>
-
-
-<!-- KILLED -->
-<section id="killed" aria-labelledby="kill-h">
-  <div class="wrap">
-    <span class="label">What I cut</span>
-    <h2 id="kill-h" style="margin-top:14px;max-width:20ch">Saying no was half the design.</h2>
-    <div class="kills">
-      <div class="kill rise"><s>Spoken directions</s><p>Built, then removed. The helmet mic records the ride; a voice in it ruins the clip, and the screen is enough.</p></div>
-      <div class="kill rise"><s>Auto-start when you ride off</s><p>Parked. Every errand would become a ride, with battery and storage to match.</p></div>
-      <div class="kill rise"><s>MapTiler place search</s><p>Replaced after a test: it couldn't find a lot of local places. Google's search went in, with your places saved on the phone.</p></div>
-      <div class="kill rise"><s>Speed and lean records</s><p>Removed from achievements. An app that rewards riding faster shouldn't exist.</p></div>
-      <div class="kill rise"><s>Cloud descriptions for every clip</s><p>Swapped for the free on-phone labeller. Seventy requests a ride for "Road, Sky" wasn't worth it.</p></div>
-      <div class="kill rise"><s>A paid route server</s><p>₹1,500–3,000 a month, kept as a plan until real rides prove Google misses side roads.</p></div>
-      <div class="kill rise"><s>Friends and WhatsApp alerts</s><p>Parked and skipped. A ride app for one rider had to be excellent before it became social.</p></div>
-      <div class="kill rise"><s>"1 MIC", guessed by the app</s><p>The app used to decide which mic was which and flip its labels. Now the rider sets it once, and the app only warns.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- ECONOMICS -->
-<section id="economics" aria-labelledby="eco-h">
-  <div class="wrap">
-    <span class="label">The business underneath</span>
-    <h2 id="eco-h" style="margin-top:14px;max-width:22ch">A feature that cost ₹1,300 a rider, redesigned to about ₹140.</h2>
-    <p class="lede" style="margin-top:20px">The first plan for Keep moving re-checked traffic every minute. At Google's list price, a rider using it an hour a day would cost more than a subscription brings in. The fix was design, not engineering.</p>
-    <div class="eco">
-      <div class="ecoCard rise">
-        <span class="label">Keep moving, a daily rider, per month</span>
-        <div class="ecoBars" aria-label="Before: about 1,300 rupees. After: about 140 rupees.">
-          <div><span class="mono small">Re-check every minute</span><div class="eb"><i style="width:100%;background:var(--err)"></i></div><b class="tnum">≈ ₹1,300</b></div>
-          <div><span class="mono small">Free warnings, paid switch last</span><div class="eb"><i style="width:11%;background:var(--teal)"></i></div><b class="tnum">≈ ₹140</b></div>
-        </div>
-        <ul class="ecoList">
-          <li>Watching traffic uses what's already on screen: free.</li>
-          <li>Leaving Google's route is free; Google re-plans at no charge.</li>
-          <li>Per ride, a destination (≈ ₹2.2), a couple of route looks (≈ ₹1.3 each) and the odd switch (≈ ₹3.5).</li>
-        </ul>
-        <p class="small">Estimates at Google's list price, before monthly free allowances; 22 rides a month.</p>
+<!-- KEEP MOVING -->
+<section id="keep-moving" aria-labelledby="km-h">
+  <div class="wrap split">
+    <div class="stack" style="gap:26px">
+      <span class="label">Deep dive · Keep moving</span>
+      <h2 id="km-h">From one sentence to a shipped feature.</h2>
+      <blockquote class="quote">"A route from A to B with zero traffic. If there's traffic ahead, take another route; left, right, U-turn doesn't matter."<cite>6 Nov</cite></blockquote>
+      <div class="steps">
+        <button class="step" type="button" aria-current="true" data-shot="0"><span class="k">01 · Check before building</span><h3>Is Google's traffic true for a bike?</h3><p>A logger recorded Google's slow and jammed stretches every 2 minutes on my rides, to compare against how I actually moved.</p></button>
+        <button class="step" type="button" aria-current="false" data-shot="1"><span class="k">02 · Read the rules first</span><h3>Google's terms shaped the design</h3><p>Google's routes have to sit on Google's map, and its directions can't be read out by our own voice. So Keep moving got its own map screen, and the rest of the app kept its own map.</p></button>
+        <button class="step" type="button" aria-current="false" data-shot="2"><span class="k">03 · Three ways to ride</span><h3>Normal, Less traffic, No foot down</h3><p>Normal is Google's fastest at no extra cost. Less traffic picks the clearest of Google's routes. No foot down searches detours, counts traffic lights and accepts a longer ride.</p></button>
+        <button class="step" type="button" aria-current="false" data-shot="3"><span class="k">04 · Found on the road</span><h3>A crash, a fix and a build the same day</h3><p>"Unsupported travel mode: 3", sent from the roadside. The navigation SDK only follows a planned route in car mode; a fallback went in and a new build followed.</p></button>
+        <button class="step" type="button" aria-current="false" data-shot="4"><span class="k">05 · Your own traffic <span class="testing">In testing</span></span><h3>It learns which roads are clear for you</h3><p>Every ride records how you move on each 100 m, by hour and weekday. On a bike that differs from Google's car-based picture.</p></button>
+        <button class="step" type="button" aria-current="false" data-shot="5"><span class="k">06 · The offer</span><h3>A clearer road, for 5 seconds, no tap needed</h3><p>When a clearer road is worth it, the dock offers it with how much jam it saves and what it costs in time. Do nothing and you keep your road; the countdown means a gloved hand never has to dismiss it.</p></button>
       </div>
-      <div class="ecoCard rise">
-        <span class="label">Pro pays for the AI, and the AI is capped</span>
-        <div class="ecoRow"><span>Pro</span><b class="tnum">₹249 / month · ₹1,999 / year</b></div>
-        <div class="ecoRow"><span>Gemini, a rider who uses everything</span><b class="tnum">≈ $1–3 / month</b></div>
-        <div class="ecoRow"><span>Cap on AI spend</span><b>35% of what the rider pays</b></div>
-        <div class="ecoRow"><span>Crash alerts</span><b>₹0 to us: an SMS from the rider's own plan</b></div>
-        <p style="color:var(--body);font-size:15px;margin-top:6px">Cheaper models first for anything that only needs to hear words; at the cap, "You've made a lot today, more tomorrow". Free riders get one Reel a week, with no AI cost in the background.</p>
-        <div class="row" style="gap:18px;align-items:center;margin-top:6px">
-          <div class="phone sm" style="max-width:170px;border-width:6px;border-radius:26px;flex:none"><img src="img/paywall.webp" alt="The Pro paywall: turn every ride into a Reel, 7 days free, then 1,999 rupees a year" loading="lazy"></div>
-          <p style="color:var(--body);font-size:15px">The paywall sells Reels, captions and the fuel price. Crash alerts and ride stats are never on it.</p>
-        </div>
+    </div>
+    <div class="sticky">
+      <div class="phone" id="kmPhone">
+        <div class="layer"><div class="ph"><b>R2 · screen recording</b><span>Keep moving end to end: slide, Where to?, plan, Start, directions.</span></div></div>
+        <div class="layer" aria-hidden="true"><div class="ui"><div class="t">Google's terms</div><div class="s">What they meant for the design</div>
+          <div class="card"><b>Routes on Google's map only</b><div class="s" style="margin-top:4px">→ a map screen of its own for Keep moving</div></div>
+          <div class="card"><b>No own voice for its directions</b><div class="s" style="margin-top:4px">→ Google's navigation, silent</div></div>
+          <div class="card"><b>Keep only what's allowed</b><div class="s" style="margin-top:4px">→ store your own speed on a road, not Google's data</div></div></div></div>
+        <div class="layer" aria-hidden="true"><div class="ui"><div class="t">Keep moving</div><div class="s">To Cyber Hub</div>
+          <div class="row" style="gap:6px"><div class="card" style="flex:1;padding:8px">Normal</div><div class="card" style="flex:1;padding:8px">Less traffic</div><div class="card" style="flex:1;padding:8px;background:var(--teal-fill);border:2px solid var(--teal)">No foot down</div></div>
+          <div class="card"><div class="row"><b class="tnum">48 min · 23 km</b><span class="s" style="margin-left:auto;color:var(--teal)">NO JAMS</span></div><div class="s">200 m slow · 3 signals</div></div>
+          <div class="card row s"><span style="flex:1">Google's fastest: 42 min · 3 jams</span><span style="color:var(--warn)">+6 min</span></div></div></div>
+        <div class="layer" aria-hidden="true"><div class="ui"><div class="t">Error log</div><div class="s">From the rider's phone, 24 Nov</div>
+          <div class="card mono" style="font-size:11px;line-height:1.5;color:#fca5a5">IllegalArgumentException:<br>Unsupported travel mode: 3</div>
+          <div class="card s" style="color:var(--body)">Fix: ask for car mode (the planned route's two-wheeler mode wins on Google's side), and fall back to guiding through the detour points.</div>
+          <div class="card row"><span class="dot" style="background:var(--ok)"></span>Rebuilt the same day</div></div></div>
+        <div class="layer" aria-hidden="true"><div class="ui" data-ui="roads"></div></div>
+        <div class="layer" aria-hidden="true"><img src="img/c2-offer.webp" alt="Directions with a clearer-road offer: 400 m less jam, plus 1 minute, keep this road or switch now, 5-second countdown"></div>
       </div>
     </div>
   </div>
@@ -970,44 +917,6 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
   </div>
 </section>
 
-<!-- KEEP MOVING -->
-<section id="keep-moving" aria-labelledby="km-h">
-  <div class="wrap split">
-    <div class="stack" style="gap:26px">
-      <span class="label">Deep dive · Keep moving</span>
-      <h2 id="km-h">From one sentence to a shipped feature.</h2>
-      <blockquote class="quote">"A route from A to B with zero traffic. If there's traffic ahead, take another route; left, right, U-turn doesn't matter."<cite>6 Nov</cite></blockquote>
-      <div class="steps">
-        <button class="step" type="button" aria-current="true" data-shot="0"><span class="k">01 · Check before building</span><h3>Is Google's traffic true for a bike?</h3><p>A logger recorded Google's slow and jammed stretches every 2 minutes on my rides, to compare against how I actually moved.</p></button>
-        <button class="step" type="button" aria-current="false" data-shot="1"><span class="k">02 · Read the rules first</span><h3>Google's terms shaped the design</h3><p>Google's routes have to sit on Google's map, and its directions can't be read out by our own voice. So Keep moving got its own map screen, and the rest of the app kept its own map.</p></button>
-        <button class="step" type="button" aria-current="false" data-shot="2"><span class="k">03 · Three ways to ride</span><h3>Normal, Less traffic, No foot down</h3><p>Normal is Google's fastest at no extra cost. Less traffic picks the clearest of Google's routes. No foot down searches detours, counts traffic lights and accepts a longer ride.</p></button>
-        <button class="step" type="button" aria-current="false" data-shot="3"><span class="k">04 · Found on the road</span><h3>A crash, a fix and a build the same day</h3><p>"Unsupported travel mode: 3", sent from the roadside. The navigation SDK only follows a planned route in car mode; a fallback went in and a new build followed.</p></button>
-        <button class="step" type="button" aria-current="false" data-shot="4"><span class="k">05 · Your own traffic</span><h3>It learns which roads are clear for you</h3><p>Every ride records how you move on each 100 m, by hour and weekday. On a bike that differs from Google's car-based picture.</p></button>
-        <button class="step" type="button" aria-current="false" data-shot="5"><span class="k">06 · The offer</span><h3>A clearer road, for 5 seconds, no tap needed</h3><p>When a clearer road is worth it, the dock offers it with how much jam it saves and what it costs in time. Do nothing and you keep your road; the countdown means a gloved hand never has to dismiss it.</p></button>
-      </div>
-    </div>
-    <div class="sticky">
-      <div class="phone" id="kmPhone">
-        <div class="layer"><div class="ph"><b>R2 · screen recording</b><span>Keep moving end to end: slide, Where to?, plan, Start, directions.</span></div></div>
-        <div class="layer" aria-hidden="true"><div class="ui"><div class="t">Google's terms</div><div class="s">What they meant for the design</div>
-          <div class="card"><b>Routes on Google's map only</b><div class="s" style="margin-top:4px">→ a map screen of its own for Keep moving</div></div>
-          <div class="card"><b>No own voice for its directions</b><div class="s" style="margin-top:4px">→ Google's navigation, silent</div></div>
-          <div class="card"><b>Keep only what's allowed</b><div class="s" style="margin-top:4px">→ store your own speed on a road, not Google's data</div></div></div></div>
-        <div class="layer" aria-hidden="true"><div class="ui"><div class="t">Keep moving</div><div class="s">To Cyber Hub</div>
-          <div class="row" style="gap:6px"><div class="card" style="flex:1;padding:8px">Normal</div><div class="card" style="flex:1;padding:8px">Less traffic</div><div class="card" style="flex:1;padding:8px;background:var(--teal-fill);border:2px solid var(--teal)">No foot down</div></div>
-          <div class="card"><div class="row"><b class="tnum">48 min · 23 km</b><span class="s" style="margin-left:auto;color:var(--teal)">NO JAMS</span></div><div class="s">200 m slow · 3 signals</div></div>
-          <div class="card row s"><span style="flex:1">Google's fastest: 42 min · 3 jams</span><span style="color:var(--warn)">+6 min</span></div></div></div>
-        <div class="layer" aria-hidden="true"><div class="ui"><div class="t">Error log</div><div class="s">From the rider's phone, 24 Nov</div>
-          <div class="card mono" style="font-size:11px;line-height:1.5;color:#fca5a5">IllegalArgumentException:<br>Unsupported travel mode: 3</div>
-          <div class="card s" style="color:var(--body)">Fix: ask for car mode (the planned route's two-wheeler mode wins on Google's side), and fall back to guiding through the detour points.</div>
-          <div class="card row"><span class="dot" style="background:var(--ok)"></span>Rebuilt the same day</div></div></div>
-        <div class="layer" aria-hidden="true"><div class="ph"><b>Shot 19 · Your roads</b><span>The map of what the app learned from your rides.</span></div></div>
-        <div class="layer" aria-hidden="true"><img src="img/c2-offer.webp" alt="Directions with a clearer-road offer: 400 m less jam, plus 1 minute, keep this road or switch now, 5-second countdown"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- AUDIT AND REDESIGN -->
 <section id="audit" aria-labelledby="audit-h">
   <div class="wrap">
@@ -1027,29 +936,6 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
       <figure class="pair rise"><div class="pairPh"><span>Before</span><div class="phone"><img src="media/screens/before-moment-details.webp" alt="Before: moment details over a red video" loading="lazy"></div></div><div class="pairPh"><span class="after">After</span><div class="phone"><img src="media/screens/moment.webp" alt="After: the moment with the video in its own frame" loading="lazy"></div></div><figcaption><b>Moment</b>Text over a red-lit video, umms in the transcript, "know" and "she's" as tags. Now: the video in its own frame, a cleaned transcript, grouped tags.</figcaption></figure>
       <figure class="pair rise"><div class="pairPh"><span>Before</span><div class="phone"><img src="media/screens/before-profile.webp" alt="Before: Profile with stats, Pro and many settings" loading="lazy"></div></div><div class="pairPh"><span class="after">After</span><div class="phone"><img src="media/screens/you.webp" alt="After: You with the bike, safety status and settings" loading="lazy"></div></div><figcaption><b>Profile becomes You</b>Stats, badges, Pro and twelve settings in one scroll, Safety below Pro. Now: your bike, your safety status, then settings.</figcaption></figure>
       <figure class="pair rise"><div class="pairPh"><span>Before</span><div class="phone"><img src="media/screens/before-safety.webp" alt="Before: Safety with crash detection at the bottom" loading="lazy"></div></div><div class="pairPh"><span class="after">After</span><div class="phone"><img src="media/screens/safety.webp" alt="After: Safety with the warning and crash detection first" loading="lazy"></div></div><figcaption><b>Safety</b>The switch that matters was last, after the medical fields. Now: the warning first, then crash detection, then who gets the text.</figcaption></figure>
-    </div>
-  </div>
-</section>
-
-<!-- TOUR -->
-<section id="tour" aria-labelledby="tour-h">
-  <div class="wrap">
-    <span class="label">The rest of the app</span>
-    <h2 id="tour-h" style="margin-top:14px;max-width:20ch">Thirty-odd screens, each built for one glance.</h2>
-    <p class="lede" style="margin-top:20px">Scroll sideways. Screens are rebuilt from the app with my own rides, after the redesign below; contacts' phone numbers are made up.</p>
-    <div class="tour" role="list">
-      <figure role="listitem"><div class="phone"><img src="media/screens/home.webp" alt="Home: only the one problem shown, everything else collapsed into one line, then the ride switches, the bike and bike care" loading="lazy"></div><figcaption><b>Home</b>Only what needs you, then one slide to ride.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="media/screens/rides.webp" alt="Rides: each ride led by its route, with distance, time and moments" loading="lazy"></div><figcaption><b>Rides</b>Every ride, led by where you went.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="media/screens/ride-detail.webp" alt="Ride detail: the map with replay, labelled readouts, the speed chart and ride dynamics" loading="lazy"></div><figcaption><b>Ride detail</b>Map, replay, lean and braking, and a Reel one tap away.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="media/screens/your-riding.webp" alt="Your riding: level, all-time numbers, this month, the riding year and the next badges" loading="lazy"></div><figcaption><b>Your riding</b>Statistics and badges in one place.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="img/c2-filming.webp" alt="Directions while filming: the dock shows recording, mic bars, speed, lean and gear" loading="lazy"></div><figcaption><b>Directions, filming</b>The dock while a moment records.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="media/screens/share-video.webp" alt="Share ride as a 3D video: the part of the ride, the map speed and Create video" loading="lazy"></div><figcaption><b>Share a ride</b>A story card or a 3D video of the route.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="media/screens/you.webp" alt="You: the bike with care due, crash alerts on, and settings" loading="lazy"></div><figcaption><b>You</b>Your bike, your safety, your settings.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="media/screens/bike.webp" alt="Your bike: care items with done dates, and the fuel log" loading="lazy"></div><figcaption><b>Your bike</b>Care with done dates, and every fill.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="media/screens/safety.webp" alt="Safety: a warning first, crash detection, who gets the text, and medical info" loading="lazy"></div><figcaption><b>Safety</b>On by default, free, no account.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="media/screens/before-popup-hud.webp" alt="Pop-up HUD settings with a live preview and four layouts" loading="lazy"></div><figcaption><b>Pop-up HUD</b>Four layouts, over any app.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="media/screens/routines.webp" alt="Routines: ride start and ride end, each with when and what it does" loading="lazy"></div><figcaption><b>Routines</b>What happens when a ride starts or ends.</figcaption></figure>
-      <figure role="listitem"><div class="phone"><img src="img/paywall.webp" alt="The Pro paywall" loading="lazy"></div><figcaption><b>Pro</b>Reels and captions; safety stays free.</figcaption></figure>
     </div>
   </div>
 </section>
@@ -1096,6 +982,118 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
       <div class="node rise"><span class="k">FLOW</span><b>Routines</b><span>On start, on arrival</span></div>
       <div class="node rise"><span class="k">DATA</span><b>Backup and export</b><span>Own Drive, GPX, CSV</span></div>
       <div class="node rise"><span class="k">MONEY</span><b>Pro</b><span>Play billing, free Reels</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TOUR -->
+<section id="tour" aria-labelledby="tour-h">
+  <div class="wrap">
+    <span class="label">The rest of the app</span>
+    <h2 id="tour-h" style="margin-top:14px;max-width:20ch">Thirty-odd screens, each built for one glance.</h2>
+    <p class="lede" style="margin-top:20px">Scroll sideways. Screens are rebuilt from the app with my own rides, after the redesign below; contacts' phone numbers are made up.</p>
+    <div class="tour" role="list">
+      <figure role="listitem"><div class="phone"><img src="media/screens/home.webp" alt="Home: only the one problem shown, everything else collapsed into one line, then the ride switches, the bike and bike care" loading="lazy"></div><figcaption><b>Home</b>Only what needs you, then one slide to ride.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/rides.webp" alt="Rides: each ride led by its route, with distance, time and moments" loading="lazy"></div><figcaption><b>Rides</b>Every ride, led by where you went.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/ride-detail.webp" alt="Ride detail: the map with replay, labelled readouts, the speed chart and ride dynamics" loading="lazy"></div><figcaption><b>Ride detail</b>Map, replay, lean and braking, and a Reel one tap away.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/moment.webp" alt="A moment: the clip, voice and engine sound, telemetry, the cleaned transcript and tags" loading="lazy"></div><figcaption><b>A moment</b>The clip, what you said, and the engine on its own track.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/moments.webp" alt="Moments settings: hard braking, acceleration, lean, voice, and revs and exhaust pops from the engine mic" loading="lazy"></div><figcaption><b>Moments</b>Choose what starts a clip: braking, lean, voice, the engine.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/your-riding.webp" alt="Your riding: level, all-time numbers, this month, the riding year and the next badges" loading="lazy"></div><figcaption><b>Your riding</b>Statistics and badges in one place.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="img/c2-filming.webp" alt="Directions while filming: the dock shows recording, mic bars, speed, lean and gear" loading="lazy"></div><figcaption><b>Directions, filming</b>The dock while a moment records.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/share-video.webp" alt="Share ride as a 3D video: the part of the ride, the map speed and Create video" loading="lazy"></div><figcaption><b>Share a ride</b>A story card or a 3D video of the route.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/you.webp" alt="You: the bike with care due, crash alerts on, and settings" loading="lazy"></div><figcaption><b>You</b>Your bike, your safety, your settings.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/bike.webp" alt="Your bike: care items with done dates, and the fuel log" loading="lazy"></div><figcaption><b>Your bike</b>Care with done dates, and every fill.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/safety.webp" alt="Safety: a warning first, crash detection, who gets the text, and medical info" loading="lazy"></div><figcaption><b>Safety</b>On by default, free, no account.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/before-popup-hud.webp" alt="Pop-up HUD settings with a live preview and four layouts" loading="lazy"></div><figcaption><b>Pop-up HUD</b>Four layouts, over any app.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="media/screens/routines.webp" alt="Routines: ride start and ride end, each with when and what it does" loading="lazy"></div><figcaption><b>Routines</b>What happens when a ride starts or ends.</figcaption></figure>
+      <figure role="listitem"><div class="phone"><img src="img/paywall.webp" alt="The Pro paywall" loading="lazy"></div><figcaption><b>Pro</b>Reels and captions; safety stays free.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- IN TESTING -->
+<section id="testing" aria-labelledby="test-h">
+  <div class="wrap">
+    <span class="label">In testing</span>
+    <h2 id="test-h" style="margin-top:14px;max-width:20ch">Being built now, ridden next.</h2>
+    <p class="lede" style="margin-top:20px">These are in the app's test builds, and every build goes to my bike first. Screens marked mock-up are drawn in the app's own design system and get swapped for captures as each one ships.</p>
+    <div class="next">
+      <article class="nextCard rise"><span class="testing">In testing</span><h3>Ask across all rides</h3><p>"All my downshifts." "Every rainy bit from October." Only the ask goes to Gemini; the phone finds the moments itself.</p><div class="phone"><img src="media/screens/studio-ask.webp" alt="Studio across all rides: a compilation of every time I said ho gaya, an older idea, and suggested asks" loading="lazy"></div><span class="note">Captured from a test build</span></article>
+      <article class="nextCard rise"><span class="testing">In testing</span><h3>Storyboard, rebuilt</h3><p>Chat an idea in, get a script and a shot list that knows your gear: which camera, which mount, where the tripod goes.</p><div class="phone"><div class="ui" data-ui="storyboard"></div></div><span class="note">Mock-up</span></article>
+      <article class="nextCard rise"><span class="testing">In testing</span><h3>An editor toolbar</h3><p>Every tool one reach away, over a timeline where voice, engine and music never hide each other.</p><div class="phone"><div class="ui" data-ui="editor"></div></div><span class="note">Mock-up</span></article>
+      <article class="nextCard rise"><span class="testing">In testing</span><h3>Ride together</h3><p>A group ride shows who's ahead and who stopped. If anyone in the group goes down, everyone gets the alert.</p><div class="phone"><div class="ui" data-ui="friends"></div></div><span class="note">Mock-up</span></article>
+      <article class="nextCard rise"><span class="testing">In testing</span><h3>Your roads</h3><p>Google's traffic is drawn for cars. A logger compares it with how you actually moved, road by road and hour by hour.</p><div class="phone"><div class="ui" data-ui="roads"></div></div><span class="note">Mock-up</span></article>
+      <article class="nextCard rise"><span class="testing">In testing</span><h3>Start from the engine</h3><p>With an OBD adapter, the ride starts when the engine does, with 3 seconds to cancel. A walk to the shop never becomes a ride.</p><div class="phone"><div class="ui" data-ui="autostart"></div></div><span class="note">Mock-up</span></article>
+    </div>
+  </div>
+</section>
+
+<!-- DECISION LOG -->
+<section id="decisions" aria-labelledby="dec-h">
+  <div class="wrap">
+    <span class="label">Decision log</span>
+    <h2 id="dec-h" style="margin-top:14px">What I chose, and what I said no to.</h2>
+    <p class="lede" style="margin-top:20px">From 149 numbered entries in my project log. Filter by what was at stake.</p>
+    <div class="chips" role="group" aria-label="Filter decisions" id="decChips">
+      <button type="button" data-f="all" aria-pressed="true">All</button>
+      <button type="button" data-f="safety" aria-pressed="false">Safety</button>
+      <button type="button" data-f="riding" aria-pressed="false">Riding UX</button>
+      <button type="button" data-f="cost" aria-pressed="false">Cost</button>
+      <button type="button" data-f="privacy" aria-pressed="false">Privacy</button>
+    </div>
+    <div class="decs" id="decs">
+      <article class="dec" data-c="cost"><span class="tag">COST · 25 Nov</span><h3>No paid route server</h3><div class="vs"><span>Own router, ₹1,500–3,000/mo</span><span class="won">Free first, prove the need</span></div><p>An on-phone router stays a plan, built only if test rides show Google misses side roads.</p><q>I don't really want to spend that much on a server.</q></article>
+      <article class="dec" data-c="riding"><span class="tag">RIDING UX · 25 Nov</span><h3>Nothing behind a tap</h3><div class="vs"><span>Tap to expand the HUD</span><span class="won">Everything at a glance</span></div><p>The directions dock shows status, three mics, speed, lean, gear, recording and the trip at once.</p><q>A tap is both risky and not a good UI for a riding app.</q></article>
+      <article class="dec" data-c="riding"><span class="tag">RIDING UX · 25 Nov</span><h3>Silent navigation</h3><div class="vs"><span>Spoken directions</span><span>Vibration</span><span class="won">Amber banner and edge</span></div><p>The phone is on a mount and the helmet mic is recording; voice and buzz both get in the way.</p><q>Phone will be on the mount, just subtle visual indications.</q></article>
+      <article class="dec" data-c="riding"><span class="tag">RIDING UX · 24 Nov</span><h3>Ride now, improve later</h3><div class="vs"><span>Wait 15 s for the best route</span><span class="won">Start, keep searching</span></div><p>No foot down's detour search runs in the background; the clearer road is offered when it's found.</p><q>Allow users to start riding while Google Maps looks for a perfect route.</q></article>
+            <article class="dec" data-c="safety"><span class="tag">SAFETY</span><h3>Safety never behind the paywall</h3><div class="vs"><span>Crash alerts in Pro</span><span class="won">Free, on by default</span></div><p>Pro pays for Studio's AI; recording, crash alerts and the HUD stay free, with no account.</p></article>
+      <article class="dec" data-c="safety"><span class="tag">SAFETY · 20 Oct</span><h3>No speed or lean records</h3><div class="vs"><span>Top speed badges</span><span class="won">Levels, no records</span></div><p>Achievements were redesigned so nothing rewards riding faster or leaning harder.</p></article>
+            <article class="dec" data-c="privacy"><span class="tag">PRIVACY</span><h3>AI only with consent</h3><div class="vs"><span>Transcribe by default</span><span class="won">"Write down what I say", opt-in</span></div><p>Rides stay on the phone; backup goes to the rider's own Google Drive, and only if they turn it on.</p></article>
+      <article class="dec" data-c="riding"><span class="tag">RIDING UX · 6 Nov</span><h3>My experience as a rule</h3><div class="vs"><span>Yellow is clear</span><span>Yellow is a jam</span><span class="won">Yellow ≈ a third of red</span></div><p>Then learned per rider, from their own rides.</p><q>When Google shows yellow there is a 20% chance it is jammed.</q></article>
+    </div>
+    <span class="label" style="display:block;margin-top:48px">Also cut</span>
+    <div class="kills" style="margin-top:16px">
+      <div class="kill rise"><s>Spoken directions</s><p>Built, then removed. The helmet mic records the ride; a voice in it ruins the clip, and the screen is enough.</p></div>
+      <div class="kill rise"><s>MapTiler place search</s><p>Replaced after a test: it couldn't find a lot of local places. Google's search went in, with your places saved on the phone.</p></div>
+      <div class="kill rise"><s>Cloud descriptions for every clip</s><p>Swapped for the free on-phone labeller. Seventy requests a ride for "Road, Sky" wasn't worth it.</p></div>
+      <div class="kill rise"><s>"1 MIC", guessed by the app</s><p>The app used to decide which mic was which and flip its labels. Now the rider sets it once, and the app only warns.</p></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ECONOMICS -->
+<section id="economics" aria-labelledby="eco-h">
+  <div class="wrap">
+    <span class="label">The business underneath</span>
+    <h2 id="eco-h" style="margin-top:14px;max-width:22ch">A feature that cost ₹1,300 a rider, redesigned to about ₹140.</h2>
+    <p class="lede" style="margin-top:20px">The first plan for Keep moving re-checked traffic every minute. At Google's list price, a rider using it an hour a day would cost more than a subscription brings in. The fix was design, not engineering.</p>
+    <div class="eco">
+      <div class="ecoCard rise">
+        <span class="label">Keep moving, a daily rider, per month</span>
+        <div class="ecoBars" aria-label="Before: about 1,300 rupees. After: about 140 rupees.">
+          <div><span class="mono small">Re-check every minute</span><div class="eb"><i style="width:100%;background:var(--err)"></i></div><b class="tnum">≈ ₹1,300</b></div>
+          <div><span class="mono small">Free warnings, paid switch last</span><div class="eb"><i style="width:11%;background:var(--teal)"></i></div><b class="tnum">≈ ₹140</b></div>
+        </div>
+        <ul class="ecoList">
+          <li>Watching traffic uses what's already on screen: free.</li>
+          <li>Leaving Google's route is free; Google re-plans at no charge.</li>
+          <li>Per ride, a destination (≈ ₹2.2), a couple of route looks (≈ ₹1.3 each) and the odd switch (≈ ₹3.5).</li>
+        </ul>
+        <p class="small">Estimates at Google's list price, before monthly free allowances; 22 rides a month.</p>
+      </div>
+      <div class="ecoCard rise">
+        <span class="label">Pro pays for the AI, and the AI is capped</span>
+        <div class="ecoRow"><span>Pro</span><b class="tnum">₹249 / month · ₹1,999 / year</b></div>
+        <div class="ecoRow"><span>Gemini, a rider who uses everything</span><b class="tnum">≈ $1–3 / month</b></div>
+        <div class="ecoRow"><span>Cap on AI spend</span><b>35% of what the rider pays</b></div>
+        <div class="ecoRow"><span>Crash alerts</span><b>₹0 to us: an SMS from the rider's own plan</b></div>
+        <p style="color:var(--body);font-size:15px;margin-top:6px">Cheaper models first for anything that only needs to hear words; at the cap, "You've made a lot today, more tomorrow". Free riders get one Reel a week, with no AI cost in the background.</p>
+        <div class="row" style="gap:18px;align-items:center;margin-top:6px">
+          <div class="phone sm" style="max-width:170px;border-width:6px;border-radius:26px;flex:none"><img src="img/paywall.webp" alt="The Pro paywall: turn every ride into a Reel, 7 days free, then 1,999 rupees a year" loading="lazy"></div>
+          <p style="color:var(--body);font-size:15px">The paywall sells Reels, captions and the fuel price. Crash alerts and ride stats are never on it.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1167,7 +1165,7 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
     <h2>Every ride, kept.</h2>
     <p class="lede">I take products from an idea to something people can use, and test them where they're used. Let's talk.</p>
     <p class="mono" style="color:var(--muted)"><a href="mailto:shivam.uxd@gmail.com">shivam.uxd@gmail.com</a> · <a href="https://www.shivamdesign.in">shivamdesign.in</a></p>
-    <p style="color:var(--muted);font-size:14px">Screens marked redesigned are rebuilt from a screen recording of the app, with my own rides and clips; contacts' phone numbers are made up. Other screens are rendered from the app's code with sample data, or captured on a demo ride, which runs on a simulated route. Ride numbers are from my own bike. Dashed frames are still to come. <a href="#tldr" data-tlm="tldr">The one-minute version.</a></p>
+    <p style="color:var(--muted);font-size:14px">Screens marked redesigned are rebuilt from a screen recording of the app, with my own rides and clips; contacts' phone numbers are made up. Other screens are rendered from the app's code with sample data, or captured on a demo ride, which runs on a simulated route. Ride numbers are from my own bike. Cards marked In testing are being built now; their mock-ups are drawn in the app's design system. Dashed frames are still to come. <a href="#tldr" data-tlm="tldr">The one-minute version.</a></p>
   </div>
 </footer>
 </main>
@@ -1229,6 +1227,36 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
     fuel: '<div class="s" style="text-align:center;margin-top:4px">Sun 16 Nov · 07:46</div>' +
       '<div class="notif"><div class="row"><span class="s">Keppo Moto · Fuel</span><span class="s" style="margin-left:auto">now</span></div><b style="display:block;margin-top:6px">Saved fill · ₹500 · 4.6 L at ₹103.44</b><div class="s" style="margin-top:4px">From your card payment at the pump stop</div><div class="btnRow"><span>Undo</span></div></div>' +
       '<div style="flex:1"></div><div class="card"><div class="label">Bike · fuel</div><div class="row" style="margin-top:8px"><b style="font:300 34px/1 Geist" class="tnum">31.8</b><span class="s">km/l, last tank</span></div></div>'
+    ,
+    editor: '<div class="t">Edit · Paani Nahi Piya</div><div class="s">0:18 · 9:16 · 4K</div>' +
+      '<div class="card" style="height:132px;background:linear-gradient(160deg,#24324a,#0d0d0f);display:flex;align-items:flex-end"><b style="font-size:14px">“Paani nahi piya…”</b></div>' +
+      '<div class="card" style="padding:10px;position:relative">' +
+        '<div class="trk"><span>VIDEO</span><i style="flex:3;background:#52525B"></i><i style="flex:2;background:#3F3F46"></i><i style="flex:3;background:#52525B"></i></div>' +
+        '<div class="trk"><span>VOICE</span><i style="flex:4;background:#69C8CB"></i><i style="flex:1;background:transparent"></i><i style="flex:3;background:#69C8CB"></i></div>' +
+        '<div class="trk"><span>ENGINE</span><i style="flex:1;background:#F97316"></i></div>' +
+        '<div class="trk"><span>MUSIC</span><i style="flex:1;background:#A5A1FF;opacity:.7"></i></div>' +
+        '<i style="position:absolute;top:6px;bottom:6px;left:46%;width:2px;background:#F4F4F5;border-radius:1px"></i></div>' +
+      '<div style="flex:1"></div><div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center"><span class="chip">Trim</span><span class="chip">Speed</span><span class="chip">Text</span><span class="chip" style="background:#1E3E40;color:#69C8CB">Sound</span><span class="chip">Style</span><span class="chip">Cover</span></div>',
+    storyboard: '<div class="t">Storyboard</div><div class="s">From your idea, for your gear</div>' +
+      '<div class="card" style="align-self:flex-end;background:#1E3E40;max-width:86%">Night ride to India Gate. City lights, my voice over it.</div>' +
+      '<div class="card"><b>Script · 4 beats · 0:30</b><div class="s" style="margin-top:6px;line-height:1.6">01 Hook: “Dilli raat ko alag hai”<br>02 Riding out · helmet cam<br>03 India Gate · tripod<br>04 Home · speed on screen</div></div>' +
+      '<div class="card"><b>Shot list</b><div class="s" style="margin-top:6px">Tripod at the gate: shots 03, 04<br>Helmet cam: 01, 02</div></div>' +
+      '<div style="flex:1"></div><div class="btnRow"><span>Edit script</span><span class="p">Use this board</span></div>',
+    friends: '<div class="t">Ride together</div><div class="s">Sunday at Nahan · 3 riders</div>' +
+      '<div class="card">' +
+        '<div class="row"><span class="dot"></span><b>You</b><span class="s" style="margin-left:auto">Leading · 42 km/h</span></div>' +
+        '<div class="row" style="margin-top:12px"><span class="dot" style="background:#4ADE80"></span><b>Aman</b><span class="s" style="margin-left:auto">1.2 km behind</span></div>' +
+        '<div class="row" style="margin-top:12px"><span class="dot" style="background:#FBBF24"></span><b>Riya</b><span class="s" style="margin-left:auto">Stopped · fuel</span></div></div>' +
+      '<div class="card s" style="color:#C9C9CF">If anyone in the group goes down, everyone gets the crash alert too.</div>' +
+      '<div style="flex:1"></div><div class="btnRow"><span>Invite</span><span class="p">Start group ride</span></div>',
+    roads: '<div class="t">Your roads</div><div class="s">Google’s traffic, against how you moved</div>' +
+      '<div class="card"><div class="row"><b>Ring Road · 6–9 pm</b><span class="s" style="margin-left:auto;color:#4ADE80">CLEAR</span></div><div class="s" style="margin-top:6px">Google: slow · You: 31 km/h</div></div>' +
+      '<div class="card"><div class="row"><b>MG Road · 9–10 am</b><span class="s" style="margin-left:auto;color:#F43F5E">JAMMED</span></div><div class="s" style="margin-top:6px">Google: slow · You: 9 km/h</div></div>' +
+      '<div class="card"><div class="row"><b>Aurobindo Marg</b><span class="s" style="margin-left:auto">AS SHOWN</span></div><div class="s" style="margin-top:6px">Google: clear · You: 38 km/h</div></div>' +
+      '<div style="flex:1"></div><div class="s" style="text-align:center">Keep moving uses this to pick your route</div>',
+    autostart: '<div class="s" style="text-align:center;margin-top:4px">Sun 07:02 · OBD connected</div>' +
+      '<div class="notif"><div class="row"><span class="s">Keppo Moto</span><span class="s" style="margin-left:auto">now</span></div><b style="display:block;margin-top:6px">Engine on. Ride starts in 3</b><div class="s" style="margin-top:4px">Moments and crash watch go on with it</div><div class="btnRow"><span>Cancel</span></div></div>' +
+      '<div style="flex:1"></div><div class="card s" style="color:#C9C9CF">Starts from the engine, not from movement, so a walk to the shop never becomes a ride.</div>'
   };
   document.querySelectorAll('[data-ui]').forEach(function (el) { el.innerHTML = UI[el.dataset.ui]; });
 
@@ -1363,7 +1391,7 @@ html[data-embedded] #tldr .wrap{padding-top:84px}
       if (capId && caps) $(capId).textContent = caps[i] || ''; }); });
   }
   stepper('#keep-moving .step', '#kmPhone .layer');
-  stepper('#studio .step', '#stPhone .layer', 'stCap', ['Studio, redesigned. Rebuilt from the app with my own clips.', 'A moment: what you said, cleaned of umms, with the engine on its own track.', 'Ask across every ride; repeated phrases become compilations.', 'Revs and exhaust pops start filming too, from the engine mic.', 'Still to come.', 'Still to come.', 'Your Reels: what is ready, what is a draft, and the series it belongs to.']);
+  stepper('#studio .step', '#stPhone .layer', 'stCap', ['Studio, redesigned. Rebuilt from the app with my own clips.', 'A moment: what you said, cleaned of umms, with the engine on its own track.', 'Ask across every ride; repeated phrases become compilations.', 'Revs and exhaust pops start filming too, from the engine mic.', 'Mock-up in the app’s design system: the editor’s new toolbar, in testing.', 'Mock-up in the app’s design system: the Storyboard revamp, in testing.', 'Your Reels: what is ready, what is a draft, and the series it belongs to.']);
 
   // Counters.
   document.querySelectorAll('[data-count]').forEach(function (el) {
