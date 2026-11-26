@@ -3,7 +3,7 @@
 @media (min-width: 768px) { .md { padding: 96px 48px 96px; } }
 .md-label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); margin: 0 0 14px; }
 .md-title { font-size: clamp(34px, 6vw, 60px); line-height: 1.04; letter-spacing: -.03em; font-weight: 500; margin: 0; }
-.md-title em, .md-h2 em { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; color: var(--primary); }
+.md-title em, .md-h2 em { font-style: normal; font-weight: 700; color: var(--em); }
 .md-lede { margin: 18px 0 0; font-size: 16px; line-height: 1.6; color: var(--muted-foreground); max-width: 56ch; }
 
 .md-sec { margin-top: 56px; }

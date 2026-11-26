@@ -13,10 +13,7 @@ export const KeppoMotoPage = () => <EmbeddedCaseStudy slug="keppo-moto" title="K
 // Keppo Journal, its sibling: its own light look (paper and marigold), so it opts out too.
 export const KeppoJournalPage = () => <EmbeddedCaseStudy slug="keppo-journal" title="Keppo Journal case study" skin={false} />;
 
-const SERIF = "'Playfair Display', Georgia, serif";
-const Accent = ({ children }: { children: string }) => (
-  <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>{children}</span>
-);
+const Accent = ({ children }: { children: string }) => <span className="em">{children}</span>;
 
 export const TOOLS = [
   { to: '/case-study/journey-studio', name: 'Journey Studio', color: '#2563EB', line: 'One prototype across every team, handed to devs as HTML.', stat: '6 → 1.5 days', statLine: 'to prototype a three-team journey' },

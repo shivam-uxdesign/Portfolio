@@ -319,6 +319,7 @@ export function createHatsEngine(root: HTMLElement, opts: HatsEngineOptions): Ha
     const p = PAL[id];
     bgrect.setAttribute('fill', p.card); bghalo.setAttribute('fill', p.halo);
     root.style.setProperty('--hh-accent', p.accent);
+    root.style.setProperty('--hh-ink', p.ink);
     listeners.forEach(cb => cb(id));
     later(() => look(lastPX || innerWidth / 2, lastPY || innerHeight / 2), 30);
     if (id === 'cat') setFace({ eyes: 'closed', mouth: 'o', brows: 'up' }, 900);

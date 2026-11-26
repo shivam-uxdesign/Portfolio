@@ -19,19 +19,19 @@ export const HATS: HatInfo[] = [
 /** Orbit order, left → right along the arc. */
 export const ORDER: HatId[] = ['cat', 'notes', 'party', 'helmet', 'beret', 'propeller', 'ninja'];
 
-export interface Palette { card: string; halo: string; accent: string }
+export interface Palette { card: string; halo: string; accent: string; /** Emphasis colour for text: the accent, darkened where needed to pass 4.5:1 on white. */ ink: string }
 
 // Per-hat colour lives only inside the portrait card and the tagline accent.
 // Default ("me") is the site's blue, taken from his glasses, rather than the prototype's yellow.
 export const PAL: Record<WearableId, Palette> = {
-  me:        { card: '#DCE4F5', halo: '#EBF0FA', accent: '#3F63CF' },
-  notes:     { card: '#FFE27A', halo: '#FFEDA8', accent: '#A57B00' },
-  party:     { card: '#FF9EC7', halo: '#FFC0DB', accent: '#D12C74' },
-  helmet:    { card: '#3A3D45', halo: '#4A4E58', accent: '#E8462A' },
-  beret:     { card: '#F7B9B9', halo: '#FAD3D3', accent: '#C81E33' },
-  propeller: { card: '#9FE8D3', halo: '#C2F1E3', accent: '#0B8467' },
-  ninja:     { card: '#F59E5B', halo: '#F8BC8A', accent: '#C4621B' },
-  cat:       { card: '#F9C894', halo: '#FCDDB9', accent: '#C0621A' },
+  me:        { card: '#DCE4F5', halo: '#EBF0FA', accent: '#3F63CF', ink: '#3F63CF' },
+  notes:     { card: '#FFE27A', halo: '#FFEDA8', accent: '#A57B00', ink: '#8A6805' },
+  party:     { card: '#FF9EC7', halo: '#FFC0DB', accent: '#D12C74', ink: '#D12C74' },
+  helmet:    { card: '#3A3D45', halo: '#4A4E58', accent: '#E8462A', ink: '#C94028' },
+  beret:     { card: '#F7B9B9', halo: '#FAD3D3', accent: '#C81E33', ink: '#C81E33' },
+  propeller: { card: '#9FE8D3', halo: '#C2F1E3', accent: '#0B8467', ink: '#0C7F63' },
+  ninja:     { card: '#F59E5B', halo: '#F8BC8A', accent: '#C4621B', ink: '#AB581B' },
+  cat:       { card: '#F9C894', halo: '#FCDDB9', accent: '#C0621A', ink: '#B05B1A' },
 };
 
 export interface Face { eyes?: string; mouth?: string; brows?: string; blush?: string }

@@ -6,7 +6,7 @@
 
 .ww-label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); margin: 0 0 14px; }
 .ww-title { font-size: clamp(34px, 6vw, 60px); line-height: 1.04; letter-spacing: -.03em; font-weight: 500; margin: 0; text-wrap: balance; }
-.ww-title em { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; color: var(--primary); }
+.ww-title em { font-style: normal; font-weight: 700; color: var(--em); }
 .ww-lede { margin: 18px 0 0; font-size: 16px; line-height: 1.6; color: var(--muted-foreground); max-width: 52ch; }
 .ww-lede b { color: var(--foreground); font-weight: 600; }
 
@@ -29,7 +29,7 @@
 
 /* Roasts I ran on my own life. */
 .ww-h2 { margin: 72px 0 6px; font-size: clamp(24px, 3.4vw, 32px); letter-spacing: -.02em; font-weight: 500; }
-.ww-h2 em { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; color: var(--primary); }
+.ww-h2 em { font-style: normal; font-weight: 700; color: var(--em); }
 .ww-sub { margin: 0; font-size: 14px; color: var(--muted-foreground); }
 .ww-roasts { list-style: none; padding: 0; margin: 24px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 @media (max-width: 900px) { .ww-roasts { grid-template-columns: minmax(0, 1fr); } }

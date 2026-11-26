@@ -5,7 +5,6 @@ import './stack.css';
 // Built with: nine flip cards in a 3×3 grid — eight tools plus Spline, which
 // I'm learning. Front: logo, name, category. Back (hover or focus on laptops,
 // tap on phones): what I use it for.
-const SERIF = "'Playfair Display', Georgia, serif";
 
 interface Card { name: string; category: string; color: string; ink: string; logo: ReactNode; note: string; learning?: boolean }
 
@@ -21,7 +20,7 @@ export function StackPanel() {
       <header className="stk-head">
         <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase mb-3">Built with</p>
         <h2 className="stk-title text-foreground">
-          Tools I <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, color: 'var(--primary)' }}>reach</span> for.
+          Tools I <span className="em">reach</span> for.
         </h2>
       </header>
       <div className="stk-wrap">
