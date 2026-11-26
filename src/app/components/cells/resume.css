@@ -49,3 +49,17 @@
 }
 @media (hover: hover) and (min-width: 768px) { .cv-skill:hover { transform: translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) { .cv-skill { transition: none; } .cv-skill:hover { transform: none; } }
+
+/* Live clock and what I'm probably up to. */
+.cv-clock { font-variant-numeric: tabular-nums; font-weight: 500; }
+.cv-status { margin: 10px 0 0; display: flex; align-items: baseline; gap: 8px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 14px; line-height: 1.4; color: var(--muted-foreground); }
+.cv-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #1D9E75; transform: translateY(-1px); animation: cv-pulse 2.4s ease-in-out infinite; }
+@keyframes cv-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(29, 158, 117, .45); } 50% { box-shadow: 0 0 0 5px rgba(29, 158, 117, 0); } }
+@media (min-width: 768px) { .cv-status { font-size: 15px; } }
+@media (prefers-reduced-motion: reduce) { .cv-dot { animation: none; } }
+/* Small phones: a narrower label column and tighter rows, so the cell fits without scrolling. */
+@media (max-width: 380px) {
+  .cv-fact { grid-template-columns: 70px 1fr; gap: 8px; padding: 6px 0; }
+  .cv-fact dd { font-size: 12.5px; }
+  .cv-status { font-size: 13px; margin-top: 8px; }
+}
