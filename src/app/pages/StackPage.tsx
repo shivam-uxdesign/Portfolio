@@ -35,14 +35,6 @@ function NotionLogo() {
   );
 }
 
-function FramerLogo() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-      <path d="M4 0h16v8H4zm0 8h8l8 8H4zm0 8h8v8z" fill="white" />
-    </svg>
-  );
-}
-
 function LottieLogo() {
   return (
     <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
@@ -84,6 +76,17 @@ function LovableLogo() {
   );
 }
 
+// Procreate has no official mark in Simple Icons: a brush stroke in its colours on a black tile.
+function ProcreateLogo() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+      <defs><linearGradient id="procreate-g" x1="10" y1="30" x2="30" y2="10" gradientUnits="userSpaceOnUse"><stop stopColor="#FF8A3D" /><stop offset=".5" stopColor="#F2416B" /><stop offset="1" stopColor="#6C63FF" /></linearGradient></defs>
+      <rect width="40" height="40" rx="8" fill="#111" />
+      <path d="M11 28c3-1 4-4 6-7s5-8 9-9c2-.4 3.6.8 3 2.6-.9 2.6-5.4 6.2-9 9-2.4 1.9-5 3.6-9 4.4z" fill="url(#procreate-g)" />
+    </svg>
+  );
+}
+
 export function SplineLogo() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -100,7 +103,7 @@ export const tools = [
   { name: 'Claude', category: 'Thinking', color: '#D97757', logo: <ClaudeLogo />, note: 'Writing and thinking things through.' },
   { name: 'Lovable', category: 'Quick builds', color: '#E8436B', logo: <LovableLogo />, note: 'Made whatiswrongwith.in in a day.' },
   { name: 'Notion', category: 'Docs', color: '#000000', logo: <NotionLogo />, note: 'Specs, decisions, and the source of truth.' },
-  { name: 'Framer', category: 'Prototyping', color: '#0055FF', logo: <FramerLogo />, note: 'Prototypes that feel closer to real.' },
+  { name: 'Procreate', category: 'Drawing', color: '#111111', logo: <ProcreateLogo />, note: 'Where my digital drawings start.' },
   { name: 'Lottie', category: 'Motion', color: '#00DDB3', logo: <LottieLogo />, note: 'Motion that ships, not just prototypes.' },
 ];
 
