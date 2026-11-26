@@ -171,7 +171,8 @@ const MotionLink = motion.create(Link);
 
 // Work: the Sales Case Card on its own, then the Rupyy design system as one
 // story told in three case studies (each also opens on its own).
-const thumb = (slug: string) => <img src={`/case-studies/thumbs/${slug}.jpg`} alt="" loading="lazy" draggable={false} className="w-full h-full object-cover" />;
+// Journey Studio is the first card the eye lands on, and usually the largest paint: fetch it first.
+const thumb = (slug: string) => <img src={`/case-studies/thumbs/${slug}-640.webp`} srcSet={`/case-studies/thumbs/${slug}-640.webp 640w, /case-studies/thumbs/${slug}.webp 1200w`} sizes="(max-width: 768px) 92vw, 480px" alt="" width={1200} height={900} decoding="async" fetchPriority={slug === 'journey-studio' ? 'high' : undefined} draggable={false} className="w-full h-full object-cover" />;
 export const PROJECTS = [
   {
     title: 'Sales Case Card',

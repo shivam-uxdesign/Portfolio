@@ -2,15 +2,10 @@ import { createBrowserRouter, Navigate } from 'react-router';
 import { RootLayout } from './components/RootLayout';
 import { ErrorPage } from './pages/ErrorPage';
 import { SheetHome as Home } from './pages/SheetHome';
-import { SalesCaseCardPage, JourneyStudioPage, DesignKitPage, IllustrationStudioPage, KeppoMotoPage, KeppoJournalPage, RupyySystemPage } from './pages/WorkCaseStudies';
-import { ComicsPage } from './pages/ComicsPage';
-import { DrawingsPage } from './pages/DrawingsPage';
-import { CoolStuffPage } from './pages/CoolStuffPage';
-import { MusicPage } from './pages/MusicPage';
-import { MoviesPage } from './pages/MoviesPage';
-import { BooksPage } from './pages/BooksPage';
-import { StackPage } from './pages/StackPage';
-import { WhatiswrongwithinPage } from './pages/WhatiswrongwithinPage';
+
+// Every page but Home loads on demand, so the first visit downloads only what Home needs.
+type Mod = Record<string, React.ComponentType>;
+const page = (load: () => Promise<unknown>, name: string) => async () => ({ Component: ((await load()) as Mod)[name] });
 
 export const router = createBrowserRouter([
   {
@@ -36,44 +31,44 @@ export const router = createBrowserRouter([
         path: '/case-study/mobile-app',
         element: <Navigate to="/case-study/journey-studio" replace />,
       },
-      { path: '/case-study/sales-case-card', Component: SalesCaseCardPage },
-      { path: '/case-study/rupyy-design-system', Component: RupyySystemPage },
-      { path: '/case-study/journey-studio', Component: JourneyStudioPage },
-      { path: '/case-study/design-kit', Component: DesignKitPage },
-      { path: '/case-study/illustration-studio', Component: IllustrationStudioPage },
-      { path: '/case-study/keppo-moto', Component: KeppoMotoPage },
-      { path: '/case-study/keppo-journal', Component: KeppoJournalPage },
+      { path: '/case-study/sales-case-card', lazy: page(() => import('./pages/WorkCaseStudies'), 'SalesCaseCardPage') },
+      { path: '/case-study/rupyy-design-system', lazy: page(() => import('./pages/WorkCaseStudies'), 'RupyySystemPage') },
+      { path: '/case-study/journey-studio', lazy: page(() => import('./pages/WorkCaseStudies'), 'JourneyStudioPage') },
+      { path: '/case-study/design-kit', lazy: page(() => import('./pages/WorkCaseStudies'), 'DesignKitPage') },
+      { path: '/case-study/illustration-studio', lazy: page(() => import('./pages/WorkCaseStudies'), 'IllustrationStudioPage') },
+      { path: '/case-study/keppo-moto', lazy: page(() => import('./pages/WorkCaseStudies'), 'KeppoMotoPage') },
+      { path: '/case-study/keppo-journal', lazy: page(() => import('./pages/WorkCaseStudies'), 'KeppoJournalPage') },
       {
         path: '/comics',
-        Component: ComicsPage,
+        lazy: page(() => import('./pages/ComicsPage'), 'ComicsPage'),
       },
       {
         path: '/drawings',
-        Component: DrawingsPage,
+        lazy: page(() => import('./pages/DrawingsPage'), 'DrawingsPage'),
       },
       {
         path: '/cool-stuff',
-        Component: CoolStuffPage,
+        lazy: page(() => import('./pages/CoolStuffPage'), 'CoolStuffPage'),
       },
       {
         path: '/music',
-        Component: MusicPage,
+        lazy: page(() => import('./pages/MusicPage'), 'MusicPage'),
       },
       {
         path: '/movies',
-        Component: MoviesPage,
+        lazy: page(() => import('./pages/MoviesPage'), 'MoviesPage'),
       },
       {
         path: '/books',
-        Component: BooksPage,
+        lazy: page(() => import('./pages/BooksPage'), 'BooksPage'),
       },
       {
         path: '/stack',
-        Component: StackPage,
+        lazy: page(() => import('./pages/StackPage'), 'StackPage'),
       },
       {
         path: '/play/whatiswrongwithin',
-        Component: WhatiswrongwithinPage,
+        lazy: page(() => import('./pages/WhatiswrongwithinPage'), 'WhatiswrongwithinPage'),
       },
       {
         // Replaced by Keppo Journal.
