@@ -1,232 +1,81 @@
-import { NavRight, NavPill, NavSegments } from '../components/chrome/NavRight';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router';
-import { useRef, useState } from 'react';
-import image14 from '../../imports/image-14.png';
-import image15 from '../../imports/image-15.png';
-import image16 from '../../imports/image-16.png';
-import image17 from '../../imports/image-17.png';
-import image19 from '../../imports/image-19.png';
+import { useEffect, useRef, useState } from 'react';
+import './comics.css';
 
-export function ComicsPage() {
-  const navigate = useNavigate();
-  const [hoveredPanel, setHoveredPanel] = useState<number | null>(null);
-  // "Next strip": step through the strips, one at a time, from the bar.
-  const stripAt = useRef(-1);
-  const nextStrip = () => {
-    const els = document.querySelectorAll<HTMLElement>('[data-strip]');
-    if (!els.length) return;
-    stripAt.current = (stripAt.current + 1) % els.length;
-    els[stripAt.current].scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
-    setHoveredPanel(stripAt.current);
-  };
+// Comics: my comics as their Instagram posts, so every panel of each carousel is there.
+// Each post (~1.5 MB of Instagram) loads only when it scrolls near.
+interface Comic { id: string; title: string; line: string }
 
-  const comicPanels = [
-    {
-      title: "CAP's (Keep Safe!!)",
-      genre: 'SAFETY',
-      image: image14,
-      soundEffect: 'BAM!',
-      color: '#FFD700',
-      bgColor: '#FFF9E6',
-    },
-    {
-      title: 'Hello!!',
-      genre: 'FRIENDSHIP',
-      image: image15,
-      soundEffect: 'POW!',
-      color: '#FF6B6B',
-      bgColor: '#FFF0F0',
-    },
-    {
-      title: 'My Big Little Sister',
-      genre: 'FAMILY',
-      image: image16,
-      soundEffect: 'WHAM!',
-      color: '#4FACFE',
-      bgColor: '#E3F2FD',
-    },
-    {
-      title: 'Dreams',
-      genre: 'REFLECTION',
-      image: image17,
-      soundEffect: 'BOOM!',
-      color: '#43E97B',
-      bgColor: '#E8FFF0',
-    },
-    {
-      title: 'Can You Not?',
-      genre: 'LIFE',
-      image: image19,
-      soundEffect: 'ZAP!',
-      color: '#FA709A',
-      bgColor: '#FFF0F5',
-    },
-  ];
+const COMICS: Comic[] = [
+  { id: 'DQ3Z9Z1D5QG', title: 'CAP’s (Keep Safe!!)', line: 'Years ago, I started collecting caps, and things kind of escalated.' },
+  { id: 'DDUMf4DvbQz', title: 'Hello!!', line: 'For all my friends I reach out to whenever I need someone to talk to.' },
+  { id: 'CgfJmg5PBHi', title: 'Can You Not?', line: 'An accidental sneeze. Thanks to everyone for the funny, stupid suggestions.' },
+  { id: 'CaVD7-rvMuv', title: 'My Big Little Sister', line: 'Made with my sister.' },
+  { id: 'CYJD2K5viFQ', title: 'Dreams', line: 'I get my best ideas in my dreams. Here’s one of them.' },
+];
+
+declare global { interface Window { instgrm?: { Embeds: { process: () => void } } } }
+
+let scriptLoading: Promise<void> | null = null;
+function loadInstagram(): Promise<void> {
+  if (window.instgrm) return Promise.resolve();
+  if (!scriptLoading) scriptLoading = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://www.instagram.com/embed.js'; s.async = true;
+    s.onload = () => resolve(); s.onerror = () => { scriptLoading = null; reject(new Error('instagram')); };
+    document.body.appendChild(s);
+  });
+  return scriptLoading;
+}
+
+const url = (id: string) => `https://www.instagram.com/p/${id}/`;
+
+function Post({ c }: { c: Comic }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<'wait' | 'show' | 'failed'>('wait');
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(entries => {
+      if (!entries.some(e => e.isIntersecting)) return;
+      io.disconnect();
+      setState('show');
+    }, { rootMargin: '600px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    if (state !== 'show') return;
+    loadInstagram().then(() => window.instgrm?.Embeds.process()).catch(() => setState('failed'));
+  }, [state]);
 
   return (
-    <div className="min-h-screen relative bg-background">
-      {/* Pink-coral gradient strip on right edge */}
-      <div
-        className="fixed top-0 right-0 w-1 h-full z-50"
-        style={{
-          background: 'linear-gradient(to bottom, #FFB6C1, #FF7F7F)',
-        }}
-      />
+    <li className="cm-item">
+      <h2 className="cm-name">{c.title}</h2>
+      <p className="cm-line">{c.line}</p>
+      <div ref={ref} className={`cm-slot${state !== 'wait' ? ' ready' : ''}`}>
+        {state === 'show' && (
+          <blockquote className="instagram-media" data-instgrm-permalink={url(c.id)} data-instgrm-version="14">
+            <a href={url(c.id)} target="_blank" rel="noopener noreferrer">{c.title} on Instagram</a>
+          </blockquote>
+        )}
+        {state === 'failed' && <a className="cm-fallback" href={url(c.id)} target="_blank" rel="noopener noreferrer">Read “{c.title}” on Instagram</a>}
+      </div>
+    </li>
+  );
+}
 
-      {/* SECTION 1 - Page header */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pt-20 pb-12">
-        <motion.div
-          className="max-w-7xl mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        >
-          <div className="mb-3">
-            <p className="text-[11px] tracking-[0.12em] text-muted-foreground">
-              FUN & EXPLORATION
-            </p>
-          </div>
-          <motion.h1
-            className="text-[56px] md:text-[72px] leading-[1.05] mb-6 relative inline-block text-foreground"
-            style={{ fontWeight: 800, letterSpacing: '-0.02em' }}
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.6, type: 'spring', stiffness: 80 }}
-          >
-            Comics I've Written
-            {/* Underline accent */}
-            <motion.div
-              className="absolute -bottom-2 left-0 h-1 rounded-full"
-              style={{ backgroundColor: '#FFD700', width: '140px' }}
-              initial={{ width: 0 }}
-              animate={{ width: '140px' }}
-              transition={{ delay: 0.8, duration: 0.6, ease: 'easeOut' }}
-            />
-          </motion.h1>
-          <p className="text-[18px] leading-[1.6] max-w-2xl mt-6 text-muted-foreground">
-            Sequential storytelling as a side obsession
-          </p>
-        </motion.div>
-      </section>
-
-      <NavRight>
-        <NavPill label="Next strip" onClick={nextStrip}>Next strip<ArrowRight /></NavPill>
-      </NavRight>
-      {/* SECTION 2 - Comic grid with square thumbnails */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {comicPanels.map((panel, idx) => (
-              <motion.div
-                key={idx}
-                data-strip={idx}
-                className="flex flex-col"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-              >
-                {/* Square thumbnail */}
-                <div
-                  className="relative cursor-pointer overflow-hidden rounded-lg group"
-                  style={{
-                    aspectRatio: '1/1',
-                    border: '3px solid #1A1A1A',
-                    backgroundColor: '#FFFFFF',
-                  }}
-                  onMouseEnter={() => setHoveredPanel(idx)}
-                  onMouseLeave={() => setHoveredPanel(null)}
-                >
-                  <img
-                    src={panel.image}
-                    alt={panel.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <AnimatePresence>
-                    {hoveredPanel === idx && (
-                      <motion.div
-                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      >
-                        <div
-                          className="text-[40px] font-black"
-                          style={{
-                            color: panel.color,
-                            textShadow: '3px 3px 0px #1A1A1A, -1px -1px 0px #FFFFFF',
-                            WebkitTextStroke: '2px #1A1A1A',
-                          }}
-                        >
-                          {panel.soundEffect}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Title and genre */}
-                <div className="pt-3">
-                  <h3
-                    className="text-[14px] font-bold mb-1.5 leading-tight text-foreground"
-                  >
-                    {panel.title}
-                  </h3>
-                  <p
-                    className="text-[10px] tracking-[0.04em] font-semibold px-2.5 py-1 rounded-full inline-block"
-                    style={{
-                      backgroundColor: panel.bgColor,
-                      color: panel.color,
-                    }}
-                  >
-                    {panel.genre}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 3 - Latest issue strip */}
-      <section className="w-full px-8 md:px-16 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            className="rounded-2xl p-8 flex items-center justify-between"
-            style={{
-              backgroundColor: '#1A1A1A',
-              border: '2px solid #1A1A1A',
-            }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            <div>
-              <p className="text-[10px] tracking-[0.12em] mb-2 text-muted-foreground">
-                LATEST ISSUE
-              </p>
-              <h3 className="text-[24px] font-bold mb-1" style={{ color: '#FFFFFF' }}>
-                CAP's (Keep Safe!!)
-              </h3>
-              <p className="text-[14px]" style={{ color: '#A0A0A0' }}>
-                Issue #1 — Safety & Mindfulness
-              </p>
-            </div>
-            <button
-              className="px-6 py-3 rounded-xl text-[13px] font-semibold transition-all"
-              style={{
-                backgroundColor: '#FFD700',
-                color: '#1A1A1A',
-                border: '2px solid #FFD700',
-              }}
-            >
-              Read Now
-            </button>
-          </motion.div>
-        </div>
-      </section>
-    </div>
+export function ComicsPage() {
+  return (
+    <main className="cm">
+      <p className="cm-label">Off Figma · Comics</p>
+      <h1 className="cm-title">Comics I’ve <em>made</em>.</h1>
+      <p className="cm-lede">
+        Small stories from my life, drawn and posted on Instagram. Swipe through each one.
+        More at <a href="https://www.instagram.com/shivamrelax/" target="_blank" rel="noopener noreferrer">@shivamrelax</a>.
+      </p>
+      <ul className="cm-list" role="list">
+        {COMICS.map(c => <Post key={c.id} c={c} />)}
+      </ul>
+    </main>
   );
 }
