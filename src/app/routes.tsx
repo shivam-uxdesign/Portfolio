@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate } from 'react-router';
 import { RootLayout } from './components/RootLayout';
 import { ErrorPage } from './pages/ErrorPage';
 import { SheetHome as Home } from './pages/SheetHome';
-import { GridPanelPage } from './pages/GridPanelPage';
 import { SalesCaseCardPage, JourneyStudioPage, DesignKitPage, IllustrationStudioPage, KeppoMotoPage, KeppoJournalPage, RupyySystemPage } from './pages/WorkCaseStudies';
 import { ComicsPage } from './pages/ComicsPage';
 import { DrawingsPage } from './pages/DrawingsPage';
@@ -21,10 +20,6 @@ export const router = createBrowserRouter([
       {
         path: '/',
         Component: Home,
-      },
-      {
-        path: '/grid-panel',
-        Component: GridPanelPage,
       },
       {
         // Placeholder case study, replaced by the real one.
