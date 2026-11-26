@@ -5,17 +5,28 @@ import { trackEvent } from '../../lib/analytics';
 import './cells/cells.css';
 
 const FORMSPREE_ENDPOINT = import.meta.env.VITE_FORMSPREE_ENDPOINT as string | undefined;
+const EMAIL = 'shivam.uxd@gmail.com';
 
 export function CTACard() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  // With no form service yet, Say Hello opens the visitor's email app, which often does nothing on office machines.
+  // So the address is always on show, with a copy button, and a hint appears after the mail app should have opened.
+  const [copied, setCopied] = useState(false);
+  const [mailHint, setMailHint] = useState(false);
+  const copyEmail = async () => {
+    try { await navigator.clipboard.writeText(EMAIL); setCopied(true); setTimeout(() => setCopied(false), 2200); }
+    catch { const el = document.getElementById('ct-email'); if (el) { const range = document.createRange(); range.selectNodeContents(el); const sel = window.getSelection(); sel?.removeAllRanges(); sel?.addRange(range); } }
+    trackEvent('contact_copy_email', {});
+  };
 
   const openMailto = () => {
     const subject = name.trim() ? `Hello from ${name.trim()}` : 'Hello from Portfolio';
     const body = message.trim() || `Hi Shivam,\n\n`;
-    window.location.href = `mailto:shivam.uxd@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setMailHint(true);
+    window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const handleSayHello = async () => {
@@ -136,6 +147,14 @@ export function CTACard() {
             <Linkedin className="w-[18px] h-[18px]" strokeWidth={1.5} />
           </motion.button>
         </div>
+
+        <p className="mt-2.5 text-[12px] text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1" aria-live="polite">
+          {mailHint ? <span>Didn’t open your email app? Write to</span> : <span>Or write to</span>}
+          <span id="ct-email" className="text-foreground select-all">{EMAIL}</span>
+          <button type="button" onClick={copyEmail} className="text-[12px] font-medium underline underline-offset-2 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded px-0.5 min-h-[24px]">
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+        </p>
       </div>
     </div>
   );

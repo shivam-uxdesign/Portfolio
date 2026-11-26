@@ -47,7 +47,13 @@ export function WhatiswrongwithinPage() {
             Open <ExternalLink className="inline w-3 h-3 -mt-0.5" aria-hidden="true" />
           </a>
         </div>
-        <iframe className="ww-frame" src={SITE} title="whatiswrongwith.in, live: type something to roast" loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" />
+        <div className="ww-stage">
+          {/* Under the live app: a still and a link, for when the embed is blocked or still loading. */}
+          <a className="ww-fallback" href={SITE} target="_blank" rel="noopener noreferrer" style={{ backgroundImage: 'url(/share/whatiswrongwith.jpg)' }}>
+            <span>Open whatiswrongwith.in ↗</span>
+          </a>
+          <iframe className="ww-frame" src={SITE} title="whatiswrongwith.in, live: type something to roast" loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" />
+        </div>
       </div>
       <p className="ww-hint"><b>Try it right here.</b> Your job, your city, your ex, yourself.</p>
 

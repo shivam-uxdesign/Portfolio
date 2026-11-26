@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useLayoutEffect, useRef, useState } from 'react';
+import './stack-page.css';
 
 /* ── Brand SVG logos ── */
 function FigmaLogo() {
@@ -110,11 +111,34 @@ export const tools = [
 const GRID_GAP = 12; // px — single fixed gap so the JS size calc and CSS stay in sync
 const SERIF = "'Playfair Display', Georgia, serif";
 
+// The standalone page: a normal scrolling page (the Home cell keeps its own flip-card grid).
 export function StackPage() {
   return (
-    <div className="h-screen w-full overflow-hidden">
-      <StackContent standalone />
-    </div>
+    <main className="sk">
+      <p className="sk-label">Built with</p>
+      <h1 className="sk-title">What I <em>build</em> with.</h1>
+      <p className="sk-lede">The tools that actually get used, day to day, from first sketch to shipped screen.</p>
+      <ul className="sk-grid" role="list">
+        {tools.map(t => (
+          <li key={t.name} className="sk-tool">
+            <span className="sk-logo" style={{ background: t.color }} aria-hidden="true">{t.logo}</span>
+            <div>
+              <p className="sk-name">{t.name}</p>
+              <p className="sk-cat">{t.category}</p>
+              <p className="sk-note">{t.note}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <div className="sk-learning">
+        <span className="sk-logo" aria-hidden="true"><SplineLogo /></span>
+        <div>
+          <p className="sk-cat">Currently learning</p>
+          <p className="sk-name">Spline</p>
+          <p className="sk-note">3D and cinematic UI transitions, not shipped anywhere yet.</p>
+        </div>
+      </div>
+    </main>
   );
 }
 

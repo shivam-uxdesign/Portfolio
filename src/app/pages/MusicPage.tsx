@@ -30,7 +30,13 @@ export function MusicPage() {
         {SONGS.map(s => (
           <li key={s.id}>
             <p className="mu-genre">{s.genre}</p>
-            <iframe src={embed(s.id)} title={`${s.name}, on Spotify`} allow={ALLOW} loading="lazy" />
+            <div className="mu-slot">
+              {/* Under the player: what shows if Spotify is blocked or still loading. */}
+              <a className="mu-fallback" href={`https://open.spotify.com/track/${s.id}`} target="_blank" rel="noopener noreferrer">
+                <b>{s.name}</b><span>Play on Spotify ↗</span>
+              </a>
+              <iframe src={embed(s.id)} title={`${s.name}, on Spotify`} allow={ALLOW} loading="lazy" />
+            </div>
           </li>
         ))}
       </ul>

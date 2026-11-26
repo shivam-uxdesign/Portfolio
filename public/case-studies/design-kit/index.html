@@ -45,13 +45,13 @@ button { font: inherit; color: inherit }
 .stat b { font: 800 32px/1.05 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums }
 .stat span { font-size: 15px; line-height: 1.4; color: #2B2F37 }
 
-section { padding: 72px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 26px }
+section { padding: 72px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px }
 section:last-of-type { border-bottom: 0 }
 .beat { display: flex; gap: 14px; align-items: baseline }
 .beat .n { font: 800 15px var(--display); color: var(--green) }
 h2 { font-size: clamp(32px, 4.4vw, 50px); font-weight: 800; letter-spacing: -.03em; line-height: 1.02 }
 h3 { font-size: 23px; font-weight: 700; letter-spacing: -.015em }
-.sub { display: grid; gap: 18px; margin-top: 18px }
+.sub { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; margin-top: 18px }
 .sub .col p { font-size: 17.5px }
 .sub-h { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap }
 .sub-h .k { font: 500 11.5px var(--mono); color: var(--green); letter-spacing: .05em; text-transform: uppercase }

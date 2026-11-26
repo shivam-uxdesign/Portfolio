@@ -422,6 +422,8 @@ footer { padding: 28px 0 48px; font: 500 12px var(--mono); color: var(--muted); 
 .stat .tip .ft { display: block; margin-top: 12px; padding-top: 10px; border-top: 1px solid #2E3138; font: 500 11.5px/1.4 var(--mono); color: #9AA3AE }
 .strip .stat { grid-template-rows: auto 1fr auto } .stat .howw { align-self: end }
 .stat .tip::after { content: ""; position: absolute; left: 22px; top: 100%; border: 7px solid transparent; border-top-color: #15171C }
+/* The last number in a row opens its tooltip leftwards, so it never runs past the screen edge. */
+.stat:last-child .tip { left: auto; right: 0 } .stat:last-child .tip::after { left: auto; right: 22px }
 .stat .howw:hover .tip, .stat .how:focus-visible + .tip, .stat .how[aria-expanded="true"] + .tip { opacity: 1; visibility: visible; transform: none }
 @media (prefers-reduced-motion: reduce) { .stat .tip { transition: none } }
 
