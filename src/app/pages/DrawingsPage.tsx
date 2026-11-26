@@ -15,7 +15,9 @@ const DRAWINGS: Drawing[] = [
   { file: 'faces', title: 'Too many of me', medium: 'Brush and ink, sketchbook', ratio: 1026 / 646 },
   { file: 'the-tied-tree', title: 'Threads around a tree', medium: 'Digital', ratio: 1400 / 1398 },
   { file: 'hand-over-glasses', title: 'Pushing my glasses up', medium: 'Ink, sketchbook', ratio: 1106 / 654 },
+  { file: 'mermaid-kitten', title: 'Mermaid kitten', medium: 'Digital', ratio: 1 },
   { file: 'charcoal-torso', title: 'Torso study', medium: 'Charcoal on paper', ratio: 1400 / 959 },
+  { file: 'ukulele-and-cactus', title: 'Still life with a dancing cactus', medium: 'Digital', ratio: 1330 / 1200 },
 ];
 
 const src = (d: Drawing) => `/drawings/${d.file}.webp`;
