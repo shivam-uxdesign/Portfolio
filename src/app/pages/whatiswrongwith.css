@@ -35,7 +35,7 @@
 @media (max-width: 900px) { .ww-roasts { grid-template-columns: minmax(0, 1fr); } }
 .ww-roast { background: var(--app-bg); color: var(--app-text); border-radius: 16px; padding: 20px 20px 18px; }
 .ww-q { font: 13px/1.5 var(--mono); color: var(--app-dim); margin: 0 0 14px; }
-.ww-q b { color: var(--app-red); font-weight: 700; }
+.ww-q b { color: #FF5753; font-weight: 700; }
 .ww-roast ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .ww-roast li { display: grid; grid-template-columns: 24px minmax(0, 1fr); border-left: 2px solid var(--app-red); padding-left: 10px; font-size: 14px; line-height: 1.45; }
 .ww-roast li span { font: 11px/20px var(--mono); color: var(--app-dim); }

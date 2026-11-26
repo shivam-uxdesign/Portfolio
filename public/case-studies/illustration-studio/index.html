@@ -226,7 +226,7 @@ ul.pain b { display: block; font-family: var(--display); font-size: 17px; margin
 .gart svg { width: 100%; height: 100%; display: block }
 .ctrl { display: grid; gap: 8px; justify-items: start }
 .sugg { border: 1px solid var(--rule); border-radius: 14px; padding: 14px 16px; display: grid; gap: 10px; background: #FCFCFA }
-.sugg h4 { margin: 0; font: 700 15px var(--display) }
+.sugg h3 { margin: 0; font: 700 15px var(--display) }
 #gSugg { display: grid; gap: 8px }
 .chk { display: grid; grid-template-columns: 18px 1fr; gap: 10px; font: 400 14.5px/1.45 var(--display) }
 .chk::before { content: ""; width: 12px; height: 12px; margin-top: 4px; border-radius: 50% }
@@ -293,7 +293,7 @@ footer { padding: 28px 0 48px; font: 500 12px var(--mono); color: var(--muted); 
 .outs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
 .out { border-top: 3px solid var(--green); padding-top: 10px; display: grid; gap: 4px }
 .out .ba { font: 800 26px/1.1 var(--display); letter-spacing: -.02em; font-variant-numeric: tabular-nums }
-.out .ba .was { color: #9AA09A; font-weight: 700 }
+.out .ba .was { color: #6B716B; font-weight: 700 }
 .out span { font-size: 15px; line-height: 1.4; color: #2B2F37 }
 
 /* Next in the system */
@@ -324,7 +324,7 @@ footer { padding: 28px 0 48px; font: 500 12px var(--mono); color: var(--muted); 
 /* TL;DR toggle: shared across the three case studies */
 .tlt { position: relative; display: inline-grid; grid-auto-flow: column; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: 999px; padding: 3px; isolation: isolate; flex: none }
 .tlt button { position: relative; z-index: 1; border: 0; background: none; font: 600 13px var(--display); padding: 6px 13px; border-radius: 999px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: color .24s; display: inline-flex; align-items: center; gap: 6px }
-.tlt button small { font: 500 11.5px var(--mono); opacity: .8 }
+.tlt button small { font: 500 11.5px var(--mono) }
 .tlt button[aria-pressed="true"] { color: #fff }
 .tlt button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px }
 .tlt .tlt-th { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 999px; background: var(--ink); transition: transform .26s cubic-bezier(.2,.8,.2,1), width .26s cubic-bezier(.2,.8,.2,1); pointer-events: none }
@@ -594,7 +594,7 @@ html[data-mode="tldr"] .tl { padding-top: 30px }
       <span class="label">Try it: break the brand</span>
       <div class="ctrl"><span class="label">Badge</span><div class="seg" role="group" aria-label="Badge" id="gBadge"><button type="button" aria-pressed="false" data-v="tick">Tick</button><button type="button" aria-pressed="false" data-v="clock">Clock</button><button type="button" aria-pressed="true" data-v="cross">Cross</button><button type="button" aria-pressed="false" data-v="shield">Shield</button></div></div>
       <div class="ctrl"><span class="label">Badge style</span><div class="seg" role="group" aria-label="Badge style" id="gStyle"><button type="button" aria-pressed="true" data-v="auto">Auto</button><button type="button" aria-pressed="false" data-v="neutral">Neutral</button><button type="button" aria-pressed="false" data-v="outline">Outline</button></div></div>
-      <div class="sugg" aria-live="polite"><h4>Suggestions</h4><div id="gSugg"></div></div>
+      <div class="sugg" aria-live="polite"><h3 class="h4">Suggestions</h3><div id="gSugg"></div></div>
       <p class="hint">Set a status badge to Neutral and watch the studio push back. Then try Shield.</p>
     </div>
   </div>

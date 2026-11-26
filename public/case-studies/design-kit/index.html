@@ -368,7 +368,7 @@ footer { padding: 28px 0 48px; font: 500 12px var(--mono); color: var(--muted); 
 .sm-btn { font: 600 15px var(--appd); color: #fff; border: 0; display: flex; align-items: center; justify-content: center; transition: background .4s, border-radius .4s, height .4s, letter-spacing .4s }
 .sm-vals { font: 500 11.5px/1.7 var(--mono); color: var(--muted); display: grid }
 .sm-vals b { color: var(--ink); font-weight: 500 }
-.sm-vals .bad { color: var(--red) }
+.sm-vals .bad { color: #B83A32 }
 
 .layers { display: grid; grid-template-columns: .9fr 1.1fr; gap: 18px; align-items: stretch }
 .lprev { display: grid; place-items: center; min-height: 340px }
@@ -476,7 +476,7 @@ footer { padding: 28px 0 48px; font: 500 12px var(--mono); color: var(--muted); 
 .prr { display: grid; gap: 18px }
 .prr-track { position: relative; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr) }
 .prr-top { display: flex; justify-content: center }
-.prr-track li { position: relative; z-index: 1; display: flex; justify-content: center }
+.prr-track li:not(.prr-line) { position: relative; z-index: 1; display: flex; justify-content: center }
 .prr-track button { display: grid; justify-items: center; gap: 4px; background: none; border: 0; cursor: pointer; padding: 0 4px; font: inherit; color: inherit }
 .prr-track i { width: 46px; height: 46px; border-radius: 14px; background: #fff; border: 2px solid #CFD8D2; display: grid; place-items: center; font-style: normal; font-size: 19px; transition: border-color .3s, box-shadow .3s, background .3s }
 .prr-track b { font: 700 14px var(--display) }
@@ -747,7 +747,7 @@ select.tb-in { font-family: var(--display) }
 /* TL;DR toggle: shared across the three case studies */
 .tlt { position: relative; display: inline-grid; grid-auto-flow: column; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: 999px; padding: 3px; isolation: isolate; flex: none }
 .tlt button { position: relative; z-index: 1; border: 0; background: none; font: 600 13px var(--display); padding: 6px 13px; border-radius: 999px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: color .24s; display: inline-flex; align-items: center; gap: 6px }
-.tlt button small { font: 500 11.5px var(--mono); opacity: .8 }
+.tlt button small { font: 500 11.5px var(--mono) }
 .tlt button[aria-pressed="true"] { color: #fff }
 .tlt button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px }
 .tlt .tlt-th { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 999px; background: var(--ink); transition: transform .26s cubic-bezier(.2,.8,.2,1), width .26s cubic-bezier(.2,.8,.2,1); pointer-events: none }
@@ -1295,7 +1295,7 @@ html[data-mode="tldr"] .tl { padding-top: 30px }
   function drawTrack(P) {
     var t = $('#prrTrack');
     t.style.gridTemplateColumns = 'repeat(' + P.length + ', 1fr)';
-    t.innerHTML = P.map(function (s, i) { var locked = (i > 2 && !path) || (path === 'fix' && i > 5 && !pm); return '<li><button type="button" data-s="' + i + '"' + (locked ? ' disabled' : '') + ' class="' + (s[0] === 'Rejected' ? 'rej ' : '') + (i < ps ? 'done' : i === ps ? 'on' : '') + '"><i>' + s[2] + '</i><b>' + s[0] + '</b><span>' + s[1] + '</span></button></li>' }).join('') + '<div class="prr-line" style="left:' + (50 / P.length) + '%;right:' + (50 / P.length) + '%"><span style="width:' + (ps / (P.length - 1) * 100) + '%"></span></div>';
+    t.innerHTML = P.map(function (s, i) { var locked = (i > 2 && !path) || (path === 'fix' && i > 5 && !pm); return '<li><button type="button" data-s="' + i + '"' + (locked ? ' disabled' : '') + ' class="' + (s[0] === 'Rejected' ? 'rej ' : '') + (i < ps ? 'done' : i === ps ? 'on' : '') + '"><i>' + s[2] + '</i><b>' + s[0] + '</b><span>' + s[1] + '</span></button></li>' }).join('') + '<li class="prr-line" aria-hidden="true" style="left:' + (50 / P.length) + '%;right:' + (50 / P.length) + '%"><span style="width:' + (ps / (P.length - 1) * 100) + '%"></span></li>';
     $$('button', t).forEach(function (b) { b.addEventListener('click', function () { ps = +b.dataset.s; drawPrr() }) });
   }
   function drawPrr() {

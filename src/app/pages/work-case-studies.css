@@ -29,7 +29,7 @@
 .rs-tool-line { font-size: 13px; line-height: 1.5; color: var(--muted-foreground); }
 .rs-tool-stat { font-size: 13px; color: var(--muted-foreground); }
 .rs-tool-stat b { color: var(--foreground); font-weight: 600; }
-.rs-tool-go { margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--c); }
+.rs-tool-go { margin-top: 4px; font-size: 12px; font-weight: 600; color: color-mix(in oklab, var(--c) 62%, #000); }
 @media (hover: hover) {
   .rs-tool:hover { background: var(--c); color: #fff; }
   .rs-tool:hover .rs-tool-line, .rs-tool:hover .rs-tool-stat, .rs-tool:hover .rs-tool-stat b, .rs-tool:hover .rs-tool-go { color: #fff; }

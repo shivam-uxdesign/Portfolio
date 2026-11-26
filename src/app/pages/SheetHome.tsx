@@ -644,7 +644,9 @@ export function SheetHome() {
   };
 
   // ── Render ──
-  const sheetVisible = s > 0;
+  // Once the sheet covers the hero, take the hero out of tab order too, not just out of the reading order.
+  const heroGone = s > 0.5;
+  useEffect(() => { if (heroRef.current) heroRef.current.inert = heroGone; }, [heroGone]);
   // Hands start once the head is nearly at the edge (as in the prototype).
   const peekProgress = peekOverride ?? s;
   const ownHat = chosenHat !== 'me';
@@ -672,7 +674,7 @@ export function SheetHome() {
   const leaveRef = useRef({ worn, cellId, open: isOpen });
   leaveRef.current = { worn, cellId, open: isOpen };
   const sheetRef = useRef<HTMLDivElement>(null);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
   const routerNavigate = useNavigate();
   const leaving = useRef(false);
   const leaveTo = (to: string) => {
@@ -730,7 +732,7 @@ export function SheetHome() {
 
   return (
     <HeroBridgeContext.Provider value={bridge}>
-      <div
+      <main
         ref={rootRef} className="sh-root fixed inset-0 overflow-hidden bg-background select-none"
         style={{ touchAction: 'none' }}
         onPointerDown={onPointerDown}
@@ -750,6 +752,8 @@ export function SheetHome() {
             only his head shows above the edge (see the peek effect above). */}
         {/* A chosen hat's soft glow behind his head. */}
         <div className={`sh-glow${themeHat !== 'me' && s > 0 ? ' on' : ''}`} style={themeHat !== 'me' ? { '--sh-halo': PAL[themeHat].halo } as React.CSSProperties : undefined} aria-hidden="true" />
+        {/* Keyboard users land here first: one key straight to the work, past the hats. */}
+        {!isOpen && <button type="button" className="sh-skip" onClick={() => openRef.current()}>Skip to my work</button>}
         <div ref={heroRef} className={`sh-hero${s > 0 ? ' peeking' : ''}${returning && s >= 1 ? ' returning' : ''}`} aria-hidden={s > 0.5} style={{ pointerEvents: s > 0 ? 'none' : undefined }}>
           <HeroPane onEngine={onEngine} />
         </div>
@@ -767,7 +771,7 @@ export function SheetHome() {
             onHome={() => closeRef.current()}
             onHatFling={peekHat !== 'me' ? (dx, dy) => { drag.current = null; engineRef.current?.takeOff(dx, dy); setBare(true); } : undefined}
           />
-          <div ref={clipRef} className="sh-clip" aria-hidden={!sheetVisible}>
+          <div ref={clipRef} className="sh-clip">
             {/* Zoomed out a touch at rest, growing to full size as the sheet rises:
                 the bar and the open sheet are the same surface. */}
             {/* While the map is open the page steps down and back to make room. */}
@@ -804,7 +808,7 @@ export function SheetHome() {
           )}
         </div>
 
-      </div>
+      </main>
     </HeroBridgeContext.Provider>
   );
 }

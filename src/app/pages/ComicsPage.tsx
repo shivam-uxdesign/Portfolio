@@ -46,7 +46,12 @@ function Post({ c }: { c: Comic }) {
   useEffect(() => {
     if (state !== 'show') return;
     loadInstagram().then(() => window.instgrm?.Embeds.process()).catch(() => setState('failed'));
-  }, [state]);
+    // Instagram swaps the quote for an untitled iframe; name it for screen readers.
+    const el = ref.current; if (!el) return;
+    const name = () => el.querySelectorAll('iframe:not([title])').forEach(f => f.setAttribute('title', `${c.title}, comic on Instagram`));
+    const mo = new MutationObserver(name); mo.observe(el, { childList: true, subtree: true });
+    return () => mo.disconnect();
+  }, [state, c.title]);
 
   return (
     <li className="cm-item">
