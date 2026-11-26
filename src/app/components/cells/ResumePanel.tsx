@@ -14,11 +14,12 @@ const FACTS = [
   { k: 'Based in', v: 'India (IST)', short: 'India (IST)' },
 ];
 
+// Each card names its proof, all facts from the case studies. Phones get the short line.
 const SKILLS = [
-  { icon: Compass, title: 'Product strategy', v: 'Balancing user needs with business goals — from early research through to shipping products that matter.', short: 'User needs balanced with business goals, research to ship.' },
-  { icon: Search, title: 'User research', v: 'Gathering insights and finding the real pain points before any design decision gets made.', short: 'Finding the real pain points before deciding anything.' },
-  { icon: PenTool, title: 'Digital design', v: 'Turning strategy and research into interfaces that are as functional as they are refined.', short: 'Interfaces as functional as they are refined.' },
-  { icon: Layers, title: 'Design systems', v: 'Component libraries and documentation that teams actually adopt — not just ship and abandon.', short: 'Component libraries teams actually adopt, not abandon.' },
+  { icon: Compass, title: 'Product strategy', v: 'Every design a PM makes passes my review before it ships. Prototyping a loan journey went from 6 days to 1.5.', short: 'Every PM design passes my review.' },
+  { icon: Search, title: 'User research', v: 'I read 2,485 support tickets before designing the Sales Case Card. 6 of 6 BMs preferred it.', short: '2,485 tickets read before designing.' },
+  { icon: PenTool, title: 'Digital design', v: 'From a single case card to a whole loan journey, plus two apps I built with AI.', short: 'Case cards to loan journeys, plus two apps.' },
+  { icon: Layers, title: 'Design systems', v: 'One Design Kit for the team: 175 screens with 0 raw values.', short: '175 screens, 0 raw values.' },
 ];
 
 export function ResumePanel() {
@@ -53,11 +54,11 @@ export function ResumePanel() {
         <section className="cv-skills" aria-label="What I do best">
           <p className="cv-skills-label">What I do best</p>
           <ul className="cv-grid">
-            {SKILLS.map(({ icon: Icon, title, short }) => (
+            {SKILLS.map(({ icon: Icon, title, v, short }) => (
               <li key={title} className="cv-skill">
                 <span className="cv-skill-icon" aria-hidden="true"><Icon className="w-4 h-4" strokeWidth={1.75} /></span>
                 <span className="cv-skill-title">{title}</span>
-                <span className="cv-skill-desc">{short}</span>
+                <span className="cv-skill-desc"><span className="md:hidden">{short}</span><span className="hidden md:inline">{v}</span></span>
               </li>
             ))}
           </ul>

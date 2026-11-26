@@ -13,7 +13,7 @@ export const HATS: HatInfo[] = [
   { id: 'beret',     name: 'Artist',             hat: 'beret',            line: 'Fine arts at JJ School of Art. I drew everything on this page.' },
   { id: 'propeller', name: 'Motion & animation', hat: 'propeller beanie', line: 'Timing, easing, physics. Tap the propeller and watch it ease out.' },
   { id: 'ninja',     name: 'Anime kid',          hat: 'ninja headband',   line: 'Raised on anime. I know when a reference lands and when it is trying too hard.' },
-  { id: 'cat',       name: 'Cat lover',          hat: 'cat',              line: 'All my work is reviewed by a very strict, very furry supervisor.' },
+  { id: 'cat',       name: 'Cat lover',          hat: 'cat',              line: 'All my work is approved by every cat I pass by.' },
 ];
 
 /** Orbit order, left → right along the arc. */
