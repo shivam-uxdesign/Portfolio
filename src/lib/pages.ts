@@ -21,7 +21,8 @@ export const PAGES: Record<string, PageMeta> = {
   '/case-study/illustration-studio': { cell: 'work', name: 'Illustration Studio', tldr: { kind: 'Case study', embedded: true } },
   '/case-study/keppo-moto': { cell: 'work', name: 'Keppo Moto', tldr: { kind: 'Case study', embedded: true }, theme: 'dark', progress: '#69C8CB' },
   '/case-study/keppo-journal': { cell: 'work', name: 'Keppo Journal', tldr: { kind: 'Case study', embedded: true } },
-  '/play/whatiswrongwithin': { cell: 'work', name: 'What is wrong within', tldr: { kind: 'Fun project', title: ['What is wrong within, in ', 'one', ' minute.'] } },
+  // A short, fun read: no TL;DR switch.
+  '/play/whatiswrongwithin': { cell: 'work', name: 'What is wrong within' },
   '/comics': { cell: 'interests', name: 'Comics' },
   '/drawings': { cell: 'interests', name: 'Drawings' },
   '/music': { cell: 'interests', name: 'Music' },

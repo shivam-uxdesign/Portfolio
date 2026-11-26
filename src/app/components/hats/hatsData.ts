@@ -8,8 +8,7 @@ export interface HatInfo { id: HatId; name: string; hat: string; line: string }
 
 export const HATS: HatInfo[] = [
   { id: 'notes',     name: 'Product designer',   hat: 'sticky notes',     line: '3+ years turning messy hypotheses into small, testable products.' },
-  // TODO(Shivam): confirm this line.
-  { id: 'party',     name: 'Plan starter',       hat: 'party hat',        line: 'The friend who turns “we should hang out” into an actual plan.' },
+  { id: 'party',     name: 'The friend with a plan', hat: 'party hat',    line: '“We should hang out” lasts about five minutes before I put a date on it.' },
   { id: 'helmet',    name: 'Biker',              hat: 'helmet',           line: 'Long rides with friends. Getting outside is the whole point.' },
   { id: 'beret',     name: 'Artist',             hat: 'beret',            line: 'Fine arts at JJ School of Art. I drew everything on this page.' },
   { id: 'propeller', name: 'Motion & animation', hat: 'propeller beanie', line: 'Timing, easing, physics. Tap the propeller and watch it ease out.' },
@@ -23,9 +22,9 @@ export const ORDER: HatId[] = ['cat', 'notes', 'party', 'helmet', 'beret', 'prop
 export interface Palette { card: string; halo: string; accent: string; /** Emphasis colour for text: the accent, darkened where needed to pass 4.5:1 on white. */ ink: string }
 
 // Per-hat colour lives only inside the portrait card and the tagline accent.
-// Default ("me") is the site's soft sage rather than the prototype's yellow.
+// Default ("me") is the site's blue, taken from his glasses, rather than the prototype's yellow.
 export const PAL: Record<WearableId, Palette> = {
-  me:        { card: '#DCE5D2', halo: '#E8EEE1', accent: '#8A9E7B', ink: '#4F6A3F' },
+  me:        { card: '#DCE4F5', halo: '#EBF0FA', accent: '#3F63CF', ink: '#3F63CF' },
   notes:     { card: '#FFE27A', halo: '#FFEDA8', accent: '#A57B00', ink: '#8A6805' },
   party:     { card: '#FF9EC7', halo: '#FFC0DB', accent: '#D12C74', ink: '#D12C74' },
   helmet:    { card: '#3A3D45', halo: '#4A4E58', accent: '#E8462A', ink: '#C94028' },

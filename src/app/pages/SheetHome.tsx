@@ -128,7 +128,8 @@ function CellContent({ id }: { id: SheetCellId }) {
     );
     case 'interests': return <ScrollCell><section className="sh-page sh-page-fixed"><InterestsCell /></section></ScrollCell>;
     case 'stack': return <ScrollCell><section className="sh-page sh-page-fixed"><StackPanel /></section></ScrollCell>;
-    case 'resume': return <ScrollCell><section className="sh-page sh-page-fixed"><ResumeCell /></section></ScrollCell>;
+    // Resume grows with its content and scrolls when the window is short, instead of squeezing the cards.
+    case 'resume': return <ScrollCell><section className="sh-page"><ResumeCell /></section></ScrollCell>;
     case 'contact': return <ScrollCell><section className="sh-page"><ContactCell /></section></ScrollCell>;
   }
 }

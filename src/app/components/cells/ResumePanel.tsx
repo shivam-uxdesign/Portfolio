@@ -22,41 +22,41 @@ const SKILLS = [
 
 export function ResumePanel() {
   return (
-    <div className="rs w-full h-full bg-background">
-      <div className="rs-top">
+    <div className="cv w-full h-full bg-background">
+      <div className="cv-top">
         <p className="text-[11px] tracking-[0.12em] text-muted-foreground uppercase">Resume</p>
         <a
           href="/resume.pdf"
           download="Shivam_Sehgal_Resume.pdf"
           onClick={() => trackEvent('resume_download', {})}
-          className="rs-download"
+          className="cv-download"
         >
           <Download className="w-3.5 h-3.5" strokeWidth={1.75} aria-hidden="true" />
           Download resume
         </a>
       </div>
-      <div className="rs-body">
-        <div className="rs-text">
-          <h2 className="rs-title text-foreground">
+      <div className="cv-body">
+        <div className="cv-text">
+          <h2 className="cv-title text-foreground">
             The <span className="em">short</span> version.
           </h2>
-          <dl className="rs-facts">
+          <dl className="cv-facts">
             {FACTS.map(f => (
-              <div key={f.k} className="rs-fact">
+              <div key={f.k} className="cv-fact">
                 <dt>{f.k}</dt>
                 <dd><span className="md:hidden">{f.short}</span><span className="hidden md:inline">{f.v}</span></dd>
               </div>
             ))}
           </dl>
         </div>
-        <section className="rs-skills" aria-label="What I do best">
-          <p className="rs-skills-label">What I do best</p>
-          <ul className="rs-grid">
-            {SKILLS.map(({ icon: Icon, title, v, short }) => (
-              <li key={title} className="rs-skill">
-                <span className="rs-skill-icon" aria-hidden="true"><Icon className="w-4 h-4" strokeWidth={1.75} /></span>
-                <span className="rs-skill-title">{title}</span>
-                <span className="rs-skill-desc"><span className="md:hidden">{short}</span><span className="hidden md:inline">{v}</span></span>
+        <section className="cv-skills" aria-label="What I do best">
+          <p className="cv-skills-label">What I do best</p>
+          <ul className="cv-grid">
+            {SKILLS.map(({ icon: Icon, title, short }) => (
+              <li key={title} className="cv-skill">
+                <span className="cv-skill-icon" aria-hidden="true"><Icon className="w-4 h-4" strokeWidth={1.75} /></span>
+                <span className="cv-skill-title">{title}</span>
+                <span className="cv-skill-desc">{short}</span>
               </li>
             ))}
           </ul>

@@ -1,14 +1,14 @@
 // Layered vector portrait of Shivam (viewBox 0 0 800 1000), from design-ref/hats/shivam.svg.
 // Additions over the source file: id="bgrect" / id="bghalo" on the two background
 // shapes, and an empty <g id="props"> as the last child of #head (hats render there).
-// Default card colour is the site's sage (#DCE5D2 / #E8EEE1) instead of the yellow.
+// Default card colour is the site's blue (#DCE4F5 / #EBF0FA) instead of the yellow.
 
 export const PORTRAIT_VIEWBOX = '0 0 800 1000';
 
 export const PORTRAIT_INNER = `
 <g id="bg">
-    <rect id="bgrect" width="800" height="1000" fill="#DCE5D2"/>
-    <circle id="bghalo" cx="400" cy="470" r="310" fill="#E8EEE1"/>
+    <rect id="bgrect" width="800" height="1000" fill="#DCE4F5"/>
+    <circle id="bghalo" cx="400" cy="470" r="310" fill="#EBF0FA"/>
   </g>
   <g id="shake">
   <g id="bodywrap"><g id="body" transform="translate(0 -40)">

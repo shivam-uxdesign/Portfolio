@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shivam Sehgal · Resume</title>
+<!--
+  Source for both resumes. Print to A4 PDF:
+    styled (matches shivamdesign.in): resume.html
+    plain (black and white, for application forms): resume.html?plain
+  build.cjs prints both.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+<style>
+/* Plain: static TrueType Inter from fonts/, so the PDF embeds real text fonts (web/variable fonts print as Type 3). */
+@font-face { font-family: "Inter Resume"; src: url(fonts/Inter-Regular.ttf) format("truetype"); font-weight: 400; }
+@font-face { font-family: "Inter Resume"; src: url(fonts/Inter-Medium.ttf) format("truetype"); font-weight: 500; }
+@font-face { font-family: "Inter Resume"; src: url(fonts/Inter-SemiBold.ttf) format("truetype"); font-weight: 600 700; }
+</style>
+<script>if (/[?&]plain\b/.test(location.search)) document.documentElement.className = 'plain';</script>
+<style>
+@page { size: A4; margin: 0; }
+:root {
+  --ink: #1A1A1A; --text: #3A3A37; --muted: #6B6860; --line: #E4E2DC;
+  --accent: #6E8560; --accent-soft: #EEF2E8;
+  --sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --serif: "Playfair Display", Georgia, serif;
+}
+html:not(.plain) body { font-size: 8.85pt; }
+html.plain { --ink: #000; --text: #111; --muted: #444; --line: #BBB; --accent: #000; --accent-soft: transparent; --sans: "Inter Resume", Arial, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #fff; }
+body { font: 400 9.1pt/1.4 var(--sans); color: var(--text); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; min-height: 297mm; padding: 10.5mm 15mm 6mm; }
+a { color: inherit; text-decoration: none; }
+b, strong { color: var(--ink); font-weight: 600; }
+
+header { display: grid; grid-template-columns: 1fr auto; gap: 4mm 8mm; align-items: end; padding-bottom: 4.5mm; border-bottom: 1px solid var(--line); }
+h1 { margin: 0; font: 600 25pt/1 var(--sans); letter-spacing: -.03em; color: var(--ink); }
+.role { margin: 2mm 0 0; font-size: 10.5pt; color: var(--text); }
+.role em { font-family: var(--serif); font-style: italic; font-weight: 500; color: var(--accent); }
+html.plain .role em { font-family: inherit; font-style: normal; font-weight: 600; }
+.contact { text-align: right; font-size: 8.6pt; line-height: 1.6; color: var(--text); }
+.contact b { font-weight: 600; }
+
+.summary { margin: 4mm 0 0; font-size: 9.6pt; color: var(--text); }
+
+h2 { margin: 4.8mm 0 2.2mm; font: 600 7.6pt/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 3mm; }
+h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+.job { margin-top: 2.6mm; }
+.job-head { display: flex; justify-content: space-between; gap: 4mm; align-items: baseline; }
+.job-title { font-size: 10.2pt; color: var(--ink); }
+.job-title b { font-weight: 600; }
+.when { font-size: 8.6pt; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.where { font-size: 8.6pt; color: var(--muted); margin-top: .4mm; }
+ul { margin: 1.6mm 0 0; padding: 0; list-style: none; }
+li { position: relative; padding-left: 4mm; margin: 1.05mm 0; }
+li::before { content: ""; position: absolute; left: .6mm; top: .62em; width: 1.3mm; height: 1.3mm; border-radius: 50%; background: var(--accent); }
+html.plain li::before { background: #000; width: 1.1mm; height: 1.1mm; }
+li b { font-weight: 600; }
+.nw { white-space: nowrap; }
+.num { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.sub { margin: 2mm 0 0; font-size: 8.6pt; color: var(--muted); }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8mm; }
+.skills { display: grid; grid-template-columns: 18mm 1fr; gap: 1.1mm 3mm; margin-top: .6mm; }
+.skills dt { font-weight: 600; color: var(--ink); }
+.skills dd { margin: 0; }
+.edu { margin-top: 1.6mm; }
+.edu .job-head { font-size: 9.6pt; }
+.edu p { margin: .5mm 0 0; font-size: 8.6pt; color: var(--muted); }
+.tag { display: inline-block; font-size: 7.6pt; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 99px; padding: .3mm 2mm; margin-left: 1.5mm; vertical-align: 1px; letter-spacing: .02em; }
+html.plain .tag { padding: 0; margin-left: 1mm; color: var(--muted); font-weight: 500; }
+html.plain .tag::before { content: "· "; }
+/* Plain is for application forms: headings without letter-spacing, one column, skills as "Label: values" lines, so parsers read them in order. */
+html.plain h2 { letter-spacing: 0; font-size: 8.4pt; margin: 4.3mm 0 2mm; }
+html.plain .cols { display: block; }
+html.plain .skills { display: block; }
+html.plain .skills dt { display: inline; }
+html.plain .skills dt::after { content: ": "; }
+html.plain .skills dd { display: inline; }
+html.plain .skills dd::after { content: "\A"; white-space: pre; }
+html.plain .edu .job-head { display: block; }
+html.plain .edu .when::before { content: " · "; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div>
+    <h1>Shivam Sehgal</h1>
+    <p class="role">Product designer · <em>design systems</em> and internal tools</p>
+  </div>
+  <div class="contact">
+    Gurugram, India · +91 88005 38208<br>
+    <a href="mailto:shivam.uxd@gmail.com"><b>shivam.uxd@gmail.com</b></a><br>
+    <a href="https://shivamdesign.in"><b>shivamdesign.in</b></a> · <a href="https://www.linkedin.com/in/shivamsehgal26/">linkedin.com/in/shivamsehgal26</a>
+  </div>
+</header>
+
+<p class="summary">Product designer with 3+ years in fintech, on lending and internal tools at Rupyy (CarDekho group). The only designer for six PMs: every design they create goes through my review, and I sign off every build before release. I start from evidence (support tickets, interviews, tests) and take it to a product people use. Lately I also build what I design, with AI: a design system and three tools the whole product team now uses, and two Android apps of my own.</p>
+
+<h2>Experience</h2>
+
+<div class="job">
+  <div class="job-head"><span class="job-title"><b>Product Designer</b> · Rupyy, CarDekho group</span><span class="when">Oct 2023 – Present</span></div>
+  <div class="where">Gurugram · B2B lending, loan tools for 42,000+ channel partners</div>
+  <ul>
+    <li><b>Design and UX owner.</b> Review every design and flow the six PMs create, and sign off each build in demo calls before it goes live, working <span class="nw">cross-functionally</span> with engineering and business.</li>
+    <li><b>Design Kit (design system).</b> Took the <span class="nw">half-built</span> 2025 library (60 icons as 282 size variants) to a system released like software: <span class="num">1,637</span> variables, <span class="num">640</span> component variants, <span class="num">11</span> releases. All <span class="num">175</span> screens use its tokens, with no <span class="nw">one-off</span> styles; Figma and code went from <span class="num">43</span> mismatches to <span class="num">0</span>. Its accessibility checks caught <span class="num">8</span> failing colours.</li>
+    <li><b>Journey Studio and Illustration Studio.</b> Two <span class="nw">self-serve</span> tools for PMs, built with Claude in <span class="nw">Oct–Nov</span> 2026. Prototyping a <span class="nw">three-team</span> loan journey and its user flows went from <span class="num">6 to 1.5 days</span>, and a change reaches every tool in <span class="num">20 min</span>, not half a day. PMs made <span class="num">40+</span> state graphics themselves in the first month, instead of waiting <span class="num">2–3 days</span>.</li>
+    <li><b>Sales Case Card.</b> Started from an analysis of <span class="num">2,485</span> support tickets, and redesigned the card so a business manager sees whose move it is. In a test with 6 BMs, new BMs on the new card got <span class="num">86%</span> right against <span class="num">43%</span> for experienced BMs on the old one. "Where is my case?" tickets fell from <span class="num">98 to 12</span> a month (−88%).</li>
+    <li>Designed the Admin Dashboard and an <span class="nw">in-house</span> Agreement Signing Service, replacing a <span class="nw">third-party</span> one. Internal awards: <b>Raising the Bar</b> and <b>Extra Mile</b> (2025, 2026).</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="job-head"><span class="job-title"><b>Product Design Intern</b> · BINOCS</span><span class="when">Jan 2023 – May 2023</span></div>
+  <div class="where">Bangalore · B2B SaaS</div>
+  <ul>
+    <li>Redesigned core flows to cut cognitive load, wrote a design guide for one visual language across the product, and designed onboarding tours for new users.</li>
+  </ul>
+</div>
+
+<h2>Projects</h2>
+<p class="sub" style="margin-top:0">Built with AI, for fun: I design, decide what to build and test on real devices; AI writes the code.</p>
+<ul>
+  <li><b>Keppo Moto</b><span class="tag">Android · 2026</span> A motorcycle app that records every ride and lean angle, films the good bits by itself, texts your people after a crash and turns rides into Reels. Designed end to end and shipped in two months: <span class="num">30+</span> screens, <span class="num">622</span> automated tests, in beta with <span class="num">4</span> riders.</li>
+  <li><b>Keppo Journal</b><span class="tag">Android · 2026</span> A journal that opens on the camera: catch the moment first, write later. No account; everything stays on the phone. <span class="num">13</span> screens, <span class="num">13</span> widgets, <span class="num">218</span> automated tests.</li>
+  <li><b>whatiswrongwith.in</b><span class="tag">Web</span> Type anything, and it tells you what's wrong with it. A small toy, made to play with AI.</li>
+</ul>
+
+<div class="cols">
+  <div>
+    <h2>Skills</h2>
+    <dl class="skills">
+      <dt>Design</dt><dd>Interaction design, user flows, wireframing, prototyping, design systems, information architecture, accessibility (WCAG contrast), visual and motion design</dd>
+      <dt>Research</dt><dd>User research and interviews, usability testing, A/B testing (informal), <span class="nw">support-ticket</span> data analysis, journey mapping</dd>
+      <dt>Tools</dt><dd>Figma (variables, libraries), Claude and Claude Code, Lovable, Lottie</dd>
+      <dt>Domains</dt><dd>Fintech and lending, B2B internal tools, mobile and web apps</dd>
+    </dl>
+  </div>
+  <div>
+    <h2>Education</h2>
+    <div class="edu">
+      <div class="job-head"><span><b>M.Des</b>, Design Research &amp; Strategy · NIFT Delhi</span><span class="when">2021 – 2023</span></div>
+      <p>Field research with metal repoussé artisans in Banaras (Craft Cluster Initiative).</p>
+    </div>
+    <div class="edu">
+      <div class="job-head"><span><b>B.F.A</b>, Textile Design · Sir J.J. School of Art, Mumbai</span><span class="when">2017 – 2021</span></div>
+      <p>Colour, composition and pattern systems; ran visual storytelling workshops for students.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -26,7 +26,7 @@
   - The header carries .modebar, which skin.css hides when the portfolio
     embeds the page (the portfolio's own bar does that job).
   - Accent words are <mark>, which skin.css restyles in the theme colour.
-  - Draft markers: .you = drafted for Shivam to check; dashed frames = media
+  - Draft markers: dashed frames = media
     to come. ?review=1 lists every one in a panel; ?clean=1 hides markers.
   - Screens are rebuilt from the app's code with a demo journal
     (rebuild/screens.html, rendered by rebuild/build.mjs).
@@ -64,10 +64,6 @@ section{padding:clamp(72px,10vw,128px) 0}
 section+section{border-top:1px solid var(--line)}
 
 /* ---------- draft markers ---------- */
-.you{background:linear-gradient(transparent 62%, var(--marigold-soft) 62%);border-bottom:1.5px dashed var(--marigold-text);cursor:help}
-.you::before{content:"YOU";font:500 10px/1 var(--mono);letter-spacing:.06em;color:var(--marigold-ink);background:var(--marigold);border-radius:4px;padding:2px 4px;margin-right:6px;vertical-align:2px}
-html[data-clean] .you{background:none;border:0}
-html[data-clean] .you::before{display:none}
 .ph{position:relative;border:2px dashed var(--line2);border-radius:var(--r-thumb);background:repeating-linear-gradient(-45deg,transparent 0 12px,rgba(0,0,0,.025) 12px 24px),var(--surface2);display:flex;align-items:center;justify-content:center;text-align:center;color:var(--dim);font:400 13px/1.45 var(--mono);padding:18px;overflow:hidden}
 .ph b{display:block;color:var(--ink);font:500 12px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .ph.dark{background:repeating-linear-gradient(-45deg,transparent 0 12px,rgba(255,255,255,.03) 12px 24px),#1C1C1F;border-color:#3A3A3F;color:#8B8B93}
@@ -257,8 +253,6 @@ footer p{max-width:75ch}
 /* ---------- embedded in the portfolio ---------- */
 /* Its bar replaces this header and drives Full / TL;DR; draft markers stay out of the live site. */
 html[data-embedded] .top{display:none}
-html[data-embedded] .you{background:none;border:0;cursor:auto}
-html[data-embedded] .you::before{display:none}
 html[data-embedded] .hero{min-height:100vh}
 html[data-embedded] .hero .wrap{padding-top:72px}
 html[data-embedded] .hero-bg .ph{padding-top:72px}
@@ -322,7 +316,7 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
     <div>
       <div class="kicker">Case study · Android · Sep–Nov 2026</div>
       <h1>A journal that opens on <mark>the camera.</mark></h1>
-      <p class="lede"><span class="you" title="Drafted from the design docs and git history, not from you: check it">I wanted to catch a moment first and write about it later, and keep all of it on my own phone. Nothing out there did both, so I made it.</span> I'm a designer, not a programmer; AI was my engineering team.</p>
+      <p class="lede">I wanted to catch a moment first and write about it later, and keep all of it on my own phone. Nothing out there did both, so I made it. I'm a designer, not a programmer; AI was my engineering team.</p>
       <div class="facts" aria-label="Facts">
         <span class="chip">Android</span>
         <span class="chip">Works offline</span>
@@ -343,26 +337,26 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
   <div class="wrap">
     <div class="kicker">01 · Why I made it</div>
     <h2>I wanted it. It didn't exist.</h2>
-    <p class="lede" style="margin-top:22px"><span class="you" title="Drafted from the design docs and git history, not from you: check it">I take photos of small things: a chai stall, a sign I like, the sea at the end of a walk. They sank into my gallery between screenshots. Every journal app I tried opened on a blank page and asked me to write first, and by the evening I’d forgotten why the photo mattered.</span></p>
+    <p class="lede" style="margin-top:22px">I take photos of small things: a chai stall, a sign I like, the sea at the end of a walk. They sank into my gallery between screenshots. Every journal app I tried opened on a blank page and asked me to write first, and by the evening I’d forgotten why the photo mattered.</p>
 
     <div class="reasons">
       <article class="reason">
         <span class="n">a · moment first</span>
         <h3>Catch it now, write later.</h3>
         <p>Journal apps open on a blank page and wait for you to have something to say. The moment is usually gone by then. I wanted the app to open on the camera, so keeping a moment takes one tap, and the words can come in the evening.</p>
-        <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">Snapchat had the camera I wanted: open it, shoot, done. But everything in it is made to be sent to someone. I wanted that speed with nobody on the other end.</span></p>
+        <p>Snapchat had the camera I wanted: open it, shoot, done. But everything in it is made to be sent to someone. I wanted that speed with nobody on the other end.</p>
       </article>
       <article class="reason">
         <span class="n">b · mine</span>
         <h3>My diary isn't anyone's data.</h3>
         <p>No sign-up, no login, no server of mine to keep it on. Entries, photos and voice notes live on the phone. Backup is something you turn on, and it goes to your own Google Drive.</p>
-        <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">A diary is the most personal thing on my phone. I didn’t want an account or a company between me and it, and I didn’t want to run a server either.</span></p>
+        <p>A diary is the most personal thing on my phone. I didn’t want an account or a company between me and it, and I didn’t want to run a server either.</p>
       </article>
       <article class="reason">
         <span class="n">c · feels like mine</span>
         <h3>A page I'd actually keep.</h3>
         <p>Drawing and writing on photos, stickers of real things, you and what you're looking at in one picture. Small things that make a page feel like a scrapbook, not a form.</p>
-        <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">A journal I’d keep looks more like a scrapbook than a form: a doodle on a photo, a ticket stuck on the page, my face in the corner of what I was looking at.</span></p>
+        <p>A journal I’d keep looks more like a scrapbook than a form: a doodle on a photo, a ticket stuck on the page, my face in the corner of what I was looking at.</p>
       </article>
     </div>
 
@@ -406,9 +400,9 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
     </div>
 
     <div class="names" aria-label="The app's names">
-      <div><span class="mono">first name</span><strong>Dear Diary</strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">The working name. Too plain to find in an app store, and it sounded like a children’s diary.</span></p></div>
-      <div><span class="mono">then</span><strong>Notica</strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">An invented word, so it could be searched for and trademarked, with a bit of “notice” in it.</span></p></div>
-      <div><span class="mono">since 1 Oct 2026</span><strong>Keppo Journal</strong><p>The second app in the Keppo family, after Keppo Moto. <span class="you" title="Drafted from the design docs and git history, not from you: check it">Keppo Moto already kept my rides; a journal that keeps my days belongs next to it.</span></p></div>
+      <div><span class="mono">first name</span><strong>Dear Diary</strong><p>The working name. Too plain to find in an app store, and it sounded like a children’s diary.</p></div>
+      <div><span class="mono">then</span><strong>Notica</strong><p>An invented word, so it could be searched for and trademarked, with a bit of “notice” in it.</p></div>
+      <div><span class="mono">since 1 Oct 2026</span><strong>Keppo Journal</strong><p>The second app in the Keppo family, after Keppo Moto. Keppo Moto already kept my rides; a journal that keeps my days belongs next to it.</p></div>
     </div>
   </div>
 </section>
@@ -418,7 +412,7 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
   <div class="wrap">
     <div class="kicker">02 · One moment, start to finish</div>
     <h2>Shoot first. It becomes a page later.</h2>
-    <p class="lede" style="margin-top:22px">One moment, followed through the app. <span class="you" title="Drafted from the design docs and git history, not from you: check it">An evening chai at a stall on Lantern Street, just after the rain. (A demo moment, staged for this page.)</span></p>
+    <p class="lede" style="margin-top:22px">One moment, followed through the app. An evening chai at a stall on Lantern Street, just after the rain. (A demo moment, staged for this page.)</p>
 
     <div class="moment-grid">
       <div class="steps">
@@ -487,7 +481,7 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
   <div class="wrap">
     <div class="kicker">03 · The fun bits</div>
     <h2>Things I made because I wanted them.</h2>
-    <p class="lede" style="margin-top:22px">None of these were on a roadmap. Each one started as "it would be nice if…". <span class="you" title="Drafted from the design docs and git history, not from you: check it">Four of them, and the reason each one exists.</span></p>
+    <p class="lede" style="margin-top:22px">None of these were on a roadmap. Each one started as "it would be nice if…". Four of them, and the reason each one exists.</p>
 
     <div class="bits">
       <article class="bit">
@@ -496,7 +490,7 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
           <span class="tag">Stickers</span>
           <h3>Stickers from real things.</h3>
           <p>Swipe up on the camera and it starts looking for shapes: a sign, a poster, a sticker on a laptop. Steady for a moment and the outline turns marigold; take it, and it's a sticker for your pages or a WhatsApp pack.</p>
-          <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">Signs and stickers I liked kept ending up as photos I never opened again. As stickers they go on my pages, and into WhatsApp.</span></p>
+          <p>Signs and stickers I liked kept ending up as photos I never opened again. As stickers they go on my pages, and into WhatsApp.</p>
         </div>
       </article>
       <article class="bit">
@@ -505,7 +499,7 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
           <span class="tag">Front + back</span>
           <h3>You and what you're looking at.</h3>
           <p>One press takes both cameras (on phones that can run both at once; others take one, then the other). Tap the little bubble to swap which one is big. Each photo keeps its own doodles and text, even after a swap.</p>
-          <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">A photo of a view never shows who was there. One press, and it’s both.</span></p>
+          <p>A photo of a view never shows who was there. One press, and it’s both.</p>
         </div>
       </article>
       <article class="bit">
@@ -514,7 +508,7 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
           <span class="tag">Lock screen</span>
           <h3>Capture without unlocking.</h3>
           <p>The moment doesn't wait for a fingerprint. Over the lock screen you get the camera, a quick note and the unsaved tray, with the same screens as usual. Everything you already kept stays behind the lock.</p>
-          <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">By the time I’d unlocked the phone, the moment had moved on.</span></p>
+          <p>By the time I’d unlocked the phone, the moment had moved on.</p>
         </div>
       </article>
       <article class="bit">
@@ -523,7 +517,7 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
           <span class="tag">Keppo Moto</span>
           <h3>Rides write themselves in.</h3>
           <p>Keppo Moto, my riding app, records the ride; the journal turns it into an entry with the route and the moments it filmed, by itself. Rename the ride in Moto and the entry follows, unless you renamed it yourself.</p>
-          <p><span class="you" title="Drafted from the design docs and git history, not from you: check it">I record every ride already. Typing it up again in a journal was never going to happen.</span></p>
+          <p>I record every ride already. Typing it up again in a journal was never going to happen.</p>
         </div>
       </article>
     </div>
@@ -563,7 +557,7 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
           <li>Designed the screens and the flow</li>
           <li>Decided what to build, and what to cut</li>
           <li>Tested every build on my phone</li>
-          <li><span class="you" title="Drafted from the design docs and git history, not from you: check it">Wrote the spec and the decisions log before any code, and kept them current</span></li>
+          <li>Wrote the spec and the decisions log before any code, and kept them current</li>
         </ul>
       </div>
       <div class="col ai">
@@ -610,12 +604,12 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
         <div class="media"><img src="media/screens/qs.webp" alt="The Keppo capture tile, with the phone locked" loading="lazy" decoding="async"></div>
       </article>
     </div>
-    <p class="mono" style="color:var(--faint);margin-top:14px"><span class="you" title="Drafted from the design docs and git history, not from you: check it">The two I picked. Others, just as real: widgets showing old states over new ones, and a Drive restore that can never lose the journal.</span></p>
+    <p class="mono" style="color:var(--faint);margin-top:14px">The two I picked. Others, just as real: widgets showing old states over new ones, and a Drive restore that can never lose the journal.</p>
 
     <div class="lessons">
-      <div><strong><span class="you" title="Drafted from the design docs and git history, not from you: check it">Say what, not how.</span></strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">I never told the AI how to build anything. I described what I wanted to happen on the screen, and what was wrong when it didn’t. That was enough.</span></p></div>
-      <div><strong><span class="you" title="Drafted from the design docs and git history, not from you: check it">The phone is the only real test.</span></strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">Tests catch logic. Only my own phone caught a black camera preview, a drag that died after a centimetre, a widget showing yesterday.</span></p></div>
-      <div><strong><span class="you" title="Drafted from the design docs and git history, not from you: check it">Write the decisions down.</span></strong><p><span class="you" title="Drafted from the design docs and git history, not from you: check it">Every session starts from zero. A handoff note and a log of why each call was made meant nothing got decided twice.</span></p></div>
+      <div><strong>Say what, not how.</strong><p>I never told the AI how to build anything. I described what I wanted to happen on the screen, and what was wrong when it didn’t. That was enough.</p></div>
+      <div><strong>The phone is the only real test.</strong><p>Tests catch logic. Only my own phone caught a black camera preview, a drag that died after a centimetre, a widget showing yesterday.</p></div>
+      <div><strong>Write the decisions down.</strong><p>Every session starts from zero. A handoff note and a log of why each call was made meant nothing got decided twice.</p></div>
     </div>
   </div>
 </section>
@@ -649,7 +643,7 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
 <section class="closing full-only">
   <div class="wrap">
     <h2>Every day, <mark>kept.</mark></h2>
-    <p class="lede" style="margin:18px auto 0"><span class="you" title="Drafted from the design docs and git history, not from you: check it">If the thing you want doesn’t exist, describe it clearly enough and it can be built. That part is still design.</span></p>
+    <p class="lede" style="margin:18px auto 0">If the thing you want doesn’t exist, describe it clearly enough and it can be built. That part is still design.</p>
     <button type="button" class="btn ghost" data-tlm="tldr">The one-minute version</button>
   </div>
 </section>
@@ -720,7 +714,6 @@ html[data-embedded] .tldr{padding-top:clamp(88px,10vw,120px)}
   if (params.get('review') === '1') {
     var items = [];
     document.querySelectorAll('[data-need]').forEach(function (el) { items.push(['media', el.getAttribute('data-need'), el]); });
-    document.querySelectorAll('.you').forEach(function (el) { items.push(['words', el.textContent.trim().slice(0, 90), el]); });
     var box = document.createElement('aside');
     box.className = 'review';
     box.innerHTML = '<button type="button" aria-label="Close">×</button><h4>Still needed: ' + items.length + '</h4><ol></ol>';

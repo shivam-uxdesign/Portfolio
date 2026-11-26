@@ -4,7 +4,7 @@
    only inside the portrait card (#bgrect / #bghalo) and --hh-accent. */
 
 .hats-hero, .hh-text, .work-peek {
-  --hh-accent: #8A9E7B;
+  --hh-accent: #3F63CF;
   --hh-shadow: rgba(20, 20, 18, .14);
   --hh-glow: rgba(255, 255, 255, 0);
 }

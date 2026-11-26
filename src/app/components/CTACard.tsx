@@ -15,7 +15,7 @@ export function CTACard() {
   const openMailto = () => {
     const subject = name.trim() ? `Hello from ${name.trim()}` : 'Hello from Portfolio';
     const body = message.trim() || `Hi Shivam,\n\n`;
-    window.location.href = `mailto:shvmshgl@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:shivam.uxd@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const handleSayHello = async () => {
