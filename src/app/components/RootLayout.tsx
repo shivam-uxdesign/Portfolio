@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router';
 import { trackPageview } from '../../lib/analytics';
 import { site, trips, useSite, type Travel } from '../../lib/site';
 import { themeVars } from '../../lib/theme';
-import { pageMeta } from '../../lib/pages';
+import { pageMeta, titleFor } from '../../lib/pages';
 import { PAL, type WearableId } from './hats/hatsData';
 import { pageScroll } from '../../lib/pageScroll';
 import { MiniHead, headBox, type Face } from './chrome/MiniHead';
@@ -58,6 +58,8 @@ export function RootLayout() {
   const path = location.pathname;
   const isHome = path === '/';
   const meta = pageMeta(path);
+  // Each page names itself in the tab, history and bookmarks.
+  useEffect(() => { document.title = titleFor(path); }, [path]);
   const hat = useSite(s => s.hat);
   const worn = useSite(s => s.worn);
   const tldr = useSite(s => s.tldr);

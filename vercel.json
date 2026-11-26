@@ -1,5 +1,12 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/:page(case-study/sales-case-card|case-study/rupyy-design-system|case-study/journey-studio|case-study/design-kit|case-study/illustration-studio|case-study/keppo-moto|case-study/keppo-journal|play/whatiswrongwithin|comics|drawings|music|movies|books|cool-stuff|stack)",
+      "destination": "/:page/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
