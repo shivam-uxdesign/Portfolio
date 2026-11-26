@@ -2,6 +2,7 @@
 // Run: node resume/build.cjs
 const { chromium } = require('playwright');
 const path = require('path');
+const { execFileSync } = require('child_process');
 (async () => {
   const b = await chromium.launch();
   const src = 'file://' + path.join(__dirname, 'resume.html');
@@ -14,4 +15,7 @@ const path = require('path');
     console.log(out, pages === 1 ? 'one page' : `${pages} PAGES: trim it`);
   }
   await b.close();
+  // Author, subject and keywords (Chromium only writes the title).
+  try { execFileSync('python3', [path.join(__dirname, 'set-meta.py'), path.join(__dirname, 'Shivam_Sehgal_Resume.pdf'), path.join(__dirname, 'Shivam_Sehgal_Resume_plain.pdf')], { stdio: 'inherit' }); }
+  catch (e) { console.warn('Could not set PDF metadata (needs: pip install pypdf):', e.message); }
 })();

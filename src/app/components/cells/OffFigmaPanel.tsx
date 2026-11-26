@@ -32,14 +32,14 @@ const EMBLEM = {
 
 const ROWS: { label: string; items: Interest[] }[] = [
   { label: 'Made by me', items: [
-    { label: 'Comics', line: "I've written", to: '/comics', color: '#7C4DFF', tint: '#EDE7F6', emblem: EMBLEM.comics },
+    { label: 'Comics', line: "I've drawn", to: '/comics', color: '#7C4DFF', tint: '#EDE7F6', emblem: EMBLEM.comics },
     { label: 'Drawings', line: "I've made", to: '/drawings', color: '#D81B7A', tint: '#FCE4EC', emblem: EMBLEM.drawings },
-    { label: 'Cool stuff', line: "I've built", to: '/cool-stuff', color: '#EF6C00', tint: '#FFF3E0', emblem: EMBLEM.cool },
+    { label: 'Cool stuff', line: 'made by hand', to: '/cool-stuff', color: '#EF6C00', tint: '#FFF3E0', emblem: EMBLEM.cool },
   ] },
   { label: 'Currently into', items: [
-    { label: 'Books', line: "I'm reading", to: '/books', color: '#689F38', tint: '#F1F8E9', emblem: EMBLEM.books },
+    { label: 'Books', line: "I'm (not) reading", to: '/books', color: '#689F38', tint: '#F1F8E9', emblem: EMBLEM.books },
     { label: 'Music', line: "I'm listening to", to: '/music', color: '#1976D2', tint: '#E3F2FD', emblem: EMBLEM.music },
-    { label: 'Movies', line: "I'm watching", to: '/movies', color: '#00838F', tint: '#E0F7FA', emblem: EMBLEM.movies },
+    { label: 'Watching', line: 'films, shows, anime', to: '/movies', color: '#00838F', tint: '#E0F7FA', emblem: EMBLEM.movies },
   ] },
 ];
 

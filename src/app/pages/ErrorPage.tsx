@@ -5,8 +5,8 @@ export function ErrorPage() {
   const error = useRouteError();
 
   let code = '404';
-  let title = 'Page not found';
-  let message = "The page you're looking for doesn't exist or may have moved.";
+  let title = 'Wrong turn.';
+  let message = 'Nothing lives at this address. The work is one tap away.';
 
   if (isRouteErrorResponse(error)) {
     code = String(error.status);
@@ -32,6 +32,7 @@ export function ErrorPage() {
         <ArrowLeft className="w-4 h-4" />
         Back to home
       </Link>
+      {code === '404' && <Link to="/#work" className="text-[13px] text-muted-foreground underline underline-offset-4 hover:text-foreground">Or straight to my work</Link>}
     </div>
   );
 }

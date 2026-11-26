@@ -9,7 +9,7 @@ const SERIF = "'Playfair Display', Georgia, serif";
 const FACTS = [
   { k: 'Trained', v: 'B.FA, JJ School of Art · M.Des, NIFT Delhi' },
   { k: 'Now', v: 'Product designer at Rupyy, from research to a shipped, adopted system' },
-  { k: 'Off the clock', v: 'Riding, cooking, learning 3D in Spline, and a cat with opinions' },
+  { k: 'Off the clock', v: 'Riding, cooking, learning 3D in Spline, and every cat I meet' },
 ];
 
 // Resting pose for each depth in the stack (top first). Only three show.

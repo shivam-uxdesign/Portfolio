@@ -7,7 +7,7 @@ const funProjects = [
     // The highlight: first in the list, so it is the featured card. A finished case
     // study; its page is public/case-studies/keppo-moto/, shown inside the portfolio.
     title: 'Keppo Moto',
-    description: 'A motorcycle app that keeps every ride, built with AI.',
+    description: 'In beta with 4 riders: a motorcycle app that keeps every ride.',
     tag: 'Case study · Built with AI',
     color: '#0A0A0B',
     image: '/case-studies/keppo-moto/img/og.jpg',
@@ -16,8 +16,8 @@ const funProjects = [
   },
   {
     title: 'Whatiswrongwith.in',
-    description: 'AI that roasts your text with brutal honesty',
-    tag: 'Vibe Coded',
+    description: 'Type anything. It tells you what’s wrong with it.',
+    tag: 'Fun project · Built with AI',
     color: '#DDE8F5',
     image: '/case-studies/thumbs/whatiswrongwith.jpg',
     link: '/play/whatiswrongwithin',
@@ -25,7 +25,7 @@ const funProjects = [
   {
     // Keppo Moto's sibling; its page is public/case-studies/keppo-journal/, shown inside the portfolio.
     title: 'Keppo Journal',
-    description: 'A journal that opens on the camera, built with AI.',
+    description: 'A journal that opens on the camera: catch the moment, write later.',
     tag: 'Case study · Built with AI',
     color: '#F7F7F5',
     image: '/case-studies/keppo-journal/media/og.jpg',

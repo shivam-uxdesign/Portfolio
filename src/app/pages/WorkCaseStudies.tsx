@@ -53,7 +53,7 @@ export function RupyySystemPage() {
         <p className="rs-label">The problem</p>
         <h2 className="rs-h2">Everything <Accent>queued</Accent> behind one person.</h2>
         <div className="rs-stats">
-          <div><b>2–3 days</b><span>a PM waited in the queue for one state graphic</span></div>
+          <div><b>1 day</b><span>of my design work for every state graphic, queued behind one designer</span></div>
           <div><b>6 days</b><span>to prototype a three-team journey in Figma, handovers untested</span></div>
           <div><b>43 tokens</b><span>where our tools and the Figma library disagreed</span></div>
         </div>

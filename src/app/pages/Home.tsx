@@ -175,7 +175,7 @@ const thumb = (slug: string) => <img src={`/case-studies/thumbs/${slug}.jpg`} al
 export const PROJECTS = [
   {
     title: 'Sales Case Card',
-    descriptor: 'A case card that tells a business manager whose move it is. 6 of 6 BMs preferred it.',
+    descriptor: '6 of 6 BMs preferred it: a case card that tells a business manager whose move it is.',
     number: '01', tag: 'Case study · Rupyy', bg: '#EFEBE3', link: '/case-study/sales-case-card', external: false,
     thumbnail: thumb('sales-case-card'),
   },
@@ -403,7 +403,7 @@ export function ContactCell() {
             Contact
             <span aria-hidden="true">·</span>
             <span className="inline-flex h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
-            Open to work
+            Open to conversations
           </p>
 
           <h2 className="text-[clamp(23px,7.2cqw,27px)] md:text-[36px] leading-[1.12] text-foreground" style={{ letterSpacing: '-0.02em' }}>
