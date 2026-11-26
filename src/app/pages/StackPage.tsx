@@ -283,7 +283,7 @@ export function StackContent({ standalone = false }: { standalone?: boolean }) {
         >
           <motion.div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: 'linear-gradient(120deg, transparent, rgba(138,158,123,0.18), transparent)' }}
+            style={{ background: 'linear-gradient(120deg, transparent, rgba(63,99,207,0.16), transparent)' }}
             animate={{ x: ['-100%', '200%'] }}
             transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut', repeatDelay: 2 }}
           />
